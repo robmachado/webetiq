@@ -1,0 +1,54 @@
+{
+    "name": "plastfoam/webetiq",
+    "type": "library",
+    "description": "Emissor de etiquetas.",
+    "keywords": [
+        "zpl",
+        "epl"
+    ],
+    "homepage": "https://www.plastfoam.com.br",
+    "license": [
+        "GPL-3.0+",
+        "LGPL-3.0+"
+    ],
+    "authors": [
+        {
+            "name": "Roberto L. Machado",
+            "email": "linux.rlm@gmail.com.br",
+            "homepage": "http://www.nfephp.org",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "ext-dom": "*",
+        "ext-xml": "*",
+        "ext-libxml": "*",
+        "ext-xmlreader": "*",
+        "ext-curl": "*",
+        "ext-soap": "*",
+        "ext-openssl": "*",
+        "ext-zip": "*",
+        "ext-zlib": "*",
+        "ext-fileinfo": "*",
+        "ext-iconv": "*",
+        "ext-mbstring": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "Webetiq\\": "src/"  
+        },
+        "psr-0": {
+            "": ["src/", "test/"]
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    },
+    "minimum-stability": "dev"
+}

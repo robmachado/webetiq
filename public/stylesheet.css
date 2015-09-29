@@ -1,0 +1,109 @@
+BODY { BACKGROUND-COLOR: #ffffff; MARGIN: 0px }
+BODY { COLOR: #000000; FONT-FAMILY: verdana,arial,helvetica; FONT-SIZE: 10px }
+DIV { COLOR: #000000; FONT-FAMILY: verdana,arial,helvetica; FONT-SIZE: 10px }
+TD { COLOR: #000000; FONT-FAMILY: verdana,arial,helvetica; FONT-SIZE: 10px }
+INPUT { COLOR: #000000; FONT-FAMILY: verdana,arial,helvetica; FONT-SIZE: 10px }
+SELECT { COLOR: #000000; FONT-FAMILY: verdana,arial,helvetica; FONT-SIZE: 10px }
+TEXTAREA { COLOR: #000000; FONT-FAMILY: verdana,arial,helvetica; FONT-SIZE: 10px }
+SELECT { BORDER-BOTTOM: #7f7f7f 1px solid; BORDER-LEFT: #7f7f7f 1px solid; BORDER-RIGHT: #7f7f7f 1px solid; BORDER-TOP: #7f7f7f 1px solid }
+TEXTAREA { BORDER-BOTTOM: #7f7f7f 1px solid; BORDER-LEFT: #7f7f7f 1px solid; BORDER-RIGHT: #7f7f7f 1px solid; BORDER-TOP: #7f7f7f 1px solid }
+TEXTAREA { OVERFLOW: auto }
+p { word-spacing: 0; margin: 0 }
+.font-preto { COLOR: #000000 }
+.font-cinza-1 { COLOR: #333333 }
+.font-cinza-2 { COLOR: #666666 }
+.font-cinza-3 { COLOR: #999999 }
+.font-cinza-4 { COLOR: #cccccc }
+.font-cinza-5 { COLOR: #313131 }
+.font-cinza-6 { COLOR: #595959 }
+.font-branco { COLOR: #ffffff }
+.font-cor_00 { COLOR: #65CCFE }
+.font-cor_01 { COLOR: #0896DE }
+.font-cor_02 { COLOR: #0173A9 }
+.font-0 { FONT-SIZE: 9px }
+.font-1 { FONT-SIZE: 10px }
+.font-11 { FONT-SIZE: 11px }
+.font-12 { FONT-SIZE: 12px }
+.font-2 { FONT-SIZE: 13px }
+.font-3 { FONT-SIZE: 16px }
+.font-4 { FONT-SIZE: 18px }
+.font-5 { FONT-SIZE: 24px }
+.font-6 { FONT-SIZE: 32px }
+.font-7 { FONT-SIZE: 48px }
+.line-height-0 { LINE-HEIGHT: 9px }
+.line-height-1 { LINE-HEIGHT: 10px }
+.line-height-2 { LINE-HEIGHT: 13px }
+.line-height-3 { LINE-HEIGHT: 16px }
+.line-height-4 { LINE-HEIGHT: 18px }
+.line-height-5 { LINE-HEIGHT: 24px }
+.line-height-6 { LINE-HEIGHT: 32px }
+.line-height-7 { LINE-HEIGHT: 48px }
+.bg-none { BACKGROUND-IMAGE: none }
+.bg-preto { BACKGROUND-COLOR: #000000 }
+.bg-branco { BACKGROUND-COLOR: #ffffff }
+.bg-gelo-1 { BACKGROUND-COLOR: #fcfcfc }
+.bg-cinza-1 { BACKGROUND-COLOR: #333333 }
+.bg-cinza-2 { BACKGROUND-COLOR: #666666 }
+.bg-cinza-3 { BACKGROUND-COLOR: #bfbfbf }
+.bg-cinza-4 { BACKGROUND-COLOR: #cccccc }
+.bg-cinza-5 { BACKGROUND-COLOR: #636363 }
+.bg-cinza-6 { BACKGROUND-COLOR: #7b7b7b }
+.bg-cinza-7 { BACKGROUND-COLOR: #e7e7e7 }
+.bg-cinza-8 { BACKGROUND-COLOR: #868686 }
+.bg-cinza-9 { BACKGROUND-COLOR: #a5a5a5 }
+.bg-cinza-10 { BACKGROUND-COLOR: #c2c2c2 }
+.bg-cinza-11 { BACKGROUND-COLOR: #888888 }
+.bg-cinza-12 { BACKGROUND-COLOR: #e5e5e5 }
+.bg-cinza-13 { BACKGROUND-COLOR: #d3d3d3 }
+.bg-bege-1 { BACKGROUND-COLOR: #f1cc74 }
+.bg-bege-2 { BACKGROUND-COLOR: #f2d181 }
+.bg-bege-3 { BACKGROUND-COLOR: #f5db9d }
+.bg-azul-1 { BACKGROUND-COLOR: #001298 }
+.bg-verde-1 { BACKGROUND-COLOR: #336600 }
+.bg-verde-2 { BACKGROUND-COLOR: #418200 }
+.bg-verde-3 { BACKGROUND-COLOR: #4a9500 }
+.bg-marrom-1 { BACKGROUND-COLOR: #663300 }
+.bg-marrom-2 { BACKGROUND-COLOR: #754719 }
+.bg-marrom-3 { BACKGROUND-COLOR: #a36323 }
+.bg-vermelho-1 { BACKGROUND-COLOR: #ff5959 }
+.bg-cor_00 { BACKGROUND-COLOR: #65CCFE }
+.bg-cor_01 { BACKGROUND-COLOR: #0896DE }
+.bg-cor_02 { BACKGROUND-COLOR: #0173A9 }
+.bg-amarelo-1 { BACKGROUND-COLOR: #ffff99 }
+.margin-submn { MARGIN: 0px 5px 0px 25px }
+.margin-int { MARGIN: 5px 30px 19px 20px }
+.margin-txt { MARGIN: 19px 0px 26px }
+.margin-pop { MARGIN: 10px }
+.margin-cx-txt { MARGIN: 10px 0px 10px 10px }
+.margin-cx-des { MARGIN: 20px 0px }
+A:link { COLOR: #000000; TEXT-DECORATION: none }
+A:visited { COLOR: #000000; TEXT-DECORATION: none }
+A:active { COLOR: #000000; TEXT-DECORATION: underline }
+A:hover { COLOR: #000000; TEXT-DECORATION: underline }
+A.link-submn:link { COLOR: #ffffff; TEXT-DECORATION: none }
+A.link-submn:visited { COLOR: #ffffff; TEXT-DECORATION: none }
+A.link-submn:active { COLOR: #ffffff; TEXT-DECORATION: none }
+A.link-submn:hover { COLOR: #ffffff; TEXT-DECORATION: none }
+A.link-preto:link { COLOR: #000000; TEXT-DECORATION: none }
+A.link-preto:visited { COLOR: #000000; TEXT-DECORATION: none }
+A.link-preto:active { COLOR: #000000; TEXT-DECORATION: underline }
+A.link-preto:hover { COLOR: #000000; TEXT-DECORATION: underline }
+A.link-preto-2:link { COLOR: #000000; TEXT-DECORATION: underline }
+A.link-preto-2:visited { COLOR: #000000; TEXT-DECORATION: underline }
+A.link-preto-2:active { COLOR: #000000; TEXT-DECORATION: none }
+A.link-preto-2:hover { COLOR: #000000; TEXT-DECORATION: none }
+A.link-branco:link { COLOR: #ffffff; TEXT-DECORATION: none }
+A.link-branco:visited { COLOR: #ffffff; TEXT-DECORATION: none }
+A.link-branco:active { COLOR: #ffffff; TEXT-DECORATION: underline }
+A.link-branco:hover { COLOR: #ffffff; TEXT-DECORATION: underline }
+A.link-cinza-1:link { COLOR: #313131; TEXT-DECORATION: none }
+A.link-cinza-1:visited { COLOR: #313131; TEXT-DECORATION: none }
+A.link-cinza-1:active { COLOR: #313131; TEXT-DECORATION: underline }
+A.link-cinza-1:hover { COLOR: #313131; TEXT-DECORATION: underline }
+A.link-cinza-2:link { COLOR: #666666; TEXT-DECORATION: none }
+A.link-cinza-2:visited { COLOR: #666666; TEXT-DECORATION: none }
+A.link-cinza-2:active { COLOR: #666666; TEXT-DECORATION: underline }
+A.link-cinza-2:hover { COLOR: #666666; TEXT-DECORATION: underline }
+.border-preto { BORDER-BOTTOM: #000000 1px solid; BORDER-LEFT: #000000 1px solid; BORDER-RIGHT: #000000 1px solid; BORDER-TOP: #000000 1px solid }
+.border-branco { BORDER-BOTTOM: #ffffff 1px solid; BORDER-LEFT: #ffffff 1px solid; BORDER-RIGHT: #ffffff 1px solid; BORDER-TOP: #ffffff 1px solid }
+

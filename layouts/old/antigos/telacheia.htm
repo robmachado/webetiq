@@ -1,0 +1,22 @@
+<html>
+<head>
+<script language="javascript">
+<!--
+funcrion Remote(){
+    var remote = null
+    remote = window.open('','vRemote','toolbar=yes, location=no,directories=no,status=no,menubar=no,scrollbars=no,resixeble=no,fullscreen=yes')
+    if (remote != null) {
+	if (remote.opener == null) {
+	    remote.opener = self
+	}
+	remote.location.href = 'http://linserver/mdb/sucata.php'    
+    }
+}
+//Remote();
+//history.go(-1); 
+// -->
+</script>
+</head>
+<body onload="window.open('http://linserver/mdb/sucata.php','vRemote','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizeble=no,fullscreen=yes')">
+</body>
+</html>

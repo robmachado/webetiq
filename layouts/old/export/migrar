@@ -1,0 +1,28 @@
+#!/bin/bash
+#####################
+# pacote mdbtools
+#####################
+# extrai do arquivo mdb o schema das tabelas
+#mdb-schema OP.mdb mysql > schema.sql
+#########################################
+rm -f OP.mdb
+cp /dados/producao/OP/OP.mdb OP.mdb
+rm -f sql/OP.sql
+rm -f sql/produtos.sql
+
+spro="produtos";
+sop="OP";
+for i in $( mdb-tables OP.mdb );
+ do echo $i;
+ #extrai dados da tabela OP
+ if [ $i = $sop ]; then
+    echo $i;
+    mdb-export -D "%Y-%m-%d %H:%M:%S" -H -I mysql OP.mdb $i > /var/www/mdb/export/sql/$i.sql;
+ fi
+ #extrai dados da tabela produtos
+ if [ $i = $spro ]; then
+    echo $i;
+    mdb-export -D "%Y-%m-%d %H:%M:%S" -H -I mysql OP.mdb $i > /var/www/mdb/export/sql/$i.sql;
+ fi
+done;
+
