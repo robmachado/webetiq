@@ -26,9 +26,7 @@ function OPFull() {
         alert("então, tá.");
         //window.location.href="migrarmdb.php?id=Full";
     }
-    
 }
-
 </script>
 <form method="POST" action="etiqueta.php">
 <div align="center">

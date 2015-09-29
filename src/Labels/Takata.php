@@ -1,6 +1,6 @@
 <?php
 
-namespace Webetiq;
+namespace Webetiq\Labels;
 
 /**
  * Description of TakataLabel
@@ -14,7 +14,7 @@ if (!defined('WEBETIQ_ROOT')) {
     define('WEBETIQ_ROOT', dirname(dirname(__FILE__)));
 }
 
-class TakataLabel
+class Takata
 {
     
     const GS = '\1D';

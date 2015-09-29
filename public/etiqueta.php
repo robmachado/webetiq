@@ -20,11 +20,6 @@ use Webetiq\Label;
 $remoteip = $_SERVER['REMOTE_ADDR'];
 $op = filter_input(INPUT_POST, 'op', FILTER_SANITIZE_STRING);
 
-if ($op == '') {
-    //retornar para paquina de op
-    header("location:op.php");
-}
-
 $copias = 1;
 $emissao = date('d/m/Y');
 
@@ -41,8 +36,13 @@ foreach ($aPrint as $printer) {
     $selPrint .= '<option value="'.$printer[0].'" '.$selp.'>'.$printer[0].'</option>';
 }
 $selPrint .= '</select>';
-//buscar dados da OP
-$lbl = $dbase->getStq($op);
+if (isset($op)) {
+    //buscar dados da OP
+    $lbl = $dbase->getStq($op);
+} else {
+    $lbl = new Label();
+}
+
 if ($lbl->volume != 1) {
     $lbl->volume += 1;
 }
@@ -159,6 +159,10 @@ $html = "<html>
           <tr>
             <td width=\"138\" align=\"right\">Doca</td>
             <td width=\"552\"><input type=\"text\" name=\"doca\" value =\"111\" size=\"16\" tabindex=\"3\" title=\"Plant/Dock\"></td>
+          </tr>
+          <tr>
+            <td width=\"138\" align=\"right\">Versão de Layout</td>
+            <td width=\"552\"><input type=\"text\" name=\"versao\" value =\"A001\" size=\"16\" tabindex=\"3\" title=\"Versão do layout\"></td>
           </tr>
           <tr>
             <td width=\"138\" align=\"right\">Cópias</td>

@@ -1,9 +1,9 @@
 <?php
 
-namespace Webetiq;
+namespace Webetiq\Labels;
 
 /**
- * Description of VisteonLabel
+ * Description of Visteon
  *
  * @author administrador
  */
@@ -13,7 +13,7 @@ if (!defined('WEBETIQ_ROOT')) {
     define('WEBETIQ_ROOT', dirname(dirname(__FILE__)));
 }
 
-class VisteonLabel
+class Visteon
 {
     
     public static $cod = '';
