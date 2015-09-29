@@ -25,7 +25,7 @@ class Label
     public $pesoBruto = 0;
     public $data = '';
     public $validade = '';
-    public $volume = 1;
+    public $volume = 0;
     public $qtdade = 0;
     public $unidade = '';
     public $emissao = '';

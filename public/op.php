@@ -28,6 +28,7 @@ function OPFull() {
     }
 }
 </script>
+<br>
 <form method="POST" action="etiqueta.php">
 <div align="center">
   <center>
@@ -40,22 +41,29 @@ function OPFull() {
     <tr>
       <td width="1"></td>
         <td bgcolor="#FFFFFF" width="400">
-        <div align="center">
+        <div>
           <table border="0" cellpadding="0" width="400">
             <tr>
-              <td align="right">Ordem de Produ&ccedil;&atilde;o</td>
-              <center>
-              <td><input type="text" name="op" id ="op" value="" size="20"></td>
+              <td align="left"><label for="op">Ordem de Produ&ccedil;&atilde;o</label><br><input type="text" name="op" id ="op" value="" size="20"></td>
               </tr>
               <tr>
-                <td></td>
-                <td></td>
+                <td align="left"><label for="volume">Volume</label><br><input type="text" name="volume" id ="volume" value="0" size="20"></td>
               </tr>
               <tr>
-                <td align="center"><input type="submit" value="Buscar" name="buscar"></td>
-                <td align="center"><input type="button" value="Recarrega dados das OPs" name="recarrega" onClick="processa();"></td>
-                <td align="center"><input type="button" value="Busca OP" name="buscaop" onClick="buscaOP();"></td>
-                <td align="center"><input type="button" value="Forçar Carga Completa" name="full" onClick="OPFull();"></td>
+                <td align="left"><input type="submit" value="Buscar" name="buscar"></td>
+              </tr>
+              <tr>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td></td>
+              </tr>
+              <tr>
+                <td align="right">
+                    <input type="button" value="Recarrega dados das OPs" name="recarrega" onClick="processa();"><br>
+                    <input type="button" value="Busca OP" name="buscaop" onClick="buscaOP();"><br>
+                    <input type="button" value="Forçar Carga Completa" name="full" onClick="OPFull();">
+                </td>
               </tr>
             </table>
           </div>

@@ -116,6 +116,8 @@ class DBaseLabel
             $lbl->ean = $dados[0]["mn_ean"];
             $lbl->peso = $dados[0]["mn_peso"];
             $lbl->tara = $dados[0]["mn_tara"];
+            $lbl->pesoLiq = $lbl->peso;
+            $lbl->pesoBruto = $lbl->peso + $lbl->tara;
             $lbl->qtdade = $dados[0]["mn_qtdade"];
             $lbl->data = $dados[0]["mn_fabricacao"];
             $lbl->validade = $dados[0]["mn_validade"];
@@ -129,8 +131,9 @@ class DBaseLabel
         return false;
     }
     
-    public function getMigrate($op)
+    public function getMigrate($op, $dbname = 'opmigrate')
     {
+        $this->connect('', $dbname);
         $sqlComm = "SELECT "
                 . "prod.codigo,"
                 . "prod.pacote,"
@@ -159,7 +162,7 @@ class DBaseLabel
             $lbl->peso = 0;
             $lbl->tara = 0;
             $lbl->qtdade = $row[0]['pacote'];
-            $lbl->data = convertData($row[0]['dataemissao']);
+            $lbl->data = $this->convertData($row[0]['dataemissao']);
             $lbl->validade = '';
             $lbl->volume = 1;
             $lbl->numdias = $row[0]['validade'];

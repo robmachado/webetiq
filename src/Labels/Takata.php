@@ -7,7 +7,6 @@ namespace Webetiq\Labels;
  *
  * @author administrador
  */
-//require_once 'Label.php';
 use Webetiq\Label;
 
 if (!defined('WEBETIQ_ROOT')) {

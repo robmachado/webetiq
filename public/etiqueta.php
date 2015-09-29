@@ -38,18 +38,12 @@ foreach ($aPrint as $printer) {
 $selPrint .= '</select>';
 if (isset($op)) {
     //buscar dados da OP
-    $lbl = $dbase->getStq($op);
+    $lbl = $dbase->getMigrate($op);
+    $stq = $dbase->getStq($op);
 } else {
     $lbl = new Label();
 }
-
-if ($lbl->volume != 1) {
-    $lbl->volume += 1;
-}
-if ($lbl->cliente == '') {
-    //buscar OP nova
-    $lbl = $dbase->getMigrate($op);
-}
+$lbl->volume = $stq->volume + 1;
 
 $html = "<html>
 <head>
