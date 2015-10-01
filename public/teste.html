@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dados da Etiqueta</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</head>
+<body contenteditable="true">
+<div class="container">
+    <form role="form" method="POST" action="print.php">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label for="op">Numero da OP</label>
+                    <input type="text" class="form-control" id="op" name="op" value="$lbl->op" placeholder="Entre com o número da OP">
+                </div>
+                <div class="form-group">
+                    <label for="qtdade">Quantidade</label>
+                    <input type="number" class="form-control" id="qtdade" name="qtdade" value="$lbl->qtdade" placeholder="Entre com a quantidade">
+                </div>
+                <div class="form-group">
+                    <label for="unidade">Unidade</label>
+                    <input type="text" class="form-control" id="unidade" name="unidade" value="$lbl->op" placeholder="Entre com a unidade de medida">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pesoBruto">Peso Bruto (kg)</label>
+                    <input type="number" class="form-control" id="pesoBruto" name="pesoBruto" value="$lbl->pesoBruto" placeholder="Entre com o peso bruto do pacote" onfocusout="calcula(this)">
+                </div>
+                <div class="form-group">
+                    <label for="tara">Tara (kg)</label>
+                    <input type="number" class="form-control" id="tara" name="tara" value="$lbl->tara" placeholder="Entre com a tara (peso da embalagem)" onfocusout="calcula(this)">
+                </div>
+                <div class="form-group">
+                    <label for="pesoLiq">Peso Líquido (kg)</label>
+                    <input type="number" class="form-control" id="pesoLiq" name="pesoLiq" value="$lbl->pesoLiq" placeholder="Entre com peso liquido (só produto)" onfocusout="calcula(this)">
+                </div>
+                <div class="form-group">
+                    <label for="copias">Número de Etiquetas</label>
+                    <input type="number" class="form-control" id="copias" name="copias" value="$lbl->copias" placeholder="Entre com o numero de etiquetas">
+                </div>
+                $selPrintGroup
+            </div>
+            <div class="col-md-2"></div>
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label for="cliente">Cliente</label>
+                    <input type="text" class="form-control" id="cliente" name="cliente" value="$lbl->cliente" placeholder="Entre com o nome do cliente">
+                </div>
+                <div class="form-group">
+                    <label for="cod">Código Interno</label>
+                    <input type="text" class="form-control" id="cod" name="cod" value="$lbl->cod" placeholder="Entre com o código interno do produto">
+                </div>
+                <div class="form-group">
+                    <label for="desc">Descrição do Produto</label>
+                    <input type="text" class="form-control" id="desc" name="desc" value="$lbl->desc" placeholder="Entre com a descrição do produto">
+                </div>
+                <div class="form-group">
+                    <label for="pedido">Pedido Interno</label>
+                    <input type="text" class="form-control" id="pedido" name="pedido" value="$lbl->pedido" placeholder="Entre com o número do pedido interno">
+                </div>
+                <div class="form-group">
+                    <label for="pedcli">Pedido do Cliente</label>
+                    <input type="text" class="form-control" id="pedcli" name="pedcli" value="$lbl->pedcli" placeholder="Entre com o número do pedido do cliente">
+                </div>
+                <div class="form-group">
+                    <label for="ean">Código GS1 do Produto</label>
+                    <input type="text" class="form-control" id="ean" name="ean" value="$lbl->ean" placeholder="Entre com o código GS1 do produto (EAN)">
+                </div>
+            </div>
+      </div>
+   </form>     
+</div>
+</body>
+</html>

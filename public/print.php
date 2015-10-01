@@ -92,42 +92,4 @@ $lbl->nf = $nf;
 $lbl->copias = $copias;
 
 
-$cliente = strtoupper($cliente);
 
-switch ($cliente) {
-    case 'VISTEON':
-        $tlbl = new \Webetiq\VisteonLabel();
-        $tlbl->setCopies($copias);
-        $tlbl->setLbl($lbl);
-        $tlbl->labelPrint($volume);
-        break;
-    case 'NEFAB':
-        $tlbl = new \Webetiq\NefabLabel();
-        $tlbl->setCopies($copias);
-        $tlbl->setLbl($lbl);
-        $tlbl->labelPrint($volume);
-        break;
-    case 'SOMAPLAST':
-        $tlbl = new \Webetiq\SomaplastLabel();
-        $tlbl->setCopies($copias);
-        $tlbl->setLbl($lbl);
-        $tlbl->labelPrint($volume);
-        break;
-    case 'CORRPACK':
-        $tlbl = new \Webetiq\CorrpackLabel();
-        $tlbl->setCopies($copias);
-        $tlbl->setLbl($lbl);
-        $tlbl->labelPrint($volume);
-        break;
-    case 'TAKATA':
-        $tlbl = new \Webetiq\TakataLabel();
-        $tlbl->setCopies($copias);
-        $tlbl->setLbl($lbl);
-        $tlbl->labelPrint($volume);
-        break;
-    default:
-        $tlbl = new \Webetiq\DefaultLabel();
-        $tlbl->setCopies($copias);
-        $tlbl->setLbl($lbl);
-        $tlbl->labelPrint($volume);
-}

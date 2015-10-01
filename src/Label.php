@@ -11,26 +11,26 @@ class Label
 {
     public $op = '';
     public $cliente = '';
-    public $codcli = '';
     public $pedido = '';
-    public $desc = '';
     public $pedcli = '';
-    public $pacote = '';
-    public $valor = '';
     public $cod = '';
+    public $codcli = '';
+    public $desc = '';
     public $ean = '';
     public $peso = 0;
-    public $tara = 0;
-    public $pesoLiq = 0;
-    public $pesoBruto = 0;
+    public $tara = '';
+    public $pesoLiq = '';
+    public $pesoBruto = '';
     public $data = '';
     public $validade = '';
-    public $volume = 0;
     public $qtdade = 0;
     public $unidade = '';
     public $emissao = '';
-    public $numdias = '360';
+    public $numdias = '365';
     public $doca = '111';
     public $nf = '';
+    public $valor = '';
+    public $pacote = '';
+    public $volume = 0;
     public $copias = 1;
 }

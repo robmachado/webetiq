@@ -9,10 +9,6 @@ namespace Webetiq\Labels;
  */
 use Webetiq\Label;
 
-if (!defined('WEBETIQ_ROOT')) {
-    define('WEBETIQ_ROOT', dirname(dirname(__FILE__)));
-}
-
 class Takata
 {
     
@@ -30,7 +26,7 @@ class Takata
     public static $dock = '111';
     public static $version = 'A001';
     public static $copies = 1;
-    public static $templatefile = WEBETIQ_ROOT.'/layouts/takata_2d_zpl.dat';
+    public static $templatefile = '/layouts/takata_2d_zpl.dat';
     public static $lbl;
     private static $bar2d = '';
     private static $bar1d = '';
