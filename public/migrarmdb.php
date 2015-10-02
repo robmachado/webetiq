@@ -5,8 +5,11 @@ require_once '../bootstrap.php';
 
 use Webetiq\DBaseLabel;
 
+$f = filter_input(INPUT_GET, 'f', FILTER_SANITIZE_STRING);
 $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
 
+echo $f;
+exit();
 //executa a migração dos dados do banco MDB
 // ../local/OP.mdb => ../sql/OP.sql 
 // e ../sql/produtos.sql
