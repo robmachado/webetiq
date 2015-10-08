@@ -14,9 +14,9 @@
 ^FT42,378
 ^A0N,51,40^FD{cod}^FS
 ^FT482,378
-^A0N,51,40^FD{lote}^FS
+^A0N,51,40^FD{numop}^FS
 ^FT42,448
-^A0N,28,39^FD{fabricacao}^FS
+^A0N,28,39^FD{emissao}^FS
 ^FT482,448
 ^A0N,28,39^FD{qtdade}^FS
 ^FO106,16

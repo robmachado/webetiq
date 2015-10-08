@@ -3,7 +3,7 @@ ini_set("display_errors", 1);
 error_reporting(E_ALL);
 require_once '../bootstrap.php';
 
-$op = filter_input(INPUT_POST, 'op', FILTER_SANITIZE_STRING);
+$numop = filter_input(INPUT_POST, 'numop', FILTER_SANITIZE_STRING);
 
 $script = "
 <script>
@@ -14,13 +14,13 @@ $script = "
     });
     $('#btn2').on('click', function(event) {
         event.preventDefault();
-        var op = document.getElementById('op').value;
-        if (op == '') {
+        var numop = document.getElementById('numop').value;
+        if (numop == '') {
             var message = 'Indique um numero de OP primeiro';
             var alerttype = 'alert-danger';
             showalert(message, alerttype);
         } else {    
-            var uri = 'migrarmdb.php?id='+document.getElementById('op').value;
+            var uri = 'migrarmdb.php?id='+document.getElementById('numop').value;
             var message = uri;
             var alerttype = 'alert-danger';
             showalert(message, alerttype);
@@ -59,7 +59,7 @@ $body = "
     </center>
     <form role=\"form\" method=\"POST\" action=\"etiqueta.php\">
         <div class=\"input-group\">
-            <input type=\"text\" class=\"form-control\" id=\"op\" name=\"op\" value=\"$op\" placeholder=\"Entre com o numero da OP\">
+            <input type=\"text\" class=\"form-control\" id=\"numop\" name=\"numop\" value=\"$numop\" placeholder=\"Entre com o numero da OP\">
                 <span class=\"input-group-btn\">
                     <button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-search\"></span> Busca </button>
                 </span>

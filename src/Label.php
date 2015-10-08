@@ -9,28 +9,24 @@ namespace Webetiq;
  */
 class Label
 {
-    public $op = '';
+    public $numop = '';
     public $cliente = '';
     public $pedido = '';
-    public $pedcli = '';
     public $cod = '';
-    public $codcli = '';
     public $desc = '';
     public $ean = '';
-    public $peso = 0;
+    public $pedcli = '';
+    public $codcli = '';
+    public $pesoBruto = '';
     public $tara = '';
     public $pesoLiq = '';
-    public $pesoBruto = '';
-    public $data = '';
+    public $emissao = '';
+    public $numdias = '365';
     public $validade = '';
     public $qtdade = 0;
     public $unidade = '';
-    public $emissao = '';
-    public $numdias = '365';
     public $doca = '111';
-    public $nf = '';
-    public $valor = '';
-    public $pacote = '';
+    public $numnf = '';
     public $volume = 0;
     public $copias = 1;
 }

@@ -10,10 +10,14 @@ namespace Webetiq;
  */
 
 use Webetiq\Label;
-use Webetiq\DBaseLabel;
+use Webetiq\Labels;
+use Webetiq\DBase;
 
 class Factory
 {
+    
+    private static $printer;
+    
     /**
      * A impressora pode ser uma
      * instalada na rede acessada via CUPS
@@ -33,9 +37,9 @@ class Factory
         // Intermec IPL,
         // DataMax DPL, etc.)
         //carrega classe de acesso a base de dados
-        $dbase = new Webetiq\DBaseLabel();
+        $dbase = new DBase();
         //carrega impressoras
-        $aPrint = $dbase->getPrinters($printer);
+        self::$printer = $dbase->getPrinter($printer);
     }
     
     /**
@@ -47,34 +51,25 @@ class Factory
         $cliente = strtoupper($lbl->cliente);
         switch ($cliente) {
             case 'VISTEON':
-                $tlbl = new \Webetiq\Labels\Visteon();
-                $tlbl->setLbl($lbl);
-                $tlbl->labelPrint();
+                $tlbl = new Labels\Visteon();
                 break;
             case 'NEFAB':
-                $tlbl = new \Webetiq\Labels\Nefab();
-                $tlbl->setLbl($lbl);
-                $tlbl->labelPrint();
+                $tlbl = new Labels\Nefab();
                 break;
             case 'SOMAPLAST':
-                $tlbl = new \Webetiq\Labels\Somaplast();
-                $tlbl->setLbl($lbl);
-                $tlbl->labelPrint();
+                $tlbl = new Labels\Somaplast();
                 break;
             case 'CORRPACK':
-                $tlbl = new \Webetiq\Labels\Corrpack();
-                $tlbl->setLbl($lbl);
-                $tlbl->labelPrint();
+                $tlbl = new Labels\Corrpack();
                 break;
             case 'TAKATA':
-                $tlbl = new \Webetiq\Labels\Takata();
-                $tlbl->setLbl($lbl);
-                $tlbl->labelPrint();
+                $tlbl = new Labels\Takata();
                 break;
             default:
-                $tlbl = new \Webetiq\Labels\Generic();
-                $tlbl->setLbl($lbl);
-                $tlbl->labelPrint();
+                $tlbl = new Labels\Generic();
         }
+        $tlbl->setPrinter(self::$printer);
+        $tlbl->setLbl($lbl);
+        $tlbl->labelPrint();
     }
 }

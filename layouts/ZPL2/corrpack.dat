@@ -34,13 +34,13 @@
 ^FT138,204
 ^A0N,34,47^FD{cliente}^FS
 ^FT42,272
-^A0N,28,39^FD{fabricacao}^FS
+^A0N,28,39^FD{emissao}^FS
 ^FT42,340
 ^A0N,34,47^FD{pedcli}^FS
 ^FT42,310
 ^A0N,17,23^FDPEDIDO^FS
 ^FT585,340
-^A0N,34,47^FD{lote}^FS
+^A0N,34,47^FD{numop}^FS
 ^FT42,412
 ^A0N,25,34^FD{desc}^FS
 ^FT285,340
@@ -52,9 +52,9 @@
 ^FT338,484
 ^A0N,34,47^FD{qtdade} {unidade}^FS
 ^FT338,564
-^A0N,34,47^FD{peso} kg^FS
+^A0N,34,47^FD{pesoLiq} kg^FS
 ^FT601,564
-^A0N,34,47^FD{pesobruto} kg^FS
+^A0N,34,47^FD{pesoBruto} kg^FS
 ^FT290,60
 ^A0N,34,33^FDSOLUCAO GLOBAL EM EMBALAGENS^FS
 ^FT402,92

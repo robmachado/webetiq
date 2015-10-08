@@ -21,7 +21,7 @@
 ^FT24,538
 ^A0N,31,42^FD{qtdade} {unidade}^FS
 ^FT607,538
-^A0N,31,42^FD{lote}^FS
+^A0N,31,42^FD{numop}^FS
 ^FT307,578
 ^A0N,23,31^FDIndustria Brasileira^FS
 ^FT24,488
@@ -29,15 +29,15 @@
 ^FT607,488
 ^A0N,23,31^FDLote^FS
 ^FT24,430
-^A0N,34,35^FD{nfnum}^FS
+^A0N,34,35^FD{numnf}^FS
 ^FT607,359
 ^A0N,23,31^FDData^FS
 ^FT607,409
-^A0N,31,42^FD{data}^FS
+^A0N,31,42^FD{emissao}^FS
 ^FT24,291
-^A0N,34,35^FD{occli}^FS
+^A0N,34,35^FD{pedcli}^FS
 ^FT607,287
-^A0N,34,35^FD{ocitem}^FS
+^A0N,34,35^FD{codcli}^FS
 ^FT24,171
 ^A0N,34,35^FD{desc}^FS
 ^PQ{copias},0,1,Y

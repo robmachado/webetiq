@@ -21,12 +21,22 @@ class DBase
     public $user = 'etiqueta';
     public $pass = 'forever';
     public $aPrinters = array();
+    public $aUnid = array();
     
     public function __construct($host = '', $dbname = '', $user = '', $pass = '')
     {
         if (!empty($host) && !empty($dbname) && !empty($user) && !empty($pass)) {
             $this->connect($host, $dbname, $user, $pass);
         }
+        $this->aUnid = array(
+            'pcs',
+            'cen',
+            'mil',
+            'kg',
+            'm',
+            'm²',
+            'bob',
+            'cj');
     }
     
     public function connect($host = '', $dbname = '', $user = '', $pass = '')
@@ -78,13 +88,32 @@ class DBase
         }
     }
     
-    public function getPrinters($printer = '')
+    public function getPrinter($printer = '')
+    {
+        if ($printer == '') {
+            return new Printer();
+        }
+        $this->connect('', $this->dbname);
+        $sqlComm = "SELECT * FROM printers WHERE printType = 'T' AND printBlock = '0'";
+        $sqlComm .= " AND printName = '$printer'";
+        $sqlComm .= " ORDER BY printName";
+        $sth = $this->conn->prepare($sqlComm);
+        $sth->execute();
+        $dados = $sth->fetchAll();
+        foreach ($dados as $printer) {
+            $objPrinter = new Printer();
+            foreach ($printer as $key => $field) {
+                $objPrinter->$key = $field;
+            }
+        }
+        $sth->closeCursor();
+        return $objPrinter;
+    }
+    
+    public function getAllPrinters()
     {
         $this->connect('', $this->dbname);
         $sqlComm = "SELECT * FROM printers WHERE printType = 'T' AND printBlock = '0'";
-        if ($printer != '') {
-            $sqlComm .= " AND printName = '$printer'";
-        }
         $sqlComm .= " ORDER BY printName";
         $sth = $this->conn->prepare($sqlComm);
         $sth->execute();
@@ -102,38 +131,34 @@ class DBase
     
     public function getStq($op = '1', $dbname = 'pbase')
     {
+        $lbl = new Label();
         $this->connect('', $dbname);
         $sqlComm = "SELECT * FROM mn_estoque WHERE mn_op = '$op' ORDER BY mn_volume DESC";
         $sth = $this->conn->prepare($sqlComm);
         $sth->execute();
         $dados = $sth->fetchAll();
         if (!empty($dados)) {
-            $lbl = new Label();
-            $lbl->op = $op;
-            $lbl->cliente = $dados[0]["mn_cliente"];
-            $lbl->codcli = $dados[0]["mn_cod_cli"];
+            $lbl->numop = $op;
             $lbl->pedido = $dados[0]["mn_pedido"];
-            $lbl->desc = $dados[0]["mn_desc"];
-            $lbl->pedcli = $dados[0]["mn_pedcli"];
-            $lbl->pacote = $dados[0]["mn_qtdade"];
-            $lbl->valor = $dados[0]["mn_valor"];
             $lbl->cod = $dados[0]["mn_cod"];
+            $lbl->desc = $dados[0]["mn_desc"];
             $lbl->ean = $dados[0]["mn_ean"];
-            $lbl->peso = $dados[0]["mn_peso"];
+            $lbl->cliente = $dados[0]["mn_cliente"];
+            $lbl->pedcli = $dados[0]["mn_pedcli"];
+            $lbl->codcli = $dados[0]["mn_cod_cli"];
+            $lbl->pesoLiq = $dados[0]["mn_peso"];
             $lbl->tara = $dados[0]["mn_tara"];
-            $lbl->pesoLiq = $lbl->peso;
-            $lbl->pesoBruto = $lbl->peso + $lbl->tara;
+            $lbl->pesoBruto = $lbl->pesoLiq + $lbl->tara;
             $lbl->qtdade = $dados[0]["mn_qtdade"];
-            $lbl->data = $dados[0]["mn_fabricacao"];
+            $lbl->unidade = $dados[0]["aux_unidade"];
+            $lbl->emissao = $dados[0]["mn_fabricacao"];
             $lbl->validade = $dados[0]["mn_validade"];
             $lbl->volume = ($dados[0]["mn_volume"]);
-            $lbl->unidade = $dados[0]["aux_unidade"];
-            $lbl->nf = '';
-            $sth->closeCursor();
-            return $lbl;
+            $lbl->numnf = '';
+            $lbl->copias = 1;
         }
         $sth->closeCursor();
-        return false;
+        return $lbl;
     }
     
     public function getMigrate($op, $dbname = 'opmigrate')
@@ -154,25 +179,25 @@ class DBase
         if (!empty($row)) {
             $unidade = $this->pushUnid($row[0]['unidade']);
             $lbl = new Label();
-            $lbl->op = $op;
-            $lbl->cliente = $row[0]['cliente'];
-            $lbl->codcli = $row[0]['codcli'];
+            $lbl->numop = $op;
             $lbl->pedido = $row[0]['pedido'];
-            $lbl->desc = $row[0]['produto'];
-            $lbl->pedcli = $row[0]['pedcli'];
-            $lbl->pacote = $row[0]['pacote'];
-            $lbl->valor = '';
             $lbl->cod = $row[0]['codigo'];
+            $lbl->desc = $row[0]['produto'];
             $lbl->ean = $row[0]['ean'];
-            $lbl->peso = 0;
-            $lbl->tara = 0;
+            $lbl->cliente = $row[0]['cliente'];
+            $lbl->pedcli = $row[0]['pedcli'];
+            $lbl->codcli = $row[0]['codcli'];
+            $lbl->pesoLiq = '';
+            $lbl->tara = '';
+            $lbl->pesoBruto = '';
             $lbl->qtdade = $row[0]['pacote'];
             $lbl->data = $this->convertData($row[0]['dataemissao']);
+            $lbl->numdias = $row[0]['validade'];
             $lbl->validade = '';
             $lbl->volume = 1;
-            $lbl->numdias = $row[0]['validade'];
             $lbl->unidade = $unidade;
-            $lbl->nf = '';
+            $lbl->numnf = '';
+            $lbl->copias = 1;
             return $lbl;
         }
         return false;
@@ -181,11 +206,11 @@ class DBase
     public function putProdutos($listaFile)
     {
         $aPL = array();
-        $aL = array();
+        $aList = array();
         //carregar uma matriz com os dados sql da tabela exportada
-        $aL = file($arquivo, FILE_IGNORE_NEW_LINES);
+        $aList = file($listaFile, FILE_IGNORE_NEW_LINES);
         //ordenar a tabela exportada pela descricao do produto
-        foreach ($aL as $sqlComm) {
+        foreach ($aList as $sqlComm) {
             $k = strpos($sqlComm, 'VALUES ("');
             $txt = substr($sqlComm, $k+9, 150);
             $atxt = explode('"', $txt);
@@ -212,11 +237,11 @@ class DBase
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
-        $i = 0;
-        $n = count($aNL);
-        echo "Serão inseridos $n registros em $table  - AGUARDE <BR>";
+        $iCount = 0;
+        $numLin = count($aNL);
+        echo "Serão inseridos $numLin registros em $table  - AGUARDE <BR>";
         foreach ($aNL as $key => $sqlComm) {
-            $i++;
+            $iCount++;
             $sqlComm = changeSQL($sqlComm, $table);
             try {
                 $stmt = $this->conn->prepare($sqlComm);
@@ -224,12 +249,12 @@ class DBase
             } catch (PDOException $e) {
                 echo $e->getMessage();
             }
-            echo "$i<br>";
+            echo "$iCount<br>";
             flush();
         }
     }
 
-    protected function cargaIncremental($aNL, $conn, $aProd = array())
+    protected function cargaIncremental($aNL, $aProd = array())
     {
         //###########################################
         //carga incremental somente para tabela OP
@@ -461,8 +486,8 @@ class DBase
         $demi = '';
         if ($data != '') {
             $aDT = explode(' ', $data);
-            $aD = explode('-', $aDT[0]);
-            $demi = $aD[2].'/'.$aD[1].'/'.$aD[0];
+            $aDH = explode('-', $aDT[0]);
+            $demi = $aDH[2].'/'.$aDH[1].'/'.$aDH[0];
         }
         return $demi;
     }
