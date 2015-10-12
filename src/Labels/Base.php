@@ -144,25 +144,27 @@ class Base
     
     public function labelPrint()
     {
-        $fim = self::$volume + self::$copies;
-        $this->setTemplate();
-        for ($iCount = self::$volume; $iCount < $fim; $iCount++) {
-            $etiq = $this->makeLabel($iCount);
-            $resp = $this->printInterface($etiq, $iCount);
-            
+        if (self::$template == '') {
+            $this->setTemplate();
         }
+        $etiq = $this->makeLabel($iCount);
+        $resp = $this->printInterface($etiq, $iCount);
         return $resp;
     }
     
     public function setTemplate()
     {
-        self::$templateFile = dirname(dirname(dirname(__FILE__))).'/layouts/' .
-            self::$printer->printLang .
-            DIRECTORY_SEPARATOR .
-            strtolower(self::$lbl->cliente) .
-            '.dat';
+        $templateFolder = dirname(dirname(dirname(__FILE__))). DIRECTORY_SEPARATOR
+            . 'layouts'
+            . DIRECTORY_SEPARATOR
+            . self::$printer->printLang
+            . DIRECTORY_SEPARATOR;
+        
+        self::$templateFile = $templateFolder . strtolower(self::$lbl->cliente) . '.dat';
         if (is_file(self::$templateFile)) {
             self::$template = file_get_contents(self::$templateFile);
+        } else {
+            self::$template = file_get_contents($templateFolder . 'Generic.dat');
         }
     }
     
@@ -209,6 +211,5 @@ class Base
     
     public function makeLabel($seqnum)
     {
-        return $seqnum;
     }
 }

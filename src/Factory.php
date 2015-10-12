@@ -29,7 +29,7 @@ class Factory
     public static function setPrinter($printer)
     {
         //buscar os dados referente a impressora na base de dados
-        //estabelecer qual interface usar (CUPS, REDE, QZ, etc.)
+        //estabelecer qual interface usar (CUPS, REDE, QZ, FILE, etc.)
         //estabelecer qual template usar:
         // Zebra ZPL2,
         // Zebra/Eltron ELP2,

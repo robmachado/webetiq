@@ -1,0 +1,1 @@
+Aqui devem ser colocados os layouts para etiquetas ARGOX, na linguagem PPLA

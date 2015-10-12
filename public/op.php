@@ -5,54 +5,11 @@ require_once '../bootstrap.php';
 
 $numop = filter_input(INPUT_POST, 'numop', FILTER_SANITIZE_STRING);
 
-$script = "
-<script>
-    $('#btn1').on('click', function(event) {
-        event.preventDefault();
-        //window.location.href=\"migrarmdb.php\";
-        alert('migrarmdb.php');
-    });
-    $('#btn2').on('click', function(event) {
-        event.preventDefault();
-        var numop = document.getElementById('numop').value;
-        if (numop == '') {
-            var message = 'Indique um numero de OP primeiro';
-            var alerttype = 'alert-danger';
-            showalert(message, alerttype);
-        } else {    
-            var uri = 'migrarmdb.php?id='+document.getElementById('numop').value;
-            var message = uri;
-            var alerttype = 'alert-danger';
-            showalert(message, alerttype);
-            //window.location.href=\"migrarmdb.php?id=\"+numop;
-        }    
-    });
-    $('#confirm-btn3').on('show.bs.modal', function(e) {
-        $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
-        $('.debug-url').html('Importar tudo novamente: <strong>' + $(this).find('.btn-ok').attr('href') + '</strong>');
-    });
+$script = "<script src=\"js/op.js\"></script>";
 
-    function showalert(message, alerttype) {
-        $('#alert_placeholder').append('<div id=\"alertdiv\" class=\"alert ' +  alerttype + '\"><a class=\"close\" data-dismiss=\"alert\">×</a><span>'+message+'</span></div>')
-        setTimeout(function() {
-            $(\"#alertdiv\").remove();
-        }, 5000);
-    }
-</script>
-";
+$title = "Busca OP";
 
-$head = "
-<head>
-    <title>Busca OP</title>
-    <meta charset=\"utf-8\">
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
-    <link rel=\"stylesheet\" href=\"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css\">
-    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js\"></script>
-    <script src=\"http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js\"></script>
-</head>";
-    
 $body = "
-<body>
 <div class=\"container\">
     <center>
     <h2>Gerador de Etiquetas</h2>
@@ -97,12 +54,10 @@ $body = "
         </div>
     </div>
 $script
-</body>";
+";
 
-$html = "<!DOCTYPE html>
-<html>
-$head
-$body
-</html>";
+$html = file_get_contents('main.html');
+$html = str_replace("{{title}}", $title, $html);
+$html = str_replace("{{content}}", $body, $html);
 
 echo $html;

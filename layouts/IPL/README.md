@@ -1,0 +1,1 @@
+Aqui devem ser colocados os layouts das etiquetas INTERMEC na linguagem IPL

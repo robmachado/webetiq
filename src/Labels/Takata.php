@@ -54,7 +54,6 @@ class Takata
         $this->setLot($lbl->op);
         $this->setPart($lbl->codcli);
         $this->setQtd($lbl->qtdade);
-        
     }
     
     public function setQtd($data)
@@ -112,16 +111,6 @@ class Takata
         self::$copies = $data;
     }
     
-    public function labelPrint($seqnum)
-    {
-        $fim = $seqnum+self::$copies;
-        for ($iC = $seqnum; $iC < $fim; $iC++) {
-            $etiq = $this->makeLabel($iC);
-            $filename = '/var/www/webetiq/local/'.self::$lot.'_'.$iC.'.prn';
-            file_put_contents($filename, $etiq);
-        }
-    }
-    
     public function makeLabel($seqnum)
     {
         //cria barcodes
@@ -164,6 +153,11 @@ class Takata
         self::$bar2d = $bar2d;
         self::make1D($licplate);
     }
+    
+    public static function make2DEPL2($seqnum)
+    {
+        
+    }
         
     /**
      * make1D
@@ -204,7 +198,7 @@ class Takata
             'lot' => array('C', 30, "0", STR_PAD_LEFT),
             'ped' => array('C', 10, "0", STR_PAD_LEFT),
             'supplier' => array('C', 7, "0", STR_PAD_LEFT),
-            'licplate' => array('C', 15, "0", STR_PAD_LEFT)
+            'licplate' => array('C', 16, "0", STR_PAD_LEFT)
         );
         if ($aFrom[$key][0] == 'N') {
             $value = number_format($value, 3, '.', '');

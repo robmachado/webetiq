@@ -14,6 +14,21 @@ foreach ($propNames as $key => $value) {
 }
 $printer = filter_input(INPUT_POST, 'printer', FILTER_SANITIZE_STRING);
 
+//verifica a interface
+// QZ então construir a etiqueta em base64
+// carregar o javascript que irá imprimir e colocar em 
+// body onLoad
+
+// se for LPR 
+
+//instancia Factory de labels
 $fact = new Factory();
+//estabelece a impressora
 $fact::setPrinter($printer);
-$fact::make($lbl);
+
+$total = $lbl->volume + $lbl->copias;
+for ($iCount = $lbl->volume; $iCount < $total; $iCount++) {
+    $fact::make($lbl);
+}
+
+//apos a impressão retornar
