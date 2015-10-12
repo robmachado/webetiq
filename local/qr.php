@@ -3,35 +3,49 @@ ini_set("display_errors", 1);
 error_reporting(E_ALL);
 require_once '../bootstrap.php';
 
-$text = '5b 29 3e 1e 30 36 1d 5a 41 30 30 31 1d 31 4a 30 36 33 34 37 30 31 35 31 30 30 36 34 30 30 1d 51 30 30 30 30 30 30 30 34 30 30 2e 30 30 30 1d 50 30 30 30 30 30 30 30 33 35 30 2d 30 31 30 33 1d 56 30 30 30 34 32 32 37 1d 31 54 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 36 33 34 37 30 1d 4b 30 30 30 30 4a 55 34 32 32 37 1e 04 0a';
+$text = '5b 29 3e 1e 30 36 1d 5a 41 30 30 31 1d 31 4a 30 36 33 34 37 30 31 35 31 30 30 36 30 30 33 1d 51 30 30 30 30 30 30 30 34 30 30 2e 30 30 30 1d 50 30 30 30 30 30 30 30 33 35 30 2d 30 31 30 33 1d 56 30 30 30 34 32 32 37 1d 31 54 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 36 33 34 37 30 1d 4b 30 30 30 30 4a 55 34 32 32 37 1e 04 0a';
+//$text = '5b 29 3e 1e 30 36 1d 5a 41 30 30 31 1d 31 4a 30 36 33 34 37 30 31 35 31 30 30 36 30 30 33 1d 51 30 30 30 30 30 30 30 34 30 30 2e 30 30 30 1d 50 30 30 30 30 30 30 30 33 35 30 2d 30 31 30 33 1d 56 30 30 30 34 32 32 37 1d 31 54 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 36 33 34 37 30 1d 4b 30 30 30 30 4a 55 34 32 32 37 1e 04 0a';
+//$text   = '5b 29 3e 1e 30 36 1d 5a 41 30 30 31 1d 31 4a 30 36 33 34 37 30 31 35 31 30 30 36 34 30 30 1d 51 30 30 30 30 30 30 30 34 30 30 2e 30 30 30 1d 50 30 30 30 30 30 30 30 33 35 30 2d 30 31 30 33 1d 56 30 30 30 34 32 32 37 1d 31 54 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 30 36 33 34 37 30 1d 4b 30 30 30 30 4a 55 34 32 32 37 1e 04 0a';
 $aList = explode(' ', $text);
 $newt = '';
 foreach($aList as $carhex) {
     $dec = (integer) hexdec($carhex);
     if ($dec > 32) {
         $newt .= chr($dec);
+        echo chr($dec);
     } else {
         switch ($dec) {
             case 4:
-                $carac = '<EOT>';
+                $carac = htmlspecialchars('<EOT>');
+                echo $carac;
                 break;
-            case 13:
-                $carac = '<CR>';
+            case 10:
+                $carac = htmlspecialchars('<LF>');
+                echo $carac;
                 break;
             case 28:
-                $carac = '<FS>';
+                $carac = htmlspecialchars('<FS>');
+                echo $carac;
                 break;
             case 29:
-                $carac = '<GS>';
+                $carac = htmlspecialchars('<GS>');
+                echo $carac.'<br>';
                 break;
             case 30:
-                $carac = '<RS>';
+                $carac = htmlspecialchars('<RS>');
+                echo $carac;
                 break;
         }
         $newt .= $carac;
     }
 }
-echo htmlspecialchars($newt);
+//$newt = htmlspecialchars($newt);
+//$aNew = explode('<GS>', $newt);
+//foreach ($aNew as $value) {
+    //$value = str_replace('GS', '<GS>', $value);
+//    echo htmlspecialchars($value.'<GS>').'<br>';    
+//}
+
 
 /*
 use Webetiq\Labels\Takata;
