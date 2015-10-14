@@ -93,7 +93,7 @@ class DBase
         if ($printer == '') {
             return new Printer();
         }
-        $this->connect('', $this->dbname);
+        $this->connect('', 'printers');
         $sqlComm = "SELECT * FROM printers WHERE printType = 'T' AND printBlock = '0'";
         $sqlComm .= " AND printName = '$printer'";
         $sqlComm .= " ORDER BY printName";

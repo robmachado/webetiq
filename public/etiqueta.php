@@ -65,7 +65,7 @@ foreach ($dbase->aUnid as $unid) {
 }
 $selUnidGroup .= '</select></div>';
 
-$script = "<script src=\"js/etiqueta.js\"></script>";
+$script = "<script type=\"text/javascript\" src=\"js/etiqueta.js\"></script>";
 
 $title = "Dados da OP";
 
@@ -74,12 +74,12 @@ $body = "
 <h2>Gerador de Etiquetas</h2>
 </center>
 <div class=\"container\">
-    <form role=\"form\" method=\"POST\" action=\"print.php\">
+    <form role=\"form\" name=\"form\" id=\"form\" method=\"POST\" action=\"process.php\">
         <div class=\"row\">
             <div class=\"col-md-5\">
                 <div class=\"form-group\">
                     <label for=\"numop\">Numero da OP</label>
-                    <input type=\"text\" class=\"form-control\" id=\"numop\" name=\"numop\" value=\"$lbl->numop\" placeholder=\"Entre com o número da OP\" >
+                    <input type=\"text\" class=\"form-control\" id=\"numop\" name=\"numop\" value=\"$lbl->numop\" placeholder=\"Entre com o número da OP\" readonly>
                 </div>
                 <div class=\"form-group\">
                     <label for=\"qtdade\">Quantidade na embalagem</label>
@@ -111,7 +111,7 @@ $body = "
                     <input type=\"number\" class=\"form-control\" id=\"copias\" name=\"copias\" value=\"$lbl->copias\" placeholder=\"Entre com o numero de etiquetas\" required>
                 </div>
                 $selPrintGroup
-                <button type=\"submit\" class=\"btn btn-info\"><span class=\"glyphicon glyphicon-print\"></span> Imprimir & Salvar </button>    
+                <button type=\"submit\" class=\"btn btn-info\"><span class=\"glyphicon glyphicon-print\"></span> Imprimir & Salvar </button>
             </div>
             <div class=\"col-md-2\"></div>
             <div class=\"col-md-5\">

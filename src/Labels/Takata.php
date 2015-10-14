@@ -8,10 +8,10 @@ namespace Webetiq\Labels;
  * @author administrador
  */
 use Webetiq\Label;
+use Webetiq\Labels\Base;
 
-class Takata
+class Takata extends Base
 {
-    
     const GS = '\1D';
     const RS = '\1E';
     const EOT = '\04';
@@ -28,10 +28,10 @@ class Takata
     public static $copies = 1;
     public static $templatefile = '';
     public static $lbl;
-    private static $bar2d = '';
-    private static $bar1d = '';
-    private static $licplate = '';
-    private static $propNames = '';
+    protected static $bar2d = '';
+    protected static $bar1d = '';
+    protected static $licplate = '';
+    protected static $propNames = '';
     
     public function __construct()
     {
@@ -40,18 +40,10 @@ class Takata
     
     public function setLbl(Label $lbl)
     {
-        self::$propNames = get_object_vars($lbl);
-        self::$lbl = $lbl;
-        foreach (self::$propNames as $key => $value) {
-            $metodo = 'set'. ucfirst($key);
-            if (method_exists($this, $metodo)) {
-                $this->$metodo($value);
-            }
-        }
-        $this->setQtd($lbl->pacote);
+        parent::setLbl($lbl);
         $this->setDesc($lbl->desc);
         $this->setDock($lbl->doca);
-        $this->setLot($lbl->op);
+        $this->setLot($lbl->numop);
         $this->setPart($lbl->codcli);
         $this->setQtd($lbl->qtdade);
     }
@@ -101,11 +93,6 @@ class Takata
         self::$datats = $data;
     }
 
-    public function setTemplate($data)
-    {
-        self::$templatefile = $data;
-    }
-
     public function setCopies($data)
     {
         self::$copies = $data;
@@ -116,7 +103,7 @@ class Takata
         //cria barcodes
         self::make2D($seqnum);
         //carrega template
-        $template = file_get_contents(self::$templatefile);
+        $template = self::$template;
         //substitui campos
         $template = str_replace('{bar2d}', self::$bar2d, $template);
         $template = str_replace('{bar1d}', self::$bar1d, $template);
@@ -165,7 +152,7 @@ class Takata
      */
     protected static function make1D($licplate)
     {
-        self::$bar1d = ">:1J>5$licplate";
+        self::$bar1d = $licplate;
     }
     
     /**

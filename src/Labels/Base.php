@@ -9,7 +9,7 @@ namespace Webetiq\Labels;
 use Webetiq\Label;
 use Webetiq\Printer;
 
-class Base
+abstract class Base
 {
     protected static $datats = 0;
     protected static $propNames = '';
@@ -36,7 +36,9 @@ class Base
     protected static $copias = 1;
     protected static $templateFile = '';
     protected static $template = '';
-    
+    protected static $printer;
+    protected static $buffer = array();
+
     public function __construct()
     {
         self::$datats = time();
@@ -141,17 +143,7 @@ class Base
     {
         self::$copias = $data;
     }
-    
-    public function labelPrint()
-    {
-        if (self::$template == '') {
-            $this->setTemplate();
-        }
-        $etiq = $this->makeLabel($iCount);
-        $resp = $this->printInterface($etiq, $iCount);
-        return $resp;
-    }
-    
+
     public function setTemplate()
     {
         $templateFolder = dirname(dirname(dirname(__FILE__))). DIRECTORY_SEPARATOR
@@ -160,12 +152,30 @@ class Base
             . self::$printer->printLang
             . DIRECTORY_SEPARATOR;
         
-        self::$templateFile = $templateFolder . strtolower(self::$lbl->cliente) . '.dat';
+        self::$templateFile = $templateFolder . strtolower(self::$cliente) . '.dat';
         if (is_file(self::$templateFile)) {
             self::$template = file_get_contents(self::$templateFile);
         } else {
             self::$template = file_get_contents($templateFolder . 'Generic.dat');
         }
+    }
+
+    abstract public function makeLabel($seqnum);    
+    
+    public function labelPrint()
+    {
+        if (self::$template == '') {
+            $this->setTemplate();
+        }
+        $total = self::$volume + self::$copias;
+        for ($iCount = self::$volume; $iCount < $total; $iCount++) {
+            $etiq = $this->makeLabel($iCount);
+            $this->printInterface($etiq, $iCount);
+        }
+        if (self::$printer->printInterface === 'QZ') {
+            return self::$buffer;
+        }
+        return true;
     }
     
     public function printInterface($etiq = '', $volume = 1)
@@ -179,37 +189,46 @@ class Base
             case 'QZ':
                 //manda para QZTray
                 //aqui a função tem que montar o envio
+                //carrega o buffer
+                return $this->printQZ($etiq, $volume);
                 break;
             case 'FILE':
                 //grava em file
-                $this->printFile($etiq, $volume);
+                return $this->printFile($etiq, $volume);
                 break;
             default:
                 //LPR
-                $this->printLPR($printer, $etiq, $volume);
+                return $this->printLPR($printer, $etiq, $volume);
         }
-        
+    }
+    
+    private function printQZ($etiq = '', $volume = 1)
+    {
+        self::$buffer[] = array('volume' => $volume, 'data' => base64_encode($etiq));
+        return true;
     }
     
     private function printFile($etiq = '', $volume = 1)
     {
-        $filename = dirname(dirname(__FILE__)).'/local/'.self::$numop.'_'.$volume.'.prn';
-        file_put_contents($filename, $etiq);
+        $filename = dirname(dirname(dirname(__FILE__))).'/local/'.self::$numop.'_'.$volume.'.prn';
+        if (! file_put_contents($filename, $etiq)) {
+            return false;
+        }
         return $filename;
     }
     
     private function printLPR($printer, $etiq, $volume)
     {
         $filename = $this->printFile($etiq, $volume);
-        $comando = "lpr -P $printer $filename";
-        // envia para impressora
-        //system($comando, $retorno);
-        //apagar arquivo temporario
-        unlink($filename);
-        return $retorno;
-    }
-    
-    public function makeLabel($seqnum)
-    {
+        if ($filename) {
+            $comando = "lpr -P $printer $filename";
+            // envia para impressora
+            $retorno = '';
+            //system($comando, $retorno);
+            //apagar arquivo temporario
+            unlink($filename);
+            return $retorno;
+        }
+        return false;
     }
 }

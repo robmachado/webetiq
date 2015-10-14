@@ -13,7 +13,8 @@ foreach ($propNames as $key => $value) {
     $lbl->$key = filter_input(INPUT_POST, $key, FILTER_SANITIZE_STRING);
 }
 $printer = filter_input(INPUT_POST, 'printer', FILTER_SANITIZE_STRING);
-
+echo $printer;
+exit();
 //verifica a interface
 // QZ então construir a etiqueta em base64
 // carregar o javascript que irá imprimir e colocar em 

@@ -22,7 +22,7 @@ class Factory
      * A impressora pode ser uma
      * instalada na rede acessada via CUPS
      * ou uma impressora LOCAL acessada via QZ
-     * Na base de dados esta indicado a linguagem usada pela 
+     * Na base de dados esta indicado a linguagem usada pela
      * impressora e a forma de acesso
      * @param string $printer
      */
@@ -70,6 +70,6 @@ class Factory
         }
         $tlbl->setPrinter(self::$printer);
         $tlbl->setLbl($lbl);
-        $tlbl->labelPrint();
+        return $tlbl->labelPrint();
     }
 }
