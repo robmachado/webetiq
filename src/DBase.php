@@ -90,8 +90,9 @@ class DBase
     
     public function getPrinter($printer = '')
     {
+        $objPrinter = new Printer();
         if ($printer == '') {
-            return new Printer();
+            return $objPrinter;
         }
         $this->connect('', 'printers');
         $sqlComm = "SELECT * FROM printers WHERE printType = 'T' AND printBlock = '0'";
@@ -112,7 +113,7 @@ class DBase
     
     public function getAllPrinters()
     {
-        $this->connect('', $this->dbname);
+        $this->connect('', 'printers');
         $sqlComm = "SELECT * FROM printers WHERE printType = 'T' AND printBlock = '0'";
         $sqlComm .= " ORDER BY printName";
         $sth = $this->conn->prepare($sqlComm);
