@@ -6,7 +6,7 @@ require_once '../bootstrap.php';
 use Webetiq\Label;
 use Webetiq\Factory;
 
-$printer = 'Local';
+$printer = 'newZebra';
 
 $lbl = new Label();
 $lbl->numop = '63470';
