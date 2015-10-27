@@ -9,13 +9,8 @@ namespace Webetiq\Labels;
  */
 use Webetiq\Label;
 
-if (!defined('WEBETIQ_ROOT')) {
-    define('WEBETIQ_ROOT', dirname(dirname(__FILE__)));
-}
-
 class Visteon
 {
-    
     public static $cod = '';
     public static $desc = '';
     public static $lote = '';
@@ -23,10 +18,9 @@ class Visteon
     public static $qtd = 0;
     public static $codcli = '';
     public static $datats = 0;
-    public static $templatefile = WEBETIQ_ROOT.'/layouts/visteon_zpl.dat';
+    public static $templatefile = '';
     public static $copies;
     public static $lbl;
-    
     
     public function __construct()
     {

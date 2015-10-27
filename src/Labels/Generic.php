@@ -25,7 +25,7 @@ class Generic
     public static $pesoLiq = 0;
     public static $codcli = '';
     public static $datats = 0;
-    public static $templatefile = WEBETIQ_ROOT.'/layouts/default_zpl.dat';
+    public static $templatefile = '';
     public static $copies;
     public static $lbl;
     public static $numNF = '';

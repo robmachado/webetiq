@@ -292,6 +292,13 @@ class DBase
         }
     }
     
+    public function cargaDiferencial($aNL)
+    {
+        foreach ($aNL as $key => $sqlComm) {
+            $sqlComm = changeSQL($sqlComm, 'OP');
+        }
+    }
+    
     /**
      * changeSQL
      * Ajusta o comando SQL extraido do arquivo MDB com o mdbtools

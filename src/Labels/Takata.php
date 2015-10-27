@@ -116,7 +116,7 @@ class Takata extends Base
         $template = str_replace('{lot}', self::formField('lot', self::$lot), $template);
         $template = str_replace('{licplate}', self::$licplate, $template);
         $template = str_replace('{version}', self::$version, $template);
-        $template = str_replace('{copies}', self::$copies, $template);
+        $template = str_replace('{copias}', self::$copies, $template);
         return $template;
     }
     

@@ -224,7 +224,7 @@ abstract class Base
             $comando = "lpr -P $printer $filename";
             // envia para impressora
             $retorno = '';
-            //system($comando, $retorno);
+            system($comando, $retorno);
             //apagar arquivo temporario
             unlink($filename);
             return $retorno;

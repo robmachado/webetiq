@@ -30,7 +30,7 @@ $(document).ready(function() {
         })
             // using the done promise callback
             .done(function(data) {
-
+                //se success == true e message == true voltar para pagina da op
                 // log data to the console so we can see
                 console.log(data); 
 
@@ -62,7 +62,7 @@ function calcula(param) {
 
 function valDate(param) {
     var emiss = document.getElementById("emissao").value;
-    alert(emiss);
+    //alert(emiss);
     //var d = new Date(year, month, day);
     //d.setMonth(d.getMonth() + 8);
 }
