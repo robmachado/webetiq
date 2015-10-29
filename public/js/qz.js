@@ -323,7 +323,7 @@ function printEPL() {
     qz.append('A310,86,0,3,1,1,N,"TEST PRINT SUCCESSFUL"\n');
     qz.append('A310,116,0,3,1,1,N,"FROM SAMPLE.HTML"\n');
     qz.append('A310,146,0,3,1,1,N,"QZINDUSTRIES.COM"\n');
-    qz.appendImage(getPath() + 'assets/img/image_sample_bw.png', 'EPL', 150, 300);
+    //qz.appendImage(getPath() + 'assets/img/image_sample_bw.png', 'EPL', 150, 300);
 
     // Automatically gets called when "qz.appendImage()" is finished.
     window['qzDoneAppending'] = function() {

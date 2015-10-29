@@ -32,7 +32,8 @@
         "ext-zlib": "*",
         "ext-fileinfo": "*",
         "ext-iconv": "*",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "zendframework/zend-barcode": "^2.5@dev"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0"
