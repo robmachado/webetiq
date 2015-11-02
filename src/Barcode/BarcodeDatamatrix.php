@@ -1,10 +1,5 @@
 <?php
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+namespace Webetiq\Barcode;
 
 /**
  * Description of BarcodeDatamatrix
@@ -13,43 +8,43 @@
  */
 class BarcodeDatamatrix
 {
-    static private $lengthRows = array(
+    private static $lengthRows = array(
         10, 12, 14, 16, 18, 20, 22, 24, 26,  // 24 squares et 6 rectangular
         32, 36, 40, 44, 48, 52, 64, 72, 80,  88, 96, 104, 120, 132, 144,
         8, 8, 12, 12, 16, 16);
-    static private $lengthCols = array(
+    private static $lengthCols = array(
         10, 12, 14, 16, 18, 20, 22, 24, 26,  // Number of columns for the entire datamatrix
         32, 36, 40, 44, 48, 52, 64, 72, 80, 88, 96, 104, 120, 132, 144,
         18, 32, 26, 36, 36, 48);
-    static private $dataCWCount = array(
+    private static $dataCWCount = array(
         3, 5, 8, 12,  18,  22,  30,  36,  // Number of data codewords for the datamatrix
         44, 62, 86, 114, 144, 174, 204, 280, 368, 456, 576, 696, 816, 1050,
         1304, 1558, 5, 10, 16, 22, 32, 49);
-    static private $solomonCWCount = array(
+    private static $solomonCWCount = array(
         5, 7, 10, 12, 14, 18, 20, 24, 28, // Number of Reed-Solomon codewords for the datamatrix
         36, 42, 48, 56, 68, 84, 112, 144, 192, 224, 272, 336, 408, 496, 620,
         7, 11, 14, 18, 24, 28);
-    static private $dataRegionRows = array(
+    private static $dataRegionRows = array(
         8, 10, 12, 14, 16, 18, 20, 22, // Number of rows per region
         24, 14, 16, 18, 20, 22, 24, 14, 16, 18, 20, 22, 24, 18, 20, 22,
         6,  6, 10, 10, 14, 14);
-    static private $dataRegionCols = array(
+    private static $dataRegionCols = array(
         8, 10, 12, 14, 16, 18, 20, 22, // Number of columns per region
         24, 14, 16, 18, 20, 22, 24, 14, 16, 18, 20, 22, 24, 18, 20, 22,
         16, 14, 24, 16, 16, 22);
-    static private $regionRows = array(
+    private static $regionRows = array(
         1, 1, 1, 1, 1, 1, 1, 1, // Number of regions per row
         1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 6, 6, 6,
         1, 1, 1, 1, 1, 1);
-    static private $regionCols = array(
+    private static $regionCols = array(
         1, 1, 1, 1, 1, 1, 1, 1, // Number of regions per column
         1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 6, 6, 6,
         1, 2, 1, 2, 2, 2);
-    static private $interleavedBlocks = array(
+    private static $interleavedBlocks = array(
         1, 1, 1, 1, 1, 1, 1, 1, // Number of blocks
         1, 1, 1, 1, 1, 1, 2, 2, 4, 4, 4, 4, 6, 6, 8, 8,
         1, 1, 1, 1, 1, 1);
-    static private $logTab = array(
+    private static $logTab = array(
         -255, 255, 1, 240, 2, 225, 241, 53, 3,  // Table of log for the Galois field
         38, 226, 133, 242, 43, 54, 210, 4, 195, 39, 114, 227, 106, 134, 28,
         243, 140, 44, 23, 55, 118, 211, 234, 5, 219, 196, 96, 40, 222, 115,
@@ -68,7 +63,7 @@ class BarcodeDatamatrix
         232, 21, 51, 238, 208, 131, 58, 69, 148, 18, 15, 16, 68, 17, 121, 149,
         129, 19, 155, 59, 249, 70, 214, 250, 168, 71, 201, 156, 64, 60, 237,
         130, 111, 20, 93, 122, 177, 150);
-    static private $aLogTab = array(
+    private static $aLogTab = array(
         1, 2, 4, 8, 16, 32, 64, 128, 45, 90, // Table of aLog for the Galois field
         180, 69, 138, 57, 114, 228, 229, 231, 227, 235, 251, 219, 155, 27, 54,
         108, 216, 157, 23, 46, 92, 184, 93, 186, 89, 178, 73, 146, 9, 18, 36,
@@ -88,25 +83,25 @@ class BarcodeDatamatrix
         221, 151, 3, 6, 12, 24, 48, 96, 192, 173, 119, 238, 241, 207, 179, 75,
         150, 1);
 
-    static private function champGaloisMult($a, $b)
+    private static function champGaloisMult($a, $b)
     {  // MULTIPLICATION IN GALOIS FIELD GF(2^8)
         if(!$a || !$b) return 0;
         return self::$aLogTab[(self::$logTab[$a] + self::$logTab[$b]) % 255];
     }
     
-    static private function champGaloisDoub($a, $b)
+    private static function champGaloisDoub($a, $b)
     {  // THE OPERATION a * 2^b IN GALOIS FIELD GF(2^8)
         if (!$a) return 0;
         if (!$b) return $a;
         return self::$aLogTab[(self::$logTab[$a] + $b) % 255];
     }
     
-    static private function champGaloisSum($a, $b)
+    private static function champGaloisSum($a, $b)
     { // SUM IN GALOIS FIELD GF(2^8)
         return $a ^ $b;
     }
 
-    static private function selectIndex($dataCodeWordsCount, $rectangular)
+    private static function selectIndex($dataCodeWordsCount, $rectangular)
     { // CHOOSE THE GOOD INDEX FOR TABLES
         if (($dataCodeWordsCount<1 || $dataCodeWordsCount>1558) && !$rectangular) return -1;
         if (($dataCodeWordsCount<1 || $dataCodeWordsCount>49) && $rectangular)  return -1;
@@ -117,7 +112,7 @@ class BarcodeDatamatrix
         return $n;
     }
     
-    static private function encodeDataCodeWordsASCII($text)
+    private static function encodeDataCodeWordsASCII($text)
     {
         $dataCodeWords = array();
         $n = 0;
@@ -139,7 +134,7 @@ class BarcodeDatamatrix
         return $dataCodeWords;
     }
 
-    static private function addPadCW(&$tab, $from, $to)
+    private static function addPadCW(&$tab, $from, $to)
     {
         if ($from >= $to) return ;
         $tab[$from] = 129;
@@ -149,7 +144,7 @@ class BarcodeDatamatrix
         }
     }
 
-    static private function calculSolFactorTable($solomonCWCount)
+    private static function calculSolFactorTable($solomonCWCount)
     { // CALCULATE THE REED SOLOMON FACTORS
         $g = array_fill(0, $solomonCWCount+1, 1);
         for($i = 1; $i <= $solomonCWCount; $i++) {
@@ -161,7 +156,7 @@ class BarcodeDatamatrix
         return $g;
     }
 
-    static private function addReedSolomonCW($nSolomonCW, $coeffTab, $nDataCW, &$dataTab, $blocks)
+    private static function addReedSolomonCW($nSolomonCW, $coeffTab, $nDataCW, &$dataTab, $blocks)
     { // Add the Reed Solomon codewords
         $errorBlocks = $nSolomonCW / $blocks;
         $correctionCW = array();
@@ -189,14 +184,14 @@ class BarcodeDatamatrix
         }
         return $dataTab;
     }
-    static private function getBits($entier){ // Transform integer to tab of bits
+    private static function getBits($entier){ // Transform integer to tab of bits
         $bits = array();
         for ($i=0; $i<8; $i++){
             $bits[$i] = $entier & (128 >> $i) ? 1 : 0;
         }
         return $bits;
     }
-    static private function next($etape, $totalRows, $totalCols, $codeWordsBits, &$datamatrix, &$assigned){ // Place codewords into the matrix
+    private static function next($etape, $totalRows, $totalCols, $codeWordsBits, &$datamatrix, &$assigned){ // Place codewords into the matrix
         $chr = 0; // Place of the 8st bit from the first character to [4][0]
         $row = 4;
         $col = 0;
@@ -243,7 +238,7 @@ class BarcodeDatamatrix
             $col += 1;
         } while (($row < $totalRows) || ($col < $totalCols));
     }
-    static private function patternShapeStandard(&$datamatrix, &$assigned, $bits, $row, $col, $totalRows, $totalCols){ // Place bits in the matrix (standard or special case)
+    private static function patternShapeStandard(&$datamatrix, &$assigned, $bits, $row, $col, $totalRows, $totalCols){ // Place bits in the matrix (standard or special case)
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[0], $row-2, $col-2, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[1], $row-2, $col-1, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[2], $row-1, $col-2, $totalRows, $totalCols);
@@ -253,7 +248,7 @@ class BarcodeDatamatrix
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[6], $row, $col-1, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[7], $row, $col, $totalRows, $totalCols);
     }
-    static private function patternShapeSpecial1(&$datamatrix, &$assigned, $bits, $totalRows, $totalCols ){
+    private static function patternShapeSpecial1(&$datamatrix, &$assigned, $bits, $totalRows, $totalCols ){
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[0], $totalRows-1,  0, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[1], $totalRows-1,  1, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[2], $totalRows-1,  2, $totalRows, $totalCols);
@@ -263,7 +258,7 @@ class BarcodeDatamatrix
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[6], 2, $totalCols-1, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[7], 3, $totalCols-1, $totalRows, $totalCols);
     }
-    static private function patternShapeSpecial2(&$datamatrix, &$assigned, $bits, $totalRows, $totalCols ){
+    private static function patternShapeSpecial2(&$datamatrix, &$assigned, $bits, $totalRows, $totalCols ){
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[0], $totalRows-3,  0, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[1], $totalRows-2,  0, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[2], $totalRows-1,  0, $totalRows, $totalCols);
@@ -273,7 +268,7 @@ class BarcodeDatamatrix
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[6], 0, $totalCols-1, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[7], 1, $totalCols-1, $totalRows, $totalCols);
     }
-    static private function patternShapeSpecial3(&$datamatrix, &$assigned, $bits, $totalRows, $totalCols ){
+    private static function patternShapeSpecial3(&$datamatrix, &$assigned, $bits, $totalRows, $totalCols ){
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[0], $totalRows-3,  0, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[1], $totalRows-2,  0, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[2], $totalRows-1,  0, $totalRows, $totalCols);
@@ -283,7 +278,7 @@ class BarcodeDatamatrix
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[6], 2, $totalCols-1, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[7], 3, $totalCols-1, $totalRows, $totalCols);
     }
-    static private function patternShapeSpecial4(&$datamatrix, &$assigned, $bits, $totalRows, $totalCols ){
+    private static function patternShapeSpecial4(&$datamatrix, &$assigned, $bits, $totalRows, $totalCols ){
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[0], $totalRows-1,  0, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[1], $totalRows-1, $totalCols-1, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[2], 0, $totalCols-3, $totalRows, $totalCols);
@@ -293,7 +288,7 @@ class BarcodeDatamatrix
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[6], 1, $totalCols-2, $totalRows, $totalCols);
         self::placeBitInDatamatrix($datamatrix, $assigned, $bits[7], 1, $totalCols-1, $totalRows, $totalCols);
     }
-    static private function placeBitInDatamatrix(&$datamatrix, &$assigned, $bit, $row, $col, $totalRows, $totalCols){ // Put a bit into the matrix
+    private static function placeBitInDatamatrix(&$datamatrix, &$assigned, $bit, $row, $col, $totalRows, $totalCols){ // Put a bit into the matrix
         if ($row < 0) {
             $row += $totalRows;
             $col += 4 - (($totalRows+4)%8);
@@ -307,35 +302,36 @@ class BarcodeDatamatrix
             $assigned[$row][$col] = 1;
         }
     }
-    static private function addFinderPattern($datamatrix, $rowsRegion, $colsRegion, $rowsRegionCW, $colsRegionCW){ // Add the finder pattern
+    
+    private static function addFinderPattern($datamatrix, $rowsRegion, $colsRegion, $rowsRegionCW, $colsRegionCW)
+    {
+        // Add the finder pattern
         $totalRowsCW = ($rowsRegionCW+2) * $rowsRegion;
         $totalColsCW = ($colsRegionCW+2) * $colsRegion;
-
         $datamatrixTemp = array();
         $datamatrixTemp[0] = array_fill(0, $totalColsCW+2, 0);
-
-        for ($i=0; $i<$totalRowsCW; $i++){
+        for ($i=0; $i<$totalRowsCW; $i++) {
             $datamatrixTemp[$i+1] = array();
             $datamatrixTemp[$i+1][0] = 0;
             $datamatrixTemp[$i+1][$totalColsCW+1] = 0;
-            for ($j=0; $j<$totalColsCW; $j++){
-                if ($i%($rowsRegionCW+2) == 0){
-                    if ($j%2 == 0){
+            for ($j=0; $j<$totalColsCW; $j++) {
+                if ($i%($rowsRegionCW+2) == 0) {
+                    if ($j%2 == 0) {
                         $datamatrixTemp[$i+1][$j+1] = 1;
                     } else {
                         $datamatrixTemp[$i+1][$j+1] = 0;
                     }
-                } else if ($i%($rowsRegionCW+2) == $rowsRegionCW+1){
+                } else if ($i%($rowsRegionCW+2) == $rowsRegionCW+1) {
                     $datamatrixTemp[$i+1][$j+1] = 1;
-                } else if ($j%($colsRegionCW+2) == $colsRegionCW+1){
-                    if ($i%2 == 0){
+                } else if ($j%($colsRegionCW+2) == $colsRegionCW+1) {
+                    if ($i%2 == 0) {
                         $datamatrixTemp[$i+1][$j+1] = 0;
                     } else {
                         $datamatrixTemp[$i+1][$j+1] = 1;
                     }
-                } else if ($j%($colsRegionCW+2) == 0){
+                } else if ($j%($colsRegionCW+2) == 0) {
                     $datamatrixTemp[$i+1][$j+1] = 1;
-                } else{
+                } else {
                     $datamatrixTemp[$i+1][$j+1] = 0;
                     $datamatrixTemp[$i+1][$j+1] = $datamatrix[$i-1-(2*(floor($i/($rowsRegionCW+2))))][$j-1-(2*(floor($j/($colsRegionCW+2))))]; // todo : parseInt => ?
                 }
@@ -347,8 +343,11 @@ class BarcodeDatamatrix
         }
         return $datamatrixTemp;
     }
-    static public function getDigit($text, $rectangular){
-        $dataCodeWords = self::encodeDataCodeWordsASCII($text); // Code the text in the ASCII mode
+
+    public static function getDigit($text, $rectangular)
+    {
+        // Code the text in the ASCII mode
+        $dataCodeWords = self::encodeDataCodeWordsASCII($text);
         $dataCWCount = count($dataCodeWords);
         $index = self::selectIndex($dataCWCount, $rectangular); // Select the index for the data tables
         $totalDataCWCount = self::$dataCWCount[$index]; // Number of data CW
@@ -360,27 +359,26 @@ class BarcodeDatamatrix
         $colsRegion = self::$regionCols[$index];
         $rowsRegionCW = self::$dataRegionRows[$index];
         $colsRegionCW = self::$dataRegionCols[$index];
-        $rowsLengthMatrice = $rowsTotal-2*$rowsRegion; // Size of matrice data
+        // Size of matrice data
+        $rowsLengthMatrice = $rowsTotal-2*$rowsRegion;
         $colsLengthMatrice = $colsTotal-2*$colsRegion;
-        $blocks = self::$interleavedBlocks[$index];  // Number of Reed Solomon blocks
+        // Number of Reed Solomon blocks
+        $blocks = self::$interleavedBlocks[$index];
         $errorBlocks = $solomonCWCount / $blocks;
-
-        self::addPadCW($dataCodeWords, $dataCWCount, $totalDataCWCount); // Add codewords pads
-
-        $g = self::calculSolFactorTable($errorBlocks); // Calculate correction coefficients
-
-        self::addReedSolomonCW($solomonCWCount, $g, $totalDataCWCount, $dataCodeWords, $blocks); // Add Reed Solomon codewords
-
+        // Add codewords pads
+        self::addPadCW($dataCodeWords, $dataCWCount, $totalDataCWCount);
+        // Calculate correction coefficients
+        $g = self::calculSolFactorTable($errorBlocks);
+        // Add Reed Solomon codewords
+        self::addReedSolomonCW($solomonCWCount, $g, $totalDataCWCount, $dataCodeWords, $blocks);
         $codeWordsBits = array(); // Calculte bits from codewords
-        for ($i=0; $i<$totalCWCount; $i++){
+        for ($i=0; $i<$totalCWCount; $i++) {
             $codeWordsBits[$i] = self::getBits($dataCodeWords[$i]);
         }
-
         $datamatrix = array_fill(0, $colsLengthMatrice, array());
         $assigned = array_fill(0, $colsLengthMatrice, array());
-
         // Add the bottom-right corner if needed
-        if ( (($rowsLengthMatrice * $colsLengthMatrice) % 8) == 4) {
+        if ((($rowsLengthMatrice * $colsLengthMatrice) % 8) == 4) {
             $datamatrix[$rowsLengthMatrice-2][$colsLengthMatrice-2] = 1;
             $datamatrix[$rowsLengthMatrice-1][$colsLengthMatrice-1] = 1;
             $datamatrix[$rowsLengthMatrice-1][$colsLengthMatrice-2] = 0;
@@ -390,13 +388,10 @@ class BarcodeDatamatrix
             $assigned[$rowsLengthMatrice-1][$colsLengthMatrice-2] = 1;
             $assigned[$rowsLengthMatrice-2][$colsLengthMatrice-1] = 1;
         }
-
         // Put the codewords into the matrix
-        self::next(0,$rowsLengthMatrice,$colsLengthMatrice, $codeWordsBits, $datamatrix, $assigned);
-
+        self::next(0, $rowsLengthMatrice, $colsLengthMatrice, $codeWordsBits, $datamatrix, $assigned);
         // Add the finder pattern
         $datamatrix = self::addFinderPattern($datamatrix, $rowsRegion, $colsRegion, $rowsRegionCW, $colsRegionCW);
-
         return $datamatrix;
     }
 }

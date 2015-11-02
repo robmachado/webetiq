@@ -1,25 +1,28 @@
 <?php
+namespace Webetiq\Barcode;
 
+class Barcode
+{
 
-class Barcode {
-
-    static public function gd($res, $color, $x, $y, $angle, $type, $datas, $width = null, $height = null){
-        return self::_draw(__FUNCTION__, $res, $color, $x, $y, $angle, $type, $datas, $width, $height);
+    public static function gd($res, $color, $x, $y, $angle, $type, $datas, $width = null, $height = null)
+    {
+        return self::draw(__FUNCTION__, $res, $color, $x, $y, $angle, $type, $datas, $width, $height);
     }
 
-    static public function fpdf($res, $color, $x, $y, $angle, $type, $datas, $width = null, $height = null){
-        return self::_draw(__FUNCTION__, $res, $color, $x, $y, $angle, $type, $datas, $width, $height);
+    public static function fpdf($res, $color, $x, $y, $angle, $type, $datas, $width = null, $height = null)
+    {
+        return self::draw(__FUNCTION__, $res, $color, $x, $y, $angle, $type, $datas, $width, $height);
     }
 
-    static private function _draw($call, $res, $color, $x, $y, $angle, $type, $datas, $width, $height){
+    private static function draw($call, $res, $color, $x, $y, $angle, $type, $datas, $width, $height)
+    {
         $digit = '';
         $hri   = '';
         $code  = '';
         $crc   = true;
         $rect  = false;
         $b2d   = false;
-
-        if (is_array($datas)){
+        if (is_array($datas)) {
             foreach(array('code' => '', 'crc' => true, 'rect' => false) as $v => $def){
                 $$v = isset($datas[$v]) ? $datas[$v] : $def;
             }
@@ -214,11 +217,12 @@ class Barcode {
         $y = $x1 * $sin + $y1 * $cos;
     }
 
-    static public function rotate($x1, $y1, $angle , &$x, &$y){
+    public static function rotate($posX1, $posY1, $angle , &$posX, &$posY)
+    {
         $angle = deg2rad(-$angle);
         $cos = cos($angle);
         $sin = sin($angle);
-        $x = $x1 * $cos - $y1 * $sin;
-        $y = $x1 * $sin + $y1 * $cos;
+        $posX = $posX1 * $cos - $posY1 * $sin;
+        $posY = $posX1 * $sin + $posY1 * $cos;
     }
 }
