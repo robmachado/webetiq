@@ -18,7 +18,8 @@ $(document).ready(function() {
     // process the form
     $('form').submit(function(event) {
         // get the form data
-        // there are many ways to get this data using jQuery (you can use the class or id also)
+        // there are many ways to get this data using 
+        // jQuery (you can use the class or id also)
         var formData = $( 'form' ).serialize();
         // process the form
         $.ajax({
@@ -26,14 +27,22 @@ $(document).ready(function() {
             url         : 'process.php', // the url where we want to POST
             data        : formData, // our data object
             dataType    : 'json', // what type of data do we expect back from the server
-                        encode          : true
+            encode      : true
         })
             // using the done promise callback
             .done(function(data) {
                 //se success == true e message == true voltar para pagina da op
                 // log data to the console so we can see
-                console.log(data); 
-
+                var index;
+                var a = data['message'];
+                var leng = a.length;
+                for (index = 0; index < leng; ++index) {
+                    var b64 = a[index]['data'];
+                    console.log(b64);
+                    //printEtiq(b64);
+                }
+                //console.log(data['message'][0]['data']); 
+                
                 // here we will handle errors and validation messages
             });
 
@@ -42,7 +51,12 @@ $(document).ready(function() {
     });
 });
 
-
+function printEtiq(data) {
+    if (notReady()) { return; }
+    qz.append64(data);
+    qz.print();
+}
+    
 function calcula(param) {
     var id = param.id;
     var pb = document.getElementById("pesoBruto").value;
