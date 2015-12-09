@@ -42,7 +42,7 @@ $objPrinter = new Printer($printer);
 //carrega Render(Label, Printer)
 //carrega Job(Render)
 
-
+/*
 //instancia Factory de labels
 $fact = new Factory();
 //estabelece a impressora
@@ -59,3 +59,4 @@ if (empty($aRet)) {
     $aRet = array('success' => true, 'message' => $aRet);
 }
 echo json_encode($aRet);
+*/

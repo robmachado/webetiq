@@ -11,6 +11,7 @@ class Render
     protected $lbl;
     protected $printer;
     protected $layoutFolder = '';
+    protected $objLayout;
 
     public function __construct(Labels $lbl, Printer $printer)
     {
@@ -18,7 +19,7 @@ class Render
         $this->printer = $printer;
         //estabelecer o folder dos layouts com base na linguagem da printer
         $this->layoutFolder = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'layouts' . DIRECTORY_SEPARATOR .  $printer->printLang .DIRECTORY_SEPARATOR;
-        $this->loadLayout();
+        $this->objLayout = $this->loadLayout();
     }
     
     public function getCopies()
@@ -49,5 +50,10 @@ class Render
                 $tlbl = new Labels\Generic($this->layoutFolder);
         }
         return $tlbl;
+    }
+    
+    public function send()
+    {
+        
     }
 }

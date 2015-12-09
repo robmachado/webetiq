@@ -1,13 +1,7 @@
 <?php
 namespace Webetiq\Labels;
 
-/**
- * Base
- *
- * @author administrador
- */
-use Webetiq\Label;
-use Webetiq\Printer;
+use Webetiq\Models\Label;
 
 abstract class Base
 {
@@ -34,20 +28,20 @@ abstract class Base
     protected static $numnf = '';
     protected static $volume = 0;
     protected static $copias = 1;
-    protected static $templateFile = '';
+    protected static $template = '';
     protected static $template = '';
     protected static $printer;
     protected static $buffer = array();
 
-    public function __construct()
-    {
-        self::$datats = time();
-    }
-    
+    //public function __construct();
+    /*
     public function setPrinter(Printer $printer)
     {
         self::$printer = $printer;
     }
+     * 
+     */
+    
     
     public function setLbl(Label $lbl)
     {
@@ -75,75 +69,93 @@ abstract class Base
     {
         self::$pedido = $data;
     }
+    
     public function setCod($data)
     {
         self::$cod = $data;
     }
+    
     public function setDesc($data)
     {
         self::$desc = $data;
     }
+    
     public function setEan($data)
     {
         self::$ean = $data;
     }
+    
     public function setPedcli($data)
     {
         self::$pedcli = $data;
     }
+    
     public function setCodcli($data)
     {
         self::$codcli = $data;
     }
+    
     public function setPesoBruto($data)
     {
         self::$pesoBruto = $data;
     }
+    
     public function setTara($data)
     {
         self::$tara = $data;
     }
+    
     public function setPesoLiq($data)
     {
         self::$pesoLiq = $data;
     }
+    
     public function setEmissao($data)
     {
         self::$emissao = $data;
     }
+    
     public function setNumdias($data)
     {
         self::$numdias = $data;
     }
+    
     public function setValidade($data)
     {
         self::$validade = $data;
     }
+    
     public function setQtdade($data)
     {
         self::$qtdade = $data;
     }
+    
     public function setUnidade($data)
     {
         self::$unidade = $data;
     }
+    
     public function setDoca($data)
     {
         self::$doca = $data;
     }
+    
     public function setNumnf($data)
     {
         self::$numnf = $data;
     }
+    
     public function setVolume($data)
     {
         self::$volume = $data;
     }
+    
     public function setCopias($data)
     {
         self::$copias = $data;
     }
 
+    /*
     public function setTemplate()
     {
         $templateFolder = dirname(dirname(dirname(__FILE__))). DIRECTORY_SEPARATOR
@@ -159,9 +171,17 @@ abstract class Base
             self::$template = file_get_contents($templateFolder . 'Generic.dat');
         }
     }
+     * 
+     */
 
-    abstract public function makeLabel($seqnum);    
+    public function setTemplate($data)
+    {
+        self::$template = file_get_contents($data);
+    }
     
+    abstract public function renderize($seqnum);    
+    
+    /*
     public function labelPrint()
     {
         if (self::$template == '') {
@@ -230,5 +250,19 @@ abstract class Base
             return $retorno;
         }
         return false;
+    }
+     * 
+     */
+    
+    public function cleanString($texto = '')
+    {
+        $texto = trim($texto);
+        $aFind = array('&','á','à','ã','â','é','ê','í','ó','ô','õ','ú','ü',
+            'ç','Á','À','Ã','Â','É','Ê','Í','Ó','Ô','Õ','Ú','Ü','Ç');
+        $aSubs = array('e','a','a','a','a','e','e','i','o','o','o','u','u',
+            'c','A','A','A','A','E','E','I','O','O','O','U','U','C');
+        $novoTexto = str_replace($aFind, $aSubs, $texto);
+        $novoTexto = preg_replace("/[^a-zA-Z0-9 @,-.;:\/]/", "", $novoTexto);
+        return $novoTexto;
     }
 }

@@ -2,12 +2,6 @@
 
 namespace Webetiq\Labels;
 
-/**
- * Description of Takata
- *
- * @author administrador
- */
-use Webetiq\Label;
 use Webetiq\Labels\Base;
 
 class Takata extends Base

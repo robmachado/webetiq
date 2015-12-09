@@ -2,14 +2,9 @@
 
 namespace Webetiq\Labels;
 
-/**
- * Description of Visteon
- *
- * @author administrador
- */
-use Webetiq\Model\Label;
+use Webetiq\Labels\Base;
 
-class Visteon
+class Visteon extends Base
 {
     public static $cod = '';
     public static $desc = '';

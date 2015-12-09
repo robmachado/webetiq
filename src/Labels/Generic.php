@@ -1,15 +1,11 @@
 <?php
 
-namespace Webetiq;
+namespace Webetiq\Labels;
 
-/**
- * Description of DefaultLabel
- *
- * @author administrador
- */
-use Webetiq\Label;
+use Webetiq\Labels\Base;
+use Webetiq\Models\Label;
 
-class Generic
+class Generic extends Base
 {
     public static $cliente = '';
     public static $cod = '';
@@ -32,9 +28,11 @@ class Generic
     
     public function __construct()
     {
+        $this->setTemplate($folder.'generic.dat');
         self::$datats = time();
     }
     
+    /*
     public function setLbl(Label $lbl)
     {
         
@@ -145,11 +143,11 @@ class Generic
             file_put_contents($filename, $etiq);
         }
     }
-    
-    public function makeLabel($seqnum)
+    */
+    public function renderize($seqnum)
     {
         //carrega template
-        $template = file_get_contents(self::$templatefile);
+        $template = self::$template;
         //substitui campos
         $template = str_replace('{desc}', self::$desc, $template);
         $template = str_replace('{cod}', self::$cod, $template);

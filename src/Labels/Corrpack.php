@@ -2,25 +2,12 @@
 
 namespace Webetiq\Labels;
 
-/**
- * Description of Corrpack
- *
- * @author administrador
- */
-class Corrpack
+use Webetiq\Models\Label;
+use Webetiq\Labels\Base;
+
+class Corrpack extends Base
 {
-    
-    //{cliente}
-    //{emissao}
-    //{pedcli}
-    //{numop}
-    //{desc}
-    //{codcli}
-    //{validade}
-    //{qtdade}
-    //{unidade}
-    //{pesoLiq}
-    //{pesoBruto}
+    /*
     public static $cliente = '';
     public static $codcli = '';
     public static $desc = '';
@@ -40,14 +27,15 @@ class Corrpack
     public static $copies;
     public static $lbl;
     protected static $folder = '';
-
+    */
 
     public function __construct($folder)
     {
         $this->setTemplate($folder.'corrpack.dat');
         self::$datats = time();
     }
-    
+
+    /*
     public function setLbl(Label $lbl)
     {
         
@@ -148,7 +136,7 @@ class Corrpack
     {
         self::$numNF = $data;
     }
-    
+    */
     /*
     public function labelPrint($seqnum)
     {
@@ -161,7 +149,7 @@ class Corrpack
     }
     */
     
-    public function makeLabel($seqnum = 0)
+    public function renderize($seqnum = 0)
     {
         //carrega template
         $template = self::$template;

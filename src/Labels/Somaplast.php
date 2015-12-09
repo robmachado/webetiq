@@ -2,12 +2,9 @@
 
 namespace Webetiq\Labels;
 
-/**
- * Description of SomaplastLabel
- *
- * @author administrador
- */
-class Somaplast
+use Webetiq\Labels\Base;
+
+class Somaplast extends Base
 {
     //put your code here
 }
