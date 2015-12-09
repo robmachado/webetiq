@@ -36,13 +36,15 @@ class Corrpack
     
     
     public static $datats = 0;
-    public static $templatefile = '';
+    public static $template = '';
     public static $copies;
     public static $lbl;
-    
-    
-    public function __construct()
+    protected static $folder = '';
+
+
+    public function __construct($folder)
     {
+        $this->setTemplate($folder.'corrpack.dat');
         self::$datats = time();
     }
     
@@ -134,7 +136,7 @@ class Corrpack
     
     public function setTemplate($data)
     {
-        self::$templatefile = $data;
+        self::$template = file_get_contents($data);
     }
 
     public function setCopies($data)
@@ -147,6 +149,7 @@ class Corrpack
         self::$numNF = $data;
     }
     
+    /*
     public function labelPrint($seqnum)
     {
         $fim = $seqnum+self::$copies;
@@ -156,11 +159,12 @@ class Corrpack
             file_put_contents($filename, $etiq);
         }
     }
+    */
     
-    public function makeLabel($seqnum)
+    public function makeLabel($seqnum = 0)
     {
         //carrega template
-        $template = file_get_contents(self::$templatefile);
+        $template = self::$template;
         //substitui campos
         $template = str_replace('{desc}', self::$desc, $template);
         $template = str_replace('{cod}', self::$cod, $template);
@@ -175,6 +179,6 @@ class Corrpack
         $template = str_replace('{codcli}', self::$codcli, $template);
         $template = str_replace('{nf}', self::$numNF, $template);
         $template = str_replace('{copias}', self::$copies, $template);
-        
         return $template;
-    }}
+    }
+}

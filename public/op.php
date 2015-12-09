@@ -57,6 +57,7 @@ $script
 ";
 
 $html = file_get_contents('main.html');
+$html = str_replace("{{extras}}", '', $html);
 $html = str_replace("{{title}}", $title, $html);
 $html = str_replace("{{content}}", $body, $html);
 

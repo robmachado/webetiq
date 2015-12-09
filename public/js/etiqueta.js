@@ -14,6 +14,8 @@ $(document).ready(function() {
     });
 });
 */
+
+/**
 $(document).ready(function() {
     // process the form
     $('form').submit(function(event) {
@@ -81,4 +83,4 @@ function valDate(param) {
     //d.setMonth(d.getMonth() + 8);
 }
 
-
+*/

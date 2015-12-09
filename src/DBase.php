@@ -8,8 +8,8 @@ namespace Webetiq;
  * @author administrador
  */
 
-use Webetiq\Label;
-use Webetiq\Printer;
+use Webetiq\Models\Label;
+
 
 class DBase
 {
@@ -90,9 +90,9 @@ class DBase
     
     public function getPrinter($printer = '')
     {
-        $objPrinter = new Printer();
+        //$objPrinter = new Printer();
         if ($printer == '') {
-            return $objPrinter;
+            return '';
         }
         $this->connect('', 'printers');
         $sqlComm = "SELECT * FROM printers WHERE printType = 'T' AND printBlock = '0'";
@@ -101,14 +101,15 @@ class DBase
         $sth = $this->conn->prepare($sqlComm);
         $sth->execute();
         $dados = $sth->fetchAll();
-        foreach ($dados as $printer) {
-            $objPrinter = new Printer();
-            foreach ($printer as $key => $field) {
-                $objPrinter->$key = $field;
-            }
-        }
+        //foreach ($dados as $printer) {
+            //$objPrinter = new Printer();
+            //foreach ($printer as $key => $field) {
+            //    $objPrinter->$key = $field;
+            //}
+        //}
         $sth->closeCursor();
-        return $objPrinter;
+        return $dados[0];
+        //return $objPrinter;
     }
     
     public function getAllPrinters()
@@ -120,19 +121,21 @@ class DBase
         $sth->execute();
         $dados = $sth->fetchAll();
         foreach ($dados as $printer) {
-            $objPrinter = new Printer();
-            foreach ($printer as $key => $field) {
-                $objPrinter->$key = $field;
-            }
-            $this->aPrinters[] = $objPrinter;
+        //    $objPrinter = new Printer();
+        ///    foreach ($printer as $key => $field) {
+        //        $objPrinter->$key = $field;
+        //    }
+            //$this->aPrinters[] = $objPrinter;
+            $this->aPrinters[] = $printer['printName'];
         }
         $sth->closeCursor();
+        //return $dados;
         return $this->aPrinters;
     }
     
-    public function getStq($op = '1', $dbname = 'pbase')
+    public function getStq(Label $lbl, $op = '1', $dbname = 'pbase')
     {
-        $lbl = new Label();
+        //$lbl = new Label();
         $this->connect('', $dbname);
         $sqlComm = "SELECT * FROM mn_estoque WHERE mn_op = '$op' ORDER BY mn_volume DESC";
         $sth = $this->conn->prepare($sqlComm);
@@ -162,7 +165,7 @@ class DBase
         return $lbl;
     }
     
-    public function getMigrate($op, $dbname = 'opmigrate')
+    public function getMigrate(Label $lbl, $op, $dbname = 'opmigrate')
     {
         $this->connect('', $dbname);
         $sqlComm = "SELECT "
@@ -179,7 +182,7 @@ class DBase
         $row = $sth->fetchAll();
         if (!empty($row)) {
             $unidade = $this->pushUnid($row[0]['unidade']);
-            $lbl = new Label();
+            //$lbl = new Label();
             $lbl->numop = $op;
             $lbl->pedido = $row[0]['pedido'];
             $lbl->cod = $row[0]['codigo'];

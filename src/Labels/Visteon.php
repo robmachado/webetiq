@@ -7,7 +7,7 @@ namespace Webetiq\Labels;
  *
  * @author administrador
  */
-use Webetiq\Label;
+use Webetiq\Model\Label;
 
 class Visteon
 {

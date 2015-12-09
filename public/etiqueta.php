@@ -12,8 +12,8 @@ require_once '../bootstrap.php';
  */
 
 use Webetiq\DBase;
-use Webetiq\Label;
-use Webetiq\Printer;
+use Webetiq\Models\Label;
+use Webetiq\Models\Printer;
 
 $remoteip = $_SERVER['REMOTE_ADDR'];
 $numop = filter_input(INPUT_POST, 'numop', FILTER_SANITIZE_STRING);
@@ -29,21 +29,20 @@ $aPrint = $dbase->getAllPrinters();
 $selPrintGroup = '<div class="form-group"><label for=\"printer\">Selecione a impressora</label><select class="form-control" name="printer">';
 foreach ($aPrint as $printer) {
     $selp = '';
-    if ($printer->printName == 'newZebra') {
+    if ($printer == 'newZebra') {
         $selp = 'selected';
     }
-    $selPrintGroup .= '<option value="'.$printer->printName.'" '.$selp.'>'.$printer->printName.'</option>';
+    $selPrintGroup .= '<option value="'.$printer.'" '.$selp.'>'.$printer.'</option>';
 }
 $selPrintGroup .= '</select></div>';
 
+$lbl = new Label();
 if (isset($numop)) {
     //buscar dados da OP
     $dbase->setDBname('opmigrate');
-    $lbl = $dbase->getMigrate($numop);
+    $lbl = $dbase->getMigrate($lbl, $numop);
     $dbase->setDBname('pbase');
-    $stq = $dbase->getStq($numop);
-} else {
-    $lbl = new Label();
+    $stq = $dbase->getStq($lbl, $numop);
 }
 $lbl->volume = $stq->volume + 1;
 
@@ -162,6 +161,7 @@ $body = "
 $script";
 
 $html = file_get_contents('main.html');
+$html = str_replace("{{extras}}", '', $html);
 $html = str_replace("{{title}}", $title, $html);
 $html = str_replace("{{content}}", $body, $html);
 

@@ -12,8 +12,11 @@ class Lpr
     public $printer;
     public $filename;
     
-    public function send()
+    public function send($printName = '', $fileName = '')
     {
+        if ($printName == '' || $fileName == '') {
+            return '';
+        }
         $retorno = '';
         $comando = "lpr -P $this->printer $this->filename";
         // envia para impressora

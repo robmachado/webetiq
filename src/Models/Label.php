@@ -1,12 +1,7 @@
 <?php
 
-namespace Webetiq;
+namespace Webetiq\Models;
 
-/**
- * Description of Label
- *
- * @author administrador
- */
 class Label
 {
     public $numop = '';
@@ -29,4 +24,5 @@ class Label
     public $numnf = '';
     public $volume = 0;
     public $copias = 1;
+    
 }

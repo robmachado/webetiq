@@ -1,5 +1,5 @@
 <?php
-
+//[![Total Downloads](https://poser.pugx.org/nfephp-org/nfephp/downloads)](https://packagist.org/packages/nfephp-org/nfephp)
     // busca dados das impressoras do sistema no banco de dados MYSQL 
     $conn = mysql_connect("localhost","plastfoam","monitor5") or die (mysql_error());
     mysql_select_db("pbase",$conn);

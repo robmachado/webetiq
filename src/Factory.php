@@ -40,6 +40,7 @@ class Factory
         $dbase = new DBase();
         //carrega impressoras
         self::$printer = $dbase->getPrinter($printer);
+        
     }
     
     /**
