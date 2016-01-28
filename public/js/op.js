@@ -1,7 +1,6 @@
 $('#btn1').on('click', function(event) {
     event.preventDefault();
-    //window.location.href=\"migrarmdb.php\";
-    alert('migrarmdb.php');
+    window.location.href="migrarmdb.php?f=LAST";
 });
 
 $('#btn2').on('click', function(event) {
@@ -12,18 +11,37 @@ $('#btn2').on('click', function(event) {
         var alerttype = 'alert-danger';
         showalert(message, alerttype);
     } else {
-        var uri = 'migrarmdb.php?id='+document.getElementById('numop').value;
+        var uri = 'migrarmdb.php?f=UNO&id='+document.getElementById('numop').value;
         var message = uri;
         var alerttype = 'alert-danger';
         showalert(message, alerttype);
-        //window.location.href=\"migrarmdb.php?id=\"+numop;
+        window.location.href=uri;
     }
 });
 
-$('#confirm-btn3').on('show.bs.modal', function(e) {
-    $(this).find('.btn-ok').attr('href', $(e.relatedTarget).data('href'));
-    $('.debug-url').html('Importar tudo novamente: <strong>' + $(this).find('.btn-ok').attr('href') + '</strong>');
+$('#btn3').on('click', function(event) {
+   event.preventDefault();
+   var dialog = new BootstrapDialog({
+       type:BootstrapDialog.TYPE_DANGER,
+       title:'Aviso Importante',
+       message:'Você está ciente que essa operação irá APAGAR todos os dados da base e importar TODAS as OPs novamente.<br> E que isso irá levar um tempo considerável, impossibilitando o uso desta aplicação por vários minutos. Devo prosseguir?',
+       buttons:[{
+          label:'Cancelar',
+          action: function(dialogItself){
+             dialogItself.close();
+          }
+               
+       },{
+          label: 'Prosseguir',
+          cssClass: 'btn-danger',
+          action: function(){
+             window.location.href="migrarmdb.php?f=Full";
+          } 
+       }]
+   });
+   dialog.open();  
 });
+
 
 function showalert(message, alerttype) {
     $('#alert_placeholder').append('<div id=\"alertdiv\" class=\"alert ' +  alerttype + '\"><a class=\"close\" data-dismiss=\"alert\">×</a><span>'+message+'</span></div>')

@@ -6,12 +6,12 @@
 #mdb-schema OP.mdb mysql > schema.sql
 #########################################
 # remove o arquivo atual das OP
-rm -f ../local/OP.mdb
+# rm -f ../local/OP.mdb
 # remove os arquivos enteriores de migração
 rm -f ../sql/OP.sql
 rm -f ../sql/produtos.sql
 # copia o arquivo atual das OP's
-cp /dados/producao/OP/OP.mdb ../local/OP.mdb
+# cp /dados/producao/OP/OP.mdb ../local/OP.mdb
 
 #nomes das tabelas de interesse
 spro="produtos";

@@ -10,7 +10,6 @@ namespace Webetiq;
 
 use Webetiq\Models\Label;
 
-
 class DBase
 {
     public $error = '';
@@ -207,11 +206,18 @@ class DBase
         return false;
     }
 
+    /**
+     * Carrega a lista bruta de comandos SQL exportados pelo
+     * script 'migrate.sh' com o mdbtools, para o arquivo 'produtos.sql'
+     *
+     * @param string $listaFile
+     */
     public function putProdutos($listaFile)
     {
         $aPL = array();
         $aList = array();
         //carregar uma matriz com os dados sql da tabela exportada
+        //ignorando linhas em branco
         $aList = file($listaFile, FILE_IGNORE_NEW_LINES);
         //ordenar a tabela exportada pela descricao do produto
         foreach ($aList as $sqlComm) {

@@ -6,9 +6,9 @@ require_once '../bootstrap.php';
 use Webetiq\DBaseLabel;
 
 $f = filter_input(INPUT_GET, 'f', FILTER_SANITIZE_STRING);
-$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
+$id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_STRING);
 
-echo $f;
+echo $f . '  id= ' . $id;
 exit();
 //executa a migração dos dados do banco MDB
 // ../local/OP.mdb => ../sql/OP.sql 
@@ -21,16 +21,19 @@ $dbase = new Webetiq\DBaseLabel();
 $listaProd = '../sql/produtos.sql';
 $listaOP = '../sql/OP.sql';
 if (is_file($listaProd) && is_file($listaOP)) {
-    //se existem os dois arquivos 
-    if (isset($id)) {
-        //foi passado um id
-        if ($id == 'Full') {
+    //se existem os dois arquivos
+    if (! isset($id)) {
+        //não foi passado um id
+        if ($f == 'Full') {
             //se o id é = Full forçar uma cópia completa
-            //isso irá apagar as tabelas 
-        } else {
-            //se o id é um numero
+            //isso irá apagar as tabelas
+        } elseif ($f == 'Last') {
+            //puxar as 10 ultimas OPS
         }
     } else {
-        //se não foi passado nenhum id
+        //se foi passado nenhum id
+        if (is_numeric($id)) {
+            //se o id é um numero
+        }
     }
 }
