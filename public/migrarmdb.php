@@ -3,13 +3,17 @@ ini_set("display_errors", 1);
 error_reporting(E_ALL);
 require_once '../bootstrap.php';
 
-use Webetiq\DBaseLabel;
+use Webetiq\Migrate;
 
 $f = filter_input(INPUT_GET, 'f', FILTER_SANITIZE_STRING);
 $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_STRING);
 
 echo $f . '  id= ' . $id;
 exit();
+
+//de for passado um id carregar essa op e seu produto na base de dados e chamar a pagina
+//etiqueta 
+
 //executa a migração dos dados do banco MDB
 // ../local/OP.mdb => ../sql/OP.sql 
 // e ../sql/produtos.sql

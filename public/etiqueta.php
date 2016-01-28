@@ -16,7 +16,7 @@ use Webetiq\Models\Label;
 use Webetiq\Models\Printer;
 
 $remoteip = $_SERVER['REMOTE_ADDR'];
-$numop = filter_input(INPUT_POST, 'numop', FILTER_SANITIZE_STRING);
+$numop = filter_input(INPUT_GET, 'numop', FILTER_SANITIZE_STRING);
 
 $copias = 1;
 $emissao = date('d/m/Y');
