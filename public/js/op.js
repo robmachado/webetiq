@@ -7,9 +7,10 @@ $('#btn2').on('click', function(event) {
     event.preventDefault();
     var numop = document.getElementById('numop').value;
     if (numop == '') {
-        var message = 'Indique um numero de OP primeiro';
-        var alerttype = 'alert-danger';
-        showalert(message, alerttype);
+        //var message = 'Indique um numero de OP primeiro';
+        //var alerttype = 'alert-danger';
+        //showalert(message, alerttype);
+        diag();
     } else {
         var uri = 'migrarmdb.php?f=UNO&id='+document.getElementById('numop').value;
         var message = uri;
@@ -18,6 +19,21 @@ $('#btn2').on('click', function(event) {
         window.location.href=uri;
     }
 });
+
+function diag() {
+       var dialog = new BootstrapDialog({
+       type:BootstrapDialog.TYPE_DANGER,
+       title:'Aviso Importante',
+       message:'Indique um numero de OP primeiro!!',
+       buttons:[{
+          label:'Cancelar',
+          action: function(dialogItself){
+             dialogItself.close();
+          }
+       }]
+   });
+   dialog.open();  
+}
 
 $('#btn3').on('click', function(event) {
    event.preventDefault();

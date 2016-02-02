@@ -8,8 +8,12 @@ use Webetiq\Migrate;
 $f = filter_input(INPUT_GET, 'f', FILTER_SANITIZE_STRING);
 $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_STRING);
 
-echo $f . '  id= ' . $id;
-exit();
+//instancia a classe para a migração de dados
+$migrate = new Migrate();
+
+if ($f!='UNO' && $f!='LAST' && $f!='ALL') {
+    header("Location: op.php");
+}
 
 //de for passado um id carregar essa op e seu produto na base de dados e chamar a pagina
 //etiqueta 
@@ -21,7 +25,7 @@ exec('../src/migrate.sh');
 
 //uma vez que os dados foram extraidos carrega-los na base de dados migrate
 //carrega classe de acesso a base de dados
-$dbase = new Webetiq\DBaseLabel();
+
 $listaProd = '../sql/produtos.sql';
 $listaOP = '../sql/OP.sql';
 if (is_file($listaProd) && is_file($listaOP)) {
@@ -32,7 +36,8 @@ if (is_file($listaProd) && is_file($listaOP)) {
             //se o id é = Full forçar uma cópia completa
             //isso irá apagar as tabelas
         } elseif ($f == 'Last') {
-            //puxar as 10 ultimas OPS
+            //puxar a partir do último numero registrado
+            
         }
     } else {
         //se foi passado nenhum id

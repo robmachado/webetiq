@@ -15,8 +15,9 @@ use Webetiq\DBase;
 use Webetiq\Models\Label;
 use Webetiq\Models\Printer;
 
+
 $remoteip = $_SERVER['REMOTE_ADDR'];
-$numop = filter_input(INPUT_GET, 'numop', FILTER_SANITIZE_STRING);
+$numop = filter_input(INPUT_POST, 'numop', FILTER_SANITIZE_STRING);
 
 $copias = 1;
 $emissao = date('d/m/Y');
@@ -41,6 +42,11 @@ if (isset($numop)) {
     //buscar dados da OP
     $dbase->setDBname('opmigrate');
     $lbl = $dbase->getMigrate($lbl, $numop);
+    //caso não seja encontrada a OP na base migrate 
+    //retornar e avisar o usuário
+    if ($lbl->numop == '') {
+        header("Location: op.php?numop=$numop&fail=1");
+    }
     $dbase->setDBname('pbase');
     $stq = $dbase->getStq($lbl, $numop);
 }

@@ -164,6 +164,20 @@ class DBase
         return $lbl;
     }
     
+    public function getLastOp($dbname = 'opmigrate')
+    {
+        $num = 0;
+        $this->connect('', $dbname);
+        $sqlComm = "SELECT OP.numop FROM OP ORDER BY OP.numop DESC";
+        $sth = $this->conn->prepare($sqlComm);
+        $sth->execute();
+        $row = $sth->fetchAll();
+        if (!empty($row)) {
+            $num = $row[0]['numop'];
+        }
+        return $num;
+    }
+    
     public function getMigrate(Label $lbl, $op, $dbname = 'opmigrate')
     {
         $this->connect('', $dbname);
@@ -181,7 +195,6 @@ class DBase
         $row = $sth->fetchAll();
         if (!empty($row)) {
             $unidade = $this->pushUnid($row[0]['unidade']);
-            //$lbl = new Label();
             $lbl->numop = $op;
             $lbl->pedido = $row[0]['pedido'];
             $lbl->cod = $row[0]['codigo'];
@@ -201,9 +214,8 @@ class DBase
             $lbl->unidade = $unidade;
             $lbl->numnf = '';
             $lbl->copias = 1;
-            return $lbl;
         }
-        return false;
+        return $lbl;
     }
 
     /**

@@ -25,6 +25,23 @@ use Webetiq\DBase;
 
 class Migrate
 {
+    
+    public function setFromLast()
+    {
+        //pegar o último numero de OP da base de dados
+        //varrer o array com as OPs 
+    }
+    
+    public function setAll()
+    {
+        
+    }
+    
+    public function setOp($num)
+    {
+        
+    }        
+    
     //ordena a lista de produtos com o codigo do produto como chave do array e o
     //statement sql como valor
     public function ordProds($listaFile)
