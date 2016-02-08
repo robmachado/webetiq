@@ -8,8 +8,8 @@
 # remove o arquivo atual das OP
 # rm -f ../local/OP.mdb
 # remove os arquivos enteriores de migração
-rm -f ../sql/OP.sql
-rm -f ../sql/produtos.sql
+rm -f ../local/OP.sql
+rm -f ../local/produtos.sql
 # copia o arquivo atual das OP's
 # cp /dados/producao/OP/OP.mdb ../local/OP.mdb
 
@@ -17,16 +17,16 @@ rm -f ../sql/produtos.sql
 spro="produtos";
 sop="OP";
 # para cada tabela em OP.mdb
-for i in $( mdb-tables OP.mdb );
+for i in $( mdb-tables ../local/OP.mdb );
  do echo $i;
  #extrai dados da tabela OP
  if [ $i = $sop ]; then
     echo $i;
-    mdb-export -D "%Y-%m-%d %H:%M:%S" -H -I mysql OP.mdb $i > ../sql/$i.sql;
+    mdb-export -D "%Y-%m-%d %H:%M:%S" -H -I mysql ../local/OP.mdb $i > ../local/$i.sql;
  fi
  #extrai dados da tabela produtos
  if [ $i = $spro ]; then
     echo $i;
-    mdb-export -D "%Y-%m-%d %H:%M:%S" -H -I mysql OP.mdb $i > ../sql/$i.sql;
+    mdb-export -D "%Y-%m-%d %H:%M:%S" -H -I mysql ../local/OP.mdb $i > ../local/$i.sql;
  fi
 done;

@@ -9,6 +9,8 @@ namespace Webetiq;
  */
 
 use Webetiq\Models\Label;
+use PDO;
+use PDOException;
 
 class DBase
 {
@@ -49,7 +51,7 @@ class DBase
         try {
             $this->conn = new \PDO($this->dsn, $this->user, $this->pass);
             $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             $this->error = $e->getMessage();
         }
     }
@@ -276,6 +278,44 @@ class DBase
         }
     }
 
+    public function insertSql($sqlComm)
+    {
+        try {
+            $stmt = $this->conn->prepare($sqlComm);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            $this->error = $e->getMessage();
+            return false;
+        }
+        return $this->conn->lastInsertId();
+    }
+    
+    public function querySql($sqlComm)
+    {
+        $rows = array();
+        try {
+            $sth = $this->conn->prepare($sqlComm);
+            $sth->execute();
+            $rows = $sth->fetchAll();
+        } catch (PDOException $e) {
+            $this->error = $e->getMessage();
+            return false;
+        }    
+        return $rows;
+    }
+    
+    public function executeSql($sqlComm)
+    {
+        try {
+            $stmt = $this->conn->prepare($sqlComm);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            $this->error = $e->getMessage();
+            return false;
+        }
+        return true;
+    }
+    
     protected function cargaIncremental($aNL, $aProd = array())
     {
         //###########################################

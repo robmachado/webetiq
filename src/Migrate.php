@@ -1,4 +1,5 @@
 <?php
+
 namespace Webetiq;
 
 /*
@@ -22,14 +23,98 @@ namespace Webetiq;
  */
 
 use Webetiq\DBase;
+use Webetiq\Models\Label;
 
 class Migrate
 {
+    protected $dbase;
+    public $error;
+    protected $aOPs;
+    protected $aProds;
+    
+    public function __construct()
+    {
+        $this->dbase = new DBase();
+        $this->dbase->setDBname('opmigrate');
+        $this->aOPs = $this->getOPsList('../local/OP.sql');
+        $this->aProds = $this->getProdsList('../local/produtos.sql');
+    }
     
     public function setFromLast()
     {
         //pegar o último numero de OP da base de dados
-        //varrer o array com as OPs 
+        $lastop = $this->dbase->getLastOp();
+        //varrer o array com as OPs
+        if (empty($this->aOPs)) {
+            return '';
+        }
+        $flag = false;
+        $result = '';
+        foreach($this->aOPs as $key => $sql) {
+            if ($flag || $lastop == 0) {
+                //carregar os novos dados na tabela
+                $sqlComm = $this->changeSQL($sql, 'OP');
+                $sqlComm = $this->extractOPdata($sqlComm);
+                $lastid = $this->dbase->insertSql($sqlComm);
+                if (!$lastid) {
+                    echo $this->dbase->error.' ==> '.$sqlComm.'<br>'; 
+                } else {
+                    //$sqlComm = "UPDATE OP SET produto = trim(produto) WHERE id='$lastid'"; 
+                    //$this->dbase->executeSql($sqlComm);
+                    $sqlComm = "SELECT produto FROM OP WHERE id='$lastid'";
+                    $lstprod = $this->dbase->querySql($sqlComm);
+                    $produto = $lstprod[0]['produto'];
+                    if (!empty($produto)) {
+                        $result = $this->setProds($produto);
+                    }
+                }
+                echo "[$lastid] $key ==> $produto  $result<BR>";
+            }
+            if ($key == $lastop) {
+                $flag = true;
+            }
+        }
+        return $lastop;
+    }
+    
+    public function setProds($produto = '', $limpar = false)
+    {
+        if ($limpar) {
+            //limpar a tabela de produtos
+            $sqlComm = "TRUNCATE TABLE produtos";
+            if (!$this->dbase->executeSql($sqlComm)) {
+                echo $this->dbase->error;
+            }
+        }
+        if ($produto != '') {
+            //verifica se o produto já existe na tabela
+            $sqlComm = "SELECT codigo FROM produtos WHERE produto=\"$produto\"";
+            $rows = $this->dbase->querySql($sqlComm);
+            if (empty($rows)) {
+                if (array_key_exists($produto, $this->aProds)) {
+                    $sql = $this->aProds[$produto];
+                    $sqlComm = $this->changeSQL($sql, 'produtos');
+                    $sqlComm = $this->extractProdData($sqlComm);
+                    $lastid = $this->dbase->insertSql($sqlComm);
+                    if (! $this->dbase->insertSql($sqlComm)) {
+                        echo $this->dbase->error.' ==> '.$sqlComm.'<br>'; 
+                    }
+                } else {
+                    return 'Produto Não encontrado na extração';
+                }
+            } elseif ($rows === false) {
+                echo $this->dbase->error.' ==> '.$sqlComm.'<br>'; 
+            }    
+        } else {
+            foreach($this->aProds as $key => $sql) {
+                $sqlComm = $this->changeSQL($sql, 'produtos');
+                $sqlComm = $this->extractProdData($sqlComm);
+                if (! $this->dbase->insertSql($sqlComm)) {
+                    echo $this->dbase->error.' ==> '.$sqlComm.'<br>'; 
+                }
+            }    
+        }
+        return '';
     }
     
     public function setAll()
@@ -44,7 +129,7 @@ class Migrate
     
     //ordena a lista de produtos com o codigo do produto como chave do array e o
     //statement sql como valor
-    public function ordProds($listaFile)
+    public function getProdsList($listaFile)
     {
         $aProd = array();
         $aList = array();
@@ -56,7 +141,8 @@ class Migrate
             $k = strpos($sqlComm, 'VALUES ("');
             $txt = substr($sqlComm, $k+9, 150);
             $atxt = explode('"', $txt);
-            $desc = $atxt[0];
+            $atxtx = str_replace("'", "", $atxt[0]); 
+            $desc = trim($atxtx);
             $aProd[$desc] = $sqlComm;
         }
         ksort($aProd);
@@ -65,7 +151,7 @@ class Migrate
     
     //ordena a lista de OPs com o numero da OP como chave do array e o statement
     //sql como valor
-    public function ordOPs($listaFile)
+    public function getOPsList($listaFile)
     {
         $aOPs = array();
         $aList = array();
@@ -227,6 +313,7 @@ class Migrate
                 $sqlComm = str_replace($key, $campo, $sqlComm);
             }
         }
+        $sqlComm = str_replace("'", "", $sqlComm);
         return $sqlComm;
     }
     
@@ -282,5 +369,41 @@ class Migrate
             $demi = $aDH[2].'/'.$aDH[1].'/'.$aDH[0];
         }
         return $demi;
+    }
+    
+    public function extractOPdata($sqlComm)
+    {
+        $aPartial = explode(') VALUES (', $sqlComm);
+        $aPartial[1] = str_replace(');','', $aPartial[1]);
+        $aPartial[1] = str_replace("'",'', $aPartial[1]);
+        $aPartial[1] = str_replace(',','.',$aPartial[1]);
+        $aPartial[1] = str_replace('"','', $aPartial[1]);
+        $values = explode(';', $aPartial[1]);
+        $sqlComm = str_replace('`', '', $aPartial[0]) . ') VALUES (';
+        foreach($values as $value) {
+            $nvalue = (string) trim($value);
+            $sqlComm .= "'$nvalue',";
+        }
+        $sqlComm = substr($sqlComm, 0, strlen($sqlComm)-1);
+        $sqlComm .= ");";
+        return $sqlComm;
+    }
+    
+    public function extractProdData($sqlComm)
+    {
+        $aPartial = explode(') VALUES (', $sqlComm);
+        $aPartial[1] = str_replace(');','', $aPartial[1]);
+        $aPartial[1] = str_replace("'",'', $aPartial[1]);
+        $aPartial[1] = str_replace(',','.',$aPartial[1]);
+        $aPartial[1] = str_replace('"','', $aPartial[1]);
+        $values = explode(';', $aPartial[1]);
+        $sqlComm = str_replace('`', '', $aPartial[0]) . ') VALUES (';
+        foreach($values as $value) {
+            $nvalue = (string) trim($value);
+            $sqlComm .= "'$nvalue',";
+        }
+        $sqlComm = substr($sqlComm, 0, strlen($sqlComm)-1);
+        $sqlComm .= ");";
+        return $sqlComm;
     }
 }

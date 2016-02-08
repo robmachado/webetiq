@@ -22,11 +22,11 @@ for i in $( mdb-tables OP.mdb );
  #extrai dados da tabela OP
  if [ $i = $sop ]; then
     echo $i;
-    mdb-export -D "%Y-%m-%d %H:%M:%S" -H -I mysql OP.mdb $i > $i.sql;
+    mdb-export -D "%Y-%m-%d %H:%M:%S" -H -d";" -I mysql OP.mdb $i > $i.sql;
  fi
  #extrai dados da tabela produtos
  if [ $i = $spro ]; then
     echo $i;
-    mdb-export -D "%Y-%m-%d %H:%M:%S" -H -I mysql OP.mdb $i > $i.sql;
+    mdb-export -D "%Y-%m-%d %H:%M:%S" -H -d";" -I mysql OP.mdb $i > $i.sql;
  fi
 done;
