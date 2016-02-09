@@ -3,23 +3,9 @@
 namespace Webetiq;
 
 /*
- * executar a migração
- * varrer todos os dados extraidos e procurar na base de dados as OP
- * se não encontrar a OP na base inserir a partir do arquivo de migração
- * 
- * SELECT codigo FROM produtos ORDER BY codigo; => arrayProd
- * 
- * SELECT numop FROM opmigrate ORDER BY numop; => arrayBase
- * 
- * para cada op em arrayExtraido
- *  verifique se não existe em arrayBase if (!in_array(opExtraido, arrayBase)
- *     caso não exista inserir
- *          verifique se existe o produto if (!in_array(prodExtraidoOP, arrayProd)
- *                 caso não exista inserir   
- *     caso exista continue
- * 
- * 
- * um cron deve ser executado a cada 1 hora
+ * executar a migração dos dados do banco OP.mdb para a base opmigrate do MySQL
+ * varrer todos os dados extraidos do banco de dados OP.mdb usando o mdbtools
+ * tratar e incerir nas tabelas OP e produtos da base MySQL
  */
 
 use Webetiq\DBase;
@@ -27,19 +13,59 @@ use Webetiq\Models\Label;
 
 class Migrate
 {
-    protected $dbase;
+    /**
+     * Erros capturados dos excptions
+     * @var string
+     */
     public $error;
+    /**
+     * Classe de acesso ao banco de dados MySQL
+     * @var DBase
+     */
+    protected $dbase;
+    /**
+     * Array com as OP's extraidas da base access OP.mdb
+     * na estrutura array('<numero da OP>, '<sql gerado pelo mdbtools>', ...
+     * @var array
+     */
     protected $aOPs;
+    /**
+     * Array com os produtos extraidos da base access OP.mdb
+     * na estrutura array('<descrição do produto>, '<sql gerado pelo mdbtools>', ...
+     * @var array
+     */
     protected $aProds;
     
+    /**
+     * função construtora
+     * Intancia a classe de acesso a base de dados,
+     * define o nome da base de dados, conecta
+     * e carrega nos arrays os dados extraidos pelo script
+     * console/migrate.sh que usa os recursos do mdbtools
+     */
     public function __construct()
     {
         $this->dbase = new DBase();
         $this->dbase->setDBname('opmigrate');
+        $this->dbase->connect();
         $this->aOPs = $this->getOPsList('../local/OP.sql');
         $this->aProds = $this->getProdsList('../local/produtos.sql');
     }
     
+    /**
+     * função destrutura
+     * deconecta a base de dados
+     */
+    public function __destruct()
+    {
+        $this->dbase->disconnect();
+    }
+    
+    /**
+     * Carrega os dados das OP a partir do ultimo numero de OP registrado
+     * na tabela opmigrate
+     * @return string
+     */
     public function setFromLast()
     {
         //pegar o último numero de OP da base de dados
@@ -50,25 +76,28 @@ class Migrate
         }
         $flag = false;
         $result = '';
-        foreach($this->aOPs as $key => $sql) {
+        $produto = '';
+        $offset = array_search($lastop, array_keys($this->aOPs));
+        $aOff = array_slice($this->aOPs, $offset, null, true);
+        foreach ($aOff as $key => $sql) {
             if ($flag || $lastop == 0) {
                 //carregar os novos dados na tabela
                 $sqlComm = $this->changeSQL($sql, 'OP');
-                $sqlComm = $this->extractOPdata($sqlComm);
+                $sqlComm = $this->extractData($sqlComm);
                 $lastid = $this->dbase->insertSql($sqlComm);
                 if (!$lastid) {
-                    echo $this->dbase->error.' ==> '.$sqlComm.'<br>'; 
+                    echo $this->dbase->error.' ==> '.$sqlComm.'<br>';
                 } else {
-                    //$sqlComm = "UPDATE OP SET produto = trim(produto) WHERE id='$lastid'"; 
+                    //$sqlComm = "UPDATE OP SET produto = trim(produto) WHERE id='$lastid'";
                     //$this->dbase->executeSql($sqlComm);
                     $sqlComm = "SELECT produto FROM OP WHERE id='$lastid'";
                     $lstprod = $this->dbase->querySql($sqlComm);
                     $produto = $lstprod[0]['produto'];
-                    if (!empty($produto)) {
+                    if (empty($produto)) {
                         $result = $this->setProds($produto);
                     }
                 }
-                echo "[$lastid] $key ==> $produto  $result<BR>";
+                echo "INSERIDA OP $key [$lastid] ==> $produto  $result<BR>";
             }
             if ($key == $lastop) {
                 $flag = true;
@@ -79,10 +108,11 @@ class Migrate
     
     public function setProds($produto = '', $limpar = false)
     {
+        $this->dbase->connect('', 'opmigrate');
         if ($limpar) {
             //limpar a tabela de produtos
             $sqlComm = "TRUNCATE TABLE produtos";
-            if (!$this->dbase->executeSql($sqlComm)) {
+            if (! $this->dbase->executeSql($sqlComm)) {
                 echo $this->dbase->error;
             }
         }
@@ -94,25 +124,30 @@ class Migrate
                 if (array_key_exists($produto, $this->aProds)) {
                     $sql = $this->aProds[$produto];
                     $sqlComm = $this->changeSQL($sql, 'produtos');
-                    $sqlComm = $this->extractProdData($sqlComm);
+                    $sqlComm = $this->extractData($sqlComm);
                     $lastid = $this->dbase->insertSql($sqlComm);
-                    if (! $this->dbase->insertSql($sqlComm)) {
-                        echo $this->dbase->error.' ==> '.$sqlComm.'<br>'; 
+                    if (! $lastid) {
+                        echo $this->dbase->error.' ==> '.$sqlComm.'<br>';
                     }
+                    return "Produto: $produto inserido!";
                 } else {
-                    return 'Produto Não encontrado na extração';
+                    return 'Produto Não encontrado na extração do access';
                 }
             } elseif ($rows === false) {
-                echo $this->dbase->error.' ==> '.$sqlComm.'<br>'; 
-            }    
+                echo $this->dbase->error.' ==> '.$sqlComm.'<br>';
+            }
         } else {
-            foreach($this->aProds as $key => $sql) {
+            $i = 0;
+            foreach ($this->aProds as $key => $sql) {
                 $sqlComm = $this->changeSQL($sql, 'produtos');
-                $sqlComm = $this->extractProdData($sqlComm);
+                $sqlComm = $this->extractData($sqlComm);
                 if (! $this->dbase->insertSql($sqlComm)) {
-                    echo $this->dbase->error.' ==> '.$sqlComm.'<br>'; 
+                    echo $this->dbase->error.' ==> '.$sqlComm.'<br>';
+                } else {
+                    echo "[$i] $key <br>";
+                    $i++;
                 }
-            }    
+            }
         }
         return '';
     }
@@ -125,7 +160,7 @@ class Migrate
     public function setOp($num)
     {
         
-    }        
+    }
     
     //ordena a lista de produtos com o codigo do produto como chave do array e o
     //statement sql como valor
@@ -141,7 +176,7 @@ class Migrate
             $k = strpos($sqlComm, 'VALUES ("');
             $txt = substr($sqlComm, $k+9, 150);
             $atxt = explode('"', $txt);
-            $atxtx = str_replace("'", "", $atxt[0]); 
+            $atxtx = str_replace("'", "", $atxt[0]);
             $desc = trim($atxtx);
             $aProd[$desc] = $sqlComm;
         }
@@ -313,7 +348,6 @@ class Migrate
                 $sqlComm = str_replace($key, $campo, $sqlComm);
             }
         }
-        $sqlComm = str_replace("'", "", $sqlComm);
         return $sqlComm;
     }
     
@@ -371,39 +405,41 @@ class Migrate
         return $demi;
     }
     
-    public function extractOPdata($sqlComm)
+    /**
+     * Remonta o comando SQL efetuando uma limpeza nos dados
+     * a serem gravados
+     * NOTA: quando o mdbtools extrai os dados do MDB vários caompos
+     * podem conter aspas simpes e duplas e os numeros estão formatados
+     * com virgula. E a separação dos valores é feita por ";" ao invés de uma
+     * virgula para facilitar a extração desses dados. Veja console/migrate.sh
+     * 
+     * @param string $sqlComm
+     * @return string
+     */
+    public function extractData($sqlComm)
     {
         $aPartial = explode(') VALUES (', $sqlComm);
-        $aPartial[1] = str_replace(');','', $aPartial[1]);
-        $aPartial[1] = str_replace("'",'', $aPartial[1]);
-        $aPartial[1] = str_replace(',','.',$aPartial[1]);
-        $aPartial[1] = str_replace('"','', $aPartial[1]);
-        $values = explode(';', $aPartial[1]);
+        $part1 = 'xxxx'.$aPartial[0];
+        $numfields = 31;
+        if (strpos($part1, 'INSERT INTO `produtos`') > 0) {
+            $numfields = 90;
+        }
+        $tvalues = str_replace(');', '', $aPartial[1]);
+        $tvalues = str_replace("'", '', $tvalues);
+        $tvalues = str_replace(',', '.', $tvalues);
+        $tvalues = str_replace('"', '', $tvalues);
+        $values = explode(';', $tvalues);
         $sqlComm = str_replace('`', '', $aPartial[0]) . ') VALUES (';
-        foreach($values as $value) {
+        if (count($values) != $numfields) {
+            return '';
+        }
+        foreach ($values as $value) {
             $nvalue = (string) trim($value);
             $sqlComm .= "'$nvalue',";
         }
         $sqlComm = substr($sqlComm, 0, strlen($sqlComm)-1);
         $sqlComm .= ");";
-        return $sqlComm;
-    }
-    
-    public function extractProdData($sqlComm)
-    {
-        $aPartial = explode(') VALUES (', $sqlComm);
-        $aPartial[1] = str_replace(');','', $aPartial[1]);
-        $aPartial[1] = str_replace("'",'', $aPartial[1]);
-        $aPartial[1] = str_replace(',','.',$aPartial[1]);
-        $aPartial[1] = str_replace('"','', $aPartial[1]);
-        $values = explode(';', $aPartial[1]);
-        $sqlComm = str_replace('`', '', $aPartial[0]) . ') VALUES (';
-        foreach($values as $value) {
-            $nvalue = (string) trim($value);
-            $sqlComm .= "'$nvalue',";
-        }
-        $sqlComm = substr($sqlComm, 0, strlen($sqlComm)-1);
-        $sqlComm .= ");";
+        $sqlComm = str_replace(array("\n", "\r"), '', $sqlComm);
         return $sqlComm;
     }
 }

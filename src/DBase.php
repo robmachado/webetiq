@@ -2,11 +2,6 @@
 
 namespace Webetiq;
 
-/**
- * Description of DBaseLabel
- *
- * @author administrador
- */
 
 use Webetiq\Models\Label;
 use PDO;
@@ -24,6 +19,13 @@ class DBase
     public $aPrinters = array();
     public $aUnid = array();
     
+    /**
+     * Construtora
+     * @param string $host
+     * @param string $dbname
+     * @param string $user
+     * @param string $pass
+     */
     public function __construct($host = '', $dbname = '', $user = '', $pass = '')
     {
         if (!empty($host) && !empty($dbname) && !empty($user) && !empty($pass)) {
@@ -40,6 +42,14 @@ class DBase
             'cj');
     }
     
+    /**
+     * Connecta com a base de dados
+     * 
+     * @param string $host
+     * @param string $dbname
+     * @param string $user
+     * @param string $pass
+     */
     public function connect($host = '', $dbname = '', $user = '', $pass = '')
     {
         $this->disconnect();
@@ -49,18 +59,25 @@ class DBase
         $this->setDBname($dbname);
         $this->dsn = "mysql:host=$this->host;dbname=$dbname";
         try {
-            $this->conn = new \PDO($this->dsn, $this->user, $this->pass);
-            $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $this->conn = new PDO($this->dsn, $this->user, $this->pass);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             $this->error = $e->getMessage();
         }
     }
     
+    /**
+     * Desconecta a base de dados
+     */
     public function disconnect()
     {
         $this->conn = null;
     }
     
+    /**
+     * Define o host do banco de dados MySQL
+     * @param string $host
+     */
     public function setHost($host = '')
     {
         if (!empty($host)) {
@@ -68,6 +85,10 @@ class DBase
         }
     }
     
+    /**
+     * Define o nome da base de dados
+     * @param string $dbname
+     */
     public function setDBname($dbname = '')
     {
         if (!empty($dbname)) {
@@ -75,6 +96,10 @@ class DBase
         }
     }
     
+    /**
+     * Define o nome do usuário da base de dados
+     * @param string $user
+     */
     public function setUser($user = '')
     {
         if (!empty($user)) {
@@ -82,6 +107,10 @@ class DBase
         }
     }
     
+    /**
+     * Define o password de acesso ao banco de dados
+     * @param string $pass
+     */
     public function setPass($pass = '')
     {
         if (!empty($pass)) {
@@ -89,9 +118,13 @@ class DBase
         }
     }
     
+    /**
+     * Recupera 
+     * @param type $printer
+     * @return string
+     */
     public function getPrinter($printer = '')
     {
-        //$objPrinter = new Printer();
         if ($printer == '') {
             return '';
         }
@@ -102,17 +135,14 @@ class DBase
         $sth = $this->conn->prepare($sqlComm);
         $sth->execute();
         $dados = $sth->fetchAll();
-        //foreach ($dados as $printer) {
-            //$objPrinter = new Printer();
-            //foreach ($printer as $key => $field) {
-            //    $objPrinter->$key = $field;
-            //}
-        //}
         $sth->closeCursor();
         return $dados[0];
-        //return $objPrinter;
     }
     
+    /**
+     * 
+     * @return type
+     */
     public function getAllPrinters()
     {
         $this->connect('', 'printers');
@@ -122,15 +152,9 @@ class DBase
         $sth->execute();
         $dados = $sth->fetchAll();
         foreach ($dados as $printer) {
-        //    $objPrinter = new Printer();
-        ///    foreach ($printer as $key => $field) {
-        //        $objPrinter->$key = $field;
-        //    }
-            //$this->aPrinters[] = $objPrinter;
             $this->aPrinters[] = $printer['printName'];
         }
         $sth->closeCursor();
-        //return $dados;
         return $this->aPrinters;
     }
     
@@ -170,7 +194,7 @@ class DBase
     {
         $num = 0;
         $this->connect('', $dbname);
-        $sqlComm = "SELECT OP.numop FROM OP ORDER BY OP.numop DESC";
+        $sqlComm = "SELECT max(numop) as numop FROM `OP`;";
         $sth = $this->conn->prepare($sqlComm);
         $sth->execute();
         $row = $sth->fetchAll();
@@ -278,8 +302,11 @@ class DBase
         }
     }
 
-    public function insertSql($sqlComm)
+    public function insertSql($sqlComm = '')
     {
+        if ($sqlComm == '') {
+            return 0;
+        }
         try {
             $stmt = $this->conn->prepare($sqlComm);
             $stmt->execute();
@@ -300,7 +327,7 @@ class DBase
         } catch (PDOException $e) {
             $this->error = $e->getMessage();
             return false;
-        }    
+        }
         return $rows;
     }
     
