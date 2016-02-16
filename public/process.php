@@ -3,9 +3,8 @@ ini_set("display_errors", 1);
 error_reporting(E_ALL);
 require_once '../bootstrap.php';
 
-use Webetiq\Models\Label;
-use Webetiq\Models\Printer;
-use Webetiq\Factory;
+use Webetiq\Label;
+use Webetiq\Printer;
 
 /**
  * Seleciona a impressora e forma de conexão dependendo da origem

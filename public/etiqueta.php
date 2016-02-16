@@ -12,8 +12,8 @@ require_once '../bootstrap.php';
  */
 
 use Webetiq\DBase;
-use Webetiq\Models\Label;
-use Webetiq\Models\Printer;
+use Webetiq\Label;
+use Webetiq\Printer;
 
 
 $remoteip = $_SERVER['REMOTE_ADDR'];
@@ -166,7 +166,7 @@ $body = "
 </div>
 $script";
 
-$html = file_get_contents('main.html');
+$html = file_get_contents('assets/main.html');
 $html = str_replace("{{extras}}", '', $html);
 $html = str_replace("{{title}}", $title, $html);
 $html = str_replace("{{content}}", $body, $html);
