@@ -9,7 +9,7 @@ namespace Webetiq;
  */
 
 use Webetiq\DBase;
-use Webetiq\Models\Label;
+use Webetiq\Label;
 
 class Migrate
 {
@@ -43,13 +43,16 @@ class Migrate
      * e carrega nos arrays os dados extraidos pelo script
      * console/migrate.sh que usa os recursos do mdbtools
      */
-    public function __construct()
+    public function __construct($storagePath = '')
     {
+        if ($storagePath =='') {
+            $storagePath = '../storage/';
+        }
         $this->dbase = new DBase();
         $this->dbase->setDBname('opmigrate');
         $this->dbase->connect();
-        $this->aOPs = $this->getOPsList('../local/OP.sql');
-        $this->aProds = $this->getProdsList('../local/produtos.sql');
+        $this->aOPs = $this->getOPsList($storagePath.'OP.sql');
+        $this->aProds = $this->getProdsList($storagePath.'produtos.sql');
     }
     
     /**
@@ -106,10 +109,16 @@ class Migrate
         return $lastop;
     }
     
-    public function setProds($produto = '', $limpar = false)
+    /**
+     * Carrega o produto na tabela 'opmigrate\produtos'
+     * @param string $produto
+     * @param bool $truncar
+     * @return string
+     */
+    public function setProds($produto = '', $truncar = false)
     {
         $this->dbase->connect('', 'opmigrate');
-        if ($limpar) {
+        if ($truncar) {
             //limpar a tabela de produtos
             $sqlComm = "TRUNCATE TABLE produtos";
             if (! $this->dbase->executeSql($sqlComm)) {
@@ -161,6 +170,27 @@ class Migrate
     {
         
     }
+    
+        /**
+     * Obtem o numero da ultima OP cadastrada na base 'opmigrate'
+     * onde foram migradas todas as OP's da base Access MDB
+     * @param string $dbname
+     * @return string
+     */
+    public function getLastOp($dbname = 'opmigrate')
+    {
+        $num = 0;
+        $this->connect('', $dbname);
+        $sqlComm = "SELECT max(numop) as numop FROM `OP`;";
+        $sth = $this->conn->prepare($sqlComm);
+        $sth->execute();
+        $row = $sth->fetchAll();
+        if (!empty($row)) {
+            $num = $row[0]['numop'];
+        }
+        return $num;
+    }
+
     
     //ordena a lista de produtos com o codigo do produto como chave do array e o
     //statement sql como valor

@@ -3,7 +3,7 @@ namespace Webetiq\Labels;
 
 use Webetiq\Models\Label;
 
-abstract class Base
+abstract class AbstractBase
 {
     protected static $datats = 0;
     protected static $propNames = '';
@@ -32,16 +32,6 @@ abstract class Base
     protected static $template = '';
     protected static $printer;
     protected static $buffer = array();
-
-    //public function __construct();
-    /*
-    public function setPrinter(Printer $printer)
-    {
-        self::$printer = $printer;
-    }
-     * 
-     */
-    
     
     public function setLbl(Label $lbl)
     {
@@ -55,205 +45,200 @@ abstract class Base
         }
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setNumop($data)
     {
         self::$numop = $data;
     }
-
+    
+    /**
+     * 
+     * @param type $data
+     */
     public function setCliente($data)
     {
         self::$cliente = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setPedido($data)
     {
         self::$pedido = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setCod($data)
     {
         self::$cod = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setDesc($data)
     {
         self::$desc = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setEan($data)
     {
         self::$ean = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setPedcli($data)
     {
         self::$pedcli = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setCodcli($data)
     {
         self::$codcli = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setPesoBruto($data)
     {
         self::$pesoBruto = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setTara($data)
     {
         self::$tara = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setPesoLiq($data)
     {
         self::$pesoLiq = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setEmissao($data)
     {
         self::$emissao = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setNumdias($data)
     {
         self::$numdias = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setValidade($data)
     {
         self::$validade = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setQtdade($data)
     {
         self::$qtdade = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setUnidade($data)
     {
         self::$unidade = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setDoca($data)
     {
         self::$doca = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setNumnf($data)
     {
         self::$numnf = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setVolume($data)
     {
         self::$volume = $data;
     }
     
+    /**
+     * 
+     * @param type $data
+     */
     public function setCopias($data)
     {
         self::$copias = $data;
     }
 
-    /*
-    public function setTemplate()
-    {
-        $templateFolder = dirname(dirname(dirname(__FILE__))). DIRECTORY_SEPARATOR
-            . 'layouts'
-            . DIRECTORY_SEPARATOR
-            . self::$printer->printLang
-            . DIRECTORY_SEPARATOR;
-        
-        self::$templateFile = $templateFolder . strtolower(self::$cliente) . '.dat';
-        if (is_file(self::$templateFile)) {
-            self::$template = file_get_contents(self::$templateFile);
-        } else {
-            self::$template = file_get_contents($templateFolder . 'Generic.dat');
-        }
-    }
-     * 
+    /**
+     *
+     * @param string $data
      */
-
     public function setTemplate($data)
     {
         self::$template = file_get_contents($data);
     }
     
-    abstract public function renderize($seqnum);    
-    
-    /*
-    public function labelPrint()
-    {
-        if (self::$template == '') {
-            $this->setTemplate();
-        }
-        $total = self::$volume + self::$copias;
-        for ($iCount = self::$volume; $iCount < $total; $iCount++) {
-            $etiq = $this->makeLabel($iCount);
-            $this->printInterface($etiq, $iCount);
-        }
-        if (self::$printer->printInterface === 'QZ') {
-            return self::$buffer;
-        }
-        return true;
-    }
-    
-    public function printInterface($etiq = '', $volume = 1)
-    {
-        if ($etiq == '') {
-            return false;
-        }
-        $printer = self::$printer->printName;
-        $inter = self::$printer->printInterface;
-        switch ($inter) {
-            case 'QZ':
-                //manda para QZTray
-                //aqui a função tem que montar o envio
-                //carrega o buffer
-                return $this->printQZ($etiq, $volume);
-                break;
-            case 'FILE':
-                //grava em file
-                return $this->printFile($etiq, $volume);
-                break;
-            default:
-                //LPR
-                return $this->printLPR($printer, $etiq, $volume);
-        }
-    }
-    
-    private function printQZ($etiq = '', $volume = 1)
-    {
-        self::$buffer[] = array('volume' => $volume, 'data' => base64_encode($etiq));
-        return true;
-    }
-    
-    private function printFile($etiq = '', $volume = 1)
-    {
-        $filename = dirname(dirname(dirname(__FILE__))).'/local/'.self::$numop.'_'.$volume.'.prn';
-        if (! file_put_contents($filename, $etiq)) {
-            return false;
-        }
-        return $filename;
-    }
-    
-    private function printLPR($printer, $etiq, $volume)
-    {
-        $filename = $this->printFile($etiq, $volume);
-        if ($filename) {
-            $comando = "lpr -P $printer $filename";
-            // envia para impressora
-            $retorno = '';
-            system($comando, $retorno);
-            //apagar arquivo temporario
-            unlink($filename);
-            return $retorno;
-        }
-        return false;
-    }
-     * 
+    /**
+     *
+     * @param string $texto
+     * @return string
      */
-    
     public function cleanString($texto = '')
     {
         $texto = trim($texto);

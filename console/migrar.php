@@ -11,7 +11,7 @@ require_once '../bootstrap.php';
 use Webetiq\Migrate;
 
 //converte os dados usando mdbtools
-exec('/var/www/webetiq/console/migrate.sh');
+//exec('/var/www/webetiq/console/migrate.sh');
 //carrega os dados na base opmigrate
 $mig = new Migrate();
 $mig->setFromLast();

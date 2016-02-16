@@ -2,97 +2,240 @@
 
 namespace Webetiq\Labels;
 
-use Webetiq\Labels\Base;
+/**
+ * Carrega e monta a etiqueta da TAKATA PETRI
+ *
+ */
+use Webetiq\Models\Label;
 
-class Takata extends Base
+class Takata
 {
+    //constantes
     const GS = '\1D';
     const RS = '\1E';
     const EOT = '\04';
     
-    public static $qtd = '';
+    /**
+     * Quantidade do produto
+     * @var float
+     */
+    public static $qtd = 0.0;
+    /**
+     * Part Number Takata
+     * @var string
+     */
     public static $part = '';
+    /**
+     * Descrição do produto
+     * @var string
+     */
     public static $desc = '';
+    /**
+     * Numero da OP que representa o Lote
+     * @var string
+     */
     public static $lot = '';
+    /**
+     * Pedido da TAKATA normalmente fixo
+     * @var string
+     */
     public static $ped = 'JU4227';
+    /**
+     * Identificação do fornecedor
+     * 4227 para a Plastfoam
+     * @var string
+     */
     public static $supplier = '4227';
+    /**
+     * Timestamp da data
+     * @var datatime
+     */
     public static $datats = 0;
+    /**
+     * Doca de descarregamento normalmente fixo
+     * @var string
+     */
     public static $dock = '111';
+    /**
+     * Versão do layout da etiqueta Takata
+     * @var string
+     */
     public static $version = 'A001';
+    /**
+     * Numero de etiquetas a serem impressas
+     * @var int
+     */
     public static $copies = 1;
+    /**
+     * Nome do arquivo com o template da etiqueta
+     * esse template varia conforme o a marca e modelo da impressora
+     * em função da linguagem utilizada
+     * @var string
+     */
     public static $templatefile = '';
+    /**
+     * Classe de etiqueta
+     * @var Label
+     */
     public static $lbl;
+    /**
+     * String contendo a sequencia de codigos para a impressão
+     * do codigo de barras 2D da etiqueta
+     * Essa sequencia pode ser diferente dependendo da marca e modelo da impressora
+     * @var string
+     */
     protected static $bar2d = '';
+    /**
+     * String contendo a sequencia de códigos para a impressão
+     * do código de barras 1D da etiqueta padrão "Code 128"
+     * Essa sequencia pode ser diferente dependendo da marca e modelo da impressora
+     * @var string
+     */
     protected static $bar1d = '';
+    /**
+     * License Plate é a chave para a identificação única da unidade de transporte
+     * @var string
+     */
     protected static $licplate = '';
+    /**
+     *
+     * @var string
+     */
     protected static $propNames = '';
     
+    /**
+     * Função construtora inicializa
+     * o timestamp para impressão da data
+     */
     public function __construct()
     {
         self::$datats = time();
     }
     
+    /**
+     * Seta a partir da classe etiqueta
+     * as propriedades desta classe
+     * @param \Webetiq\Labels\Label $lbl
+     */
     public function setLbl(Label $lbl)
     {
         parent::setLbl($lbl);
+        $this->setSupplier();
         $this->setDesc($lbl->desc);
         $this->setDock($lbl->doca);
+        $this->setPed($lbl->pedcli);
         $this->setLot($lbl->numop);
         $this->setPart($lbl->codcli);
         $this->setQtd($lbl->qtdade);
+        $this->setVersion();
     }
     
+    /**
+     * Seta a quantidade do produto
+     * @param float $data
+     */
     public function setQtd($data)
     {
         self::$qtd = $data;
     }
     
+    /**
+     * Seta o part number do produto
+     * As vezes o pessoal da Produção troca o '-' do código por um ponto
+     * então devemos corrigir
+     * @param string $data
+     */
     public function setPart($data)
     {
         self::$part = str_replace('.', '-', trim($data));
     }
-
+    
+    /**
+     * Seta a descrição do produto
+     * As vezes a descrição do produto possue letras minusculas
+     * para padronizar passar tudo para maiusculas
+     * @param type $data
+     */
     public function setDesc($data)
     {
         self::$desc = strtoupper(trim($data));
     }
-
+    
+    /**
+     * Seta o numero do lote (OP)
+     * @param string $data
+     */
     public function setLot($data)
     {
         self::$lot = $data;
     }
     
-    public function setPed($data)
+    /**
+     * Seta o pedido do cliente
+     * normalmente 'JU4227'
+     * @param string $data
+     */
+    public function setPed($data = 'JU4227')
     {
+        if ($data == '') {
+            $data = 'JU4227';
+        }
         self::$ped = $data;
     }
-
-    public function setSupplier($data)
+    
+    /**
+     * Seta o numero do fronecedor na TAKATA
+     * para a plastfoam '4227'
+     * @param string $data
+     */
+    public function setSupplier($data = '4227')
     {
         self::$supplier = $data;
     }
-
-    public function setDock($data)
+    
+    /**
+     * Seta a doca de descarregamento
+     * @param string $data
+     */
+    public function setDock($data = '111')
     {
         self::$dock = $data;
     }
-
-    public function setVersion($data)
+    
+    /**
+     * Seta a versão do modelo de etiqueta
+     * nesse caso 'A001'
+     * @param string $data
+     */
+    public function setVersion($data = 'A001')
     {
         self::$version = $data;
     }
-
+    
+    /**
+     * Seta o timestamp a ser usado
+     * @param datatime $data
+     */
     public function setDataTS($data)
     {
         self::$datats = $data;
     }
 
+    /**
+     * Seta o numero de etiquetas a serem impressas
+     * @param int $data
+     */
     public function setCopies($data)
     {
         self::$copies = $data;
     }
     
-    public function makeLabel($seqnum)
+    /**
+     * Constroi a etiqueta com base no template
+     * @param int $seqnum
+     * @return string
+     */
+    public function renderize($seqnum)
     {
         //cria barcodes
         self::make2D($seqnum);
@@ -134,14 +277,9 @@ class Takata extends Base
         self::$bar2d = $bar2d;
         self::make1D($licplate);
     }
-    
-    public static function make2DEPL2($seqnum)
-    {
-        
-    }
         
     /**
-     * make1D
+     * Cria a sequencia para o codigo de barras 1D
      * @param string $licplate
      */
     protected static function make1D($licplate)
@@ -150,7 +288,7 @@ class Takata extends Base
     }
     
     /**
-     * licPlate
+     * Monta o License Plate
      * @param int $seqnum
      * @param int $data
      * @param string $lot
@@ -166,7 +304,9 @@ class Takata extends Base
     }
     
     /**
-     * formField
+     * Formata os campos da etiqueta
+     * de acordo com as regras estabelecidas
+     * para strings e numeros
      * @param string $key
      * @param string $value
      * @return string
