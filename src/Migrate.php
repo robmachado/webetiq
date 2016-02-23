@@ -8,8 +8,9 @@ namespace Webetiq;
  * tratar e incerir nas tabelas OP e produtos da base MySQL
  */
 
-use Webetiq\DBase;
+//use Webetiq\DBase;
 use Webetiq\Labels\Label;
+use Webetiq\Op;
 
 class Migrate
 {
@@ -18,11 +19,6 @@ class Migrate
      * @var string
      */
     public $error;
-    /**
-     * Classe de acesso ao banco de dados MySQL
-     * @var DBase
-     */
-    protected $dbase;
     /**
      * Array com as OP's extraidas da base access OP.mdb
      * na estrutura array('<numero da OP>, '<sql gerado pelo mdbtools>', ...
@@ -48,9 +44,7 @@ class Migrate
         if ($storagePath =='') {
             $storagePath = '../storage/';
         }
-        $this->dbase = new DBase();
-        $this->dbase->setDBname('opmigrate');
-        $this->dbase->connect();
+        
         $this->aOPs = $this->getOPsList($storagePath.'OP.sql');
         $this->aProds = $this->getProdsList($storagePath.'produtos.sql');
     }
@@ -61,7 +55,7 @@ class Migrate
      */
     public function __destruct()
     {
-        $this->dbase->disconnect();
+        //$this->dbase->disconnect();
     }
     
     /**
@@ -72,7 +66,7 @@ class Migrate
     public function setFromLast()
     {
         //pegar o último numero de OP da base de dados
-        $lastop = $this->dbase->getLastOp();
+        $lastop = $this->op->getLastOp();
         //varrer o array com as OPs
         if (empty($this->aOPs)) {
             return '';
@@ -87,12 +81,10 @@ class Migrate
                 //carregar os novos dados na tabela
                 $sqlComm = $this->changeSQL($sql, 'OP');
                 $sqlComm = $this->extractData($sqlComm);
-                $lastid = $this->dbase->insertSql($sqlComm);
+                $lastid = $this->op->insert($sqlComm);
                 if (!$lastid) {
-                    echo $this->dbase->error.' ==> '.$sqlComm.'<br>';
+                    echo $this->op->getError().' ==> '.$sqlComm.'<br>';
                 } else {
-                    //$sqlComm = "UPDATE OP SET produto = trim(produto) WHERE id='$lastid'";
-                    //$this->dbase->executeSql($sqlComm);
                     $sqlComm = "SELECT produto FROM OP WHERE id='$lastid'";
                     $lstprod = $this->dbase->querySql($sqlComm);
                     $produto = $lstprod[0]['produto'];
@@ -160,38 +152,6 @@ class Migrate
         }
         return '';
     }
-    
-    public function setAll()
-    {
-        
-    }
-    
-    public function getOp($num)
-    {
-        //puxa os dados da OP da base migrate tabela opmigrate para 
-        //classe Label
-    }
-    
-    /**
-     * Obtem o numero da ultima OP cadastrada na base 'opmigrate'
-     * onde foram migradas todas as OP's da base Access MDB
-     * @param string $dbname
-     * @return string
-     */
-    public function getLastOp($dbname = 'opmigrate')
-    {
-        $num = 0;
-        $this->connect('', $dbname);
-        $sqlComm = "SELECT max(numop) as numop FROM `OP`;";
-        $sth = $this->conn->prepare($sqlComm);
-        $sth->execute();
-        $row = $sth->fetchAll();
-        if (!empty($row)) {
-            $num = $row[0]['numop'];
-        }
-        return $num;
-    }
-
     
     //ordena a lista de produtos com o codigo do produto como chave do array e o
     //statement sql como valor
@@ -447,7 +407,7 @@ class Migrate
      * @param string $sqlComm
      * @return string
      */
-    public function extractData($sqlComm)
+    public function extractData($sqlComm, &$values = array())
     {
         $aPartial = explode(') VALUES (', $sqlComm);
         $part1 = 'xxxx'.$aPartial[0];

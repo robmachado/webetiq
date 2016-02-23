@@ -66,7 +66,7 @@ class LabelBase
      */
     protected static $template = '';
     /**
-     * 
+     * Path para o template
      * @var string
      */
     protected static $templateFile = '';

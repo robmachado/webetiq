@@ -11,7 +11,7 @@ require_once '../bootstrap.php';
  * impressão
  */
 
-use Webetiq\DBase;
+use Webetiq\Op;
 use Webetiq\Labels\Label;
 use Webetiq\Printer;
 
@@ -39,8 +39,8 @@ $selPrintGroup .= '</select></div>';
 $lbl = new Label();
 if (isset($numop)) {
     //buscar dados da OP
-    $dbase->setDBname('opmigrate');
-    $lbl = $dbase->getMigrate($lbl, $numop);
+    $migrate = new Op();
+    $migrate->getOP($lbl, $numop);
     //caso não seja encontrada a OP na base migrate 
     //retornar e avisar o usuário
     if ($lbl->numop == '') {
