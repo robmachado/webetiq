@@ -2,10 +2,15 @@
 
 namespace Webetiq\Labels;
 
-use Webetiq\Labels\Base;
-use Webetiq\Models\Label;
+/**
+ * Classe de rederização das etiquetas genericas 
+ * para serem usadas para todos os outros clientes
+ */
 
-class Generic extends Base
+use Webetiq\Labels\LabelBase;
+use Webetiq\Labels\Label;
+
+class Generic extends LabelBase
 {
     public static $cliente = '';
     public static $cod = '';
@@ -32,118 +37,6 @@ class Generic extends Base
         self::$datats = time();
     }
     
-    /*
-    public function setLbl(Label $lbl)
-    {
-        
-        $propNames = get_object_vars($lbl);
-        self::$lbl = $lbl;
-        $this->setCod($lbl->cod);
-        $this->setDesc($lbl->desc);
-        $this->setCliente($lbl->cliente);
-        $this->setLote($lbl->op);
-        $this->setData($lbl->data);
-        $this->setValidade($lbl->validade);
-        $this->setCodCli($lbl->codcli);
-        $this->setQtd($lbl->qtdade);
-        $this->setUnid($lbl->unidade);
-        $this->setPeso($lbl->peso);
-        $this->setPesoBruto($lbl->pesoBruto);
-        $this->setPesoLiq($lbl->pesoLiq);
-        $this->setNF($lbl->nf);
-    }
-    
-    public function setDesc($data)
-    {
-        self::$desc = $data;
-    }
-
-    public function setCod($data)
-    {
-        self::$cod = $data;
-    }
-
-    public function setPed($data)
-    {
-        self::$pedido = $data;
-    }
-
-    public function setCliente($data)
-    {
-        self::$cliente = $data;
-    }
-
-    public function setLote($data)
-    {
-        self::$lote = $data;
-    }
-
-    public function setData($data)
-    {
-        self::$data = $data;
-    }
-
-    public function setValidade($data)
-    {
-        self::$validade = $data;
-    }
-
-    public function setQtd($data)
-    {
-        self::$qtd = $data;
-    }
-    
-    public function setCodCli($data)
-    {
-        self::$codcli = $data;
-    }
-    
-    public function setUnid($data)
-    {
-        self::$unidade = $data;
-    }
-    
-    public function setPeso($data)
-    {
-        self::$peso = $data;
-    }
-
-    public function setPesoBruto($data)
-    {
-        self::$pesoBruto = $data;
-    }
-
-    public function setPesoLiq($data)
-    {
-        self::$pesoLiq = $data;
-    }
-
-    
-    public function setTemplate($data)
-    {
-        self::$templatefile = $data;
-    }
-
-    public function setCopies($data)
-    {
-        self::$copies = $data;
-    }
-    
-    public function setNF($data)
-    {
-        self::$numNF = $data;
-    }
-    
-    public function labelPrint($seqnum)
-    {
-        $fim = $seqnum+self::$copies;
-        for ($iC = $seqnum; $iC < $fim; $iC++) {
-            $etiq = $this->makeLabel($iC);
-            $filename = '/var/www/webetiq/local/'.self::$lot.'_'.$iC.'.prn';
-            file_put_contents($filename, $etiq);
-        }
-    }
-    */
     public function renderize($seqnum)
     {
         //carrega template
@@ -162,7 +55,6 @@ class Generic extends Base
         $template = str_replace('{codcli}', self::$codcli, $template);
         $template = str_replace('{nf}', self::$numNF, $template);
         $template = str_replace('{copias}', self::$copies, $template);
-        
         return $template;
     }
 }

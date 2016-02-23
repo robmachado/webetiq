@@ -58,7 +58,9 @@ function printEtiq(data) {
     qz.append64(data);
     qz.print();
 }
-    
+*/
+
+//calcula pesos    
 function calcula(param) {
     var id = param.id;
     var pb = document.getElementById("pesoBruto").value;
@@ -76,6 +78,7 @@ function calcula(param) {
     }
 }
 
+/*
 function valDate(param) {
     var emiss = document.getElementById("emissao").value;
     //alert(emiss);

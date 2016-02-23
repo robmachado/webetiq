@@ -3,8 +3,7 @@ ini_set("display_errors", 1);
 error_reporting(E_ALL);
 require_once '../bootstrap.php';
 
-use Webetiq\Label;
-use Webetiq\Factory;
+use Webetiq\Labels\Label;
 
 $lbl = new Label();
 
@@ -23,7 +22,7 @@ exit();
 // se for LPR 
 
 //instancia Factory de labels
-$fact = new Factory();
+
 //estabelece a impressora
 $fact::setPrinter($printer);
 

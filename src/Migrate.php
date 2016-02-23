@@ -9,7 +9,7 @@ namespace Webetiq;
  */
 
 use Webetiq\DBase;
-use Webetiq\Label;
+use Webetiq\Labels\Label;
 
 class Migrate
 {
@@ -166,12 +166,13 @@ class Migrate
         
     }
     
-    public function setOp($num)
+    public function getOp($num)
     {
-        
+        //puxa os dados da OP da base migrate tabela opmigrate para 
+        //classe Label
     }
     
-        /**
+    /**
      * Obtem o numero da ultima OP cadastrada na base 'opmigrate'
      * onde foram migradas todas as OP's da base Access MDB
      * @param string $dbname
@@ -442,7 +443,7 @@ class Migrate
      * podem conter aspas simpes e duplas e os numeros estão formatados
      * com virgula. E a separação dos valores é feita por ";" ao invés de uma
      * virgula para facilitar a extração desses dados. Veja console/migrate.sh
-     * 
+     *
      * @param string $sqlComm
      * @return string
      */

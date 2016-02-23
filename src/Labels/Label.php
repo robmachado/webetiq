@@ -1,6 +1,6 @@
 <?php
 
-namespace Webetiq;
+namespace Webetiq\Labels;
 
 class Label
 {
@@ -24,5 +24,4 @@ class Label
     public $numnf = '';
     public $volume = 0;
     public $copias = 1;
-    
 }

@@ -12,7 +12,7 @@ require_once '../bootstrap.php';
  */
 
 use Webetiq\DBase;
-use Webetiq\Label;
+use Webetiq\Labels\Label;
 use Webetiq\Printer;
 
 
@@ -23,10 +23,9 @@ $copias = 1;
 $emissao = date('d/m/Y');
 
 //carrega classe de acesso a base de dados
-$dbase = new Webetiq\DBase();
+$objPrinter = new Webetiq\Printer();
 //carrega impressoras
-$dbase->setDBname('printers');
-$aPrint = $dbase->getAllPrinters();
+$aPrint = $objPrinter->getAllPrinters();
 $selPrintGroup = '<div class="form-group"><label for=\"printer\">Selecione a impressora</label><select class="form-control" name="printer">';
 foreach ($aPrint as $printer) {
     $selp = '';

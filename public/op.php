@@ -2,17 +2,10 @@
 ini_set("display_errors", 1);
 error_reporting(E_ALL);
 require_once '../bootstrap.php';
-
 $numop = filter_input(INPUT_GET, 'numop', FILTER_SANITIZE_STRING);
 $fail =  filter_input(INPUT_GET, 'fail', FILTER_SANITIZE_STRING);
-
 $script = "<script src=\"js/op.js\"></script>";
-
 $title = "Busca OP";
-//    <span class=\"input-group-btn\">
-//         <button class=\"btn btn-default\" type=\"submit\"><span class=\"glyphicon glyphicon-search\"></span> Busca </button>
-//    </span>
-//<button class=\"btn btn-primary\" type=\"submit\"><span class=\"glyphicon glyphicon-search\"></span> Busca </button> 
 $body = "
 <div class=\"container-fluid\">
     <div class=\"row\">
@@ -44,10 +37,8 @@ $body = "
 </div>
 $script
 ";
-
 $html = file_get_contents('main.html');
 $html = str_replace("{{extras}}", '', $html);
 $html = str_replace("{{title}}", $title, $html);
 $html = str_replace("{{content}}", $body, $html);
-
 echo $html;

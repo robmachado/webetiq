@@ -3,10 +3,11 @@
 namespace Webetiq\Labels;
 
 /**
- * Carrega e monta a etiqueta da TAKATA PETRI
+ * Classe Takata
+ * Renderiza a etiqueta da Takata com barras 2D
  *
  */
-use Webetiq\Models\Label;
+use Webetiq\Labels\Label;
 
 class Takata
 {
