@@ -210,9 +210,9 @@ class Migrate
             $pedido =  (int) $this->adjust($aReg[3],'N'); //numero do pedido interno (int)
             $prazo = (string) $this->adjust($aReg[4],'D'); //prazo de entrega (datetime)
             $produto = (string) $this->adjust($aReg[5],'C'); //descrição do produto (string)
-            $nummaq = (string) $this->adjust($aReg[6],'C'); // numero da extrusora (int)
-            $matriz;
-            $kg1;
+            $nummaq = (float) $this->adjust($aReg[6],'N'); // numero da extrusora (int)
+            $matriz = (string) $this->adjust($aReg[7],'C'); //numero da  matriz
+            $kg1 = (float) $this->adjust($aReg[8],'N'); //peso m;
             $kg1ind;
             $kg2;
             $kg2ind;
@@ -256,8 +256,8 @@ class Migrate
     private function convertNumber($text)
     {
         //remover todos os digitos não numericos de uma string
+        $text = preg_replace("/[^0-9,.\s]/", "", $text);
         $text = str_replace(',', '.', $text);
-        
         if ($text == '') {
             $number = 0;
         } else {
