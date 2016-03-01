@@ -31,7 +31,7 @@ class Stock
      * @param type $dbname
      * @return Label
      */
-    public function getStockOp(Label $lbl, $op = '1', $dbname = 'pbase')
+    public function getOp(Label $lbl, $op = '1', $dbname = 'pbase')
     {
         $this->dbase->connect('', $dbname);
         $sqlComm = "SELECT * FROM `mn_estoque` WHERE mn_op = '$op' ORDER BY mn_volume DESC LIMIT 0,1";
@@ -58,7 +58,8 @@ class Stock
         }
         return $lbl;
     }
-    public function setStockOp(Label $lbl)
+    
+    public function setOp(Label $lbl)
     {
         $this->dbase->connect('', $dbname);
         

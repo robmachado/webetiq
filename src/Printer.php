@@ -69,9 +69,13 @@ class Printer
     public function __construct($printName = '')
     {
         $this->dbase = new DBase();
-        $dados = $this->getPrinter($printName);
-        foreach ($dados as $key => $field) {
-            $this->$key = $field;
+        if (! empty($printName)) {
+            $dados = $this->getPrinter($printName);
+            if (!empty($dados)) {
+                foreach ($dados as $key => $field) {
+                    $this->$key = $field;
+                }
+            }
         }
     }
     
@@ -81,7 +85,7 @@ class Printer
      */
     public function getAll()
     {
-        $this->connect('', 'printers');
+        $this->dbase->connect('', 'printers');
         $sqlComm = "SELECT * FROM printers WHERE printType = 'T' AND printBlock = '0'";
         $sqlComm .= " ORDER BY printName";
         

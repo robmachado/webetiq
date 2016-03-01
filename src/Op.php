@@ -4,7 +4,9 @@ namespace Webetiq;
 
 /**
  * Class Op
- * Get data from OP 
+ * Get data from OP
+ * A base de dados opmigrate será escrita apenas pelas funções de migração
+ * esta classe apenas faz a leitura dos dados 
  */
 class Op
 {
@@ -13,42 +15,52 @@ class Op
      * @var DBase
      */
     protected $dbase;
-    
+    /**
+     * Erros 
+     * @var string 
+     */
     protected $error;
 
-	
-    protected $id;
-    protected $numop;
-    protected $cliente;
-    protected $codcli;
-    protected $pedido;
-    protected $prazo;
-    protected $produto;
-    protected $nummaq;
-    protected $matriz;
-    protected $kg1;
-    protected $kg1ind;
-    protected $kg2;
-    protected $kg2ind;
-    protected $kg3;
-    protected $kg3ind;
-    protected $kg4;
-    protected $kg4ind;
-    protected $kg5;
-    protected $kg5ind;
-    protected $kg6;
-    protected $kg6ind;
-    protected $pesototal;
-    protected $pesomilheiro;
-    protected $pesobobina;
-    protected $quantidade;
-    protected $bolbobinas;
-    protected $dataemissao;
-    protected $metragem;
-    protected $contadordif;
-    protected $isobobinas;
-    protected $pedcli;
-    protected $unidade;
+    /**
+     * ID da OP
+     * @var int
+     */
+    public $id;
+    /**
+     * Numero da OP
+     * @var int 
+     */
+    public $numop;
+    public $cliente;
+    public $codcli;
+    public $pedido;
+    public $prazo;
+    public $produto;
+    public $nummaq;
+    public $matriz;
+    public $kg1;
+    public $kg1ind;
+    public $kg2;
+    public $kg2ind;
+    public $kg3;
+    public $kg3ind;
+    public $kg4;
+    public $kg4ind;
+    public $kg5;
+    public $kg5ind;
+    public $kg6;
+    public $kg6ind;
+    public $pesototal;
+    public $pesomilheiro;
+    public $pesobobina;
+    public $quantidade;
+    public $bolbobinas;
+    public $dataemissao;
+    public $metragem;
+    public $contadordif;
+    public $isobobinas;
+    public $pedcli;
+    public $unidade;
 
     /**
      *
@@ -73,27 +85,18 @@ class Op
      * Carrega os dados de uma OP
      * @param string $num
      */
-    public function getOP($num)
+    public function get($num)
     {
         $sqlComm = "SELECT * FROM OP WHERE numop = '$num'";
         $rows = $this->dbase->querySql($sqlComm);
-        foreach ($rows as $row) {
-            foreach($row as $key => $value) {
-                $this->$key = $value;
+        if (! empty($rows)) {
+            foreach ($rows as $row) {
+                foreach ($row as $key => $value) {
+                    $this->$key = $value;
+                }
             }
         }
         return $this;
-    }
-    
-    public function loadParam()
-    {
-        $propNames = get_object_vars($this);
-        foreach ($propNames as $key => $value) {
-            $metodo = 'set'. ucfirst($key);
-            if (method_exists($this, $metodo)) {
-                $this->$metodo($value);
-            }
-        }
     }
     
     /**
@@ -101,7 +104,7 @@ class Op
      * onde foram migradas todas as OP's da base Access MDB
      * @return string
      */
-    public function getLastOp()
+    public function lastNum()
     {
         $num = 0;
         $sqlComm = "SELECT max(numop) as numop FROM `OP`;";
@@ -123,10 +126,4 @@ class Op
         }
         return $lastid;
     }
-    
-    public function getError()
-    {
-        return $this->error;
-    }
-    
 }

@@ -14,7 +14,7 @@ require_once '../bootstrap.php';
 use Webetiq\Op;
 use Webetiq\Labels\Label;
 use Webetiq\Printer;
-
+use Webetiq\Units;
 
 $remoteip = $_SERVER['REMOTE_ADDR'];
 $numop = filter_input(INPUT_POST, 'numop', FILTER_SANITIZE_STRING);
@@ -25,7 +25,7 @@ $emissao = date('d/m/Y');
 //carrega classe de acesso a base de dados
 $objPrinter = new Webetiq\Printer();
 //carrega impressoras
-$aPrint = $objPrinter->getAllPrinters();
+$aPrint = $objPrinter->getAll();
 $selPrintGroup = '<div class="form-group"><label for=\"printer\">Selecione a impressora</label><select class="form-control" name="printer">';
 foreach ($aPrint as $printer) {
     $selp = '';
@@ -40,14 +40,14 @@ $lbl = new Label();
 if (isset($numop)) {
     //buscar dados da OP
     $migrate = new Op();
-    $migrate->getOP($lbl, $numop);
+    $op = $migrate->getOP($numop);
     //caso não seja encontrada a OP na base migrate 
     //retornar e avisar o usuário
-    if ($lbl->numop == '') {
+    if ($op->numop == '') {
         header("Location: op.php?numop=$numop&fail=1");
     }
-    $dbase->setDBname('pbase');
-    $stq = $dbase->getStq($lbl, $numop);
+    //$dbase->setDBname('pbase');
+    //$stq = $dbase->getStq($lbl, $numop);
 }
 $lbl->volume = $stq->volume + 1;
 

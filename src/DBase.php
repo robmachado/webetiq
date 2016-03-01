@@ -59,7 +59,7 @@ class DBase
         $this->setPass($pass);
         $this->setHost($host);
         $this->setDBname($dbname);
-        $this->dsn = "mysql:host=$this->host;dbname=$dbname";
+        $this->dsn = "mysql:host=$this->host;dbname=$this->dbname";
         try {
             $this->conn = new PDO($this->dsn, $this->user, $this->pass);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

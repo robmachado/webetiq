@@ -44,9 +44,9 @@ class Migrate
         if ($storagePath =='') {
             $storagePath = '../storage/';
         }
-        
-        $this->aOPs = $this->getOPsList($storagePath.'OP.sql');
-        $this->aProds = $this->getProdsList($storagePath.'produtos.sql');
+        $this->aOPs = $this->setOPsList($storagePath.'OP.txt');
+        //$this->aOPs = $this->getOPsList($storagePath.'OP.sql');
+        //$this->aProds = $this->getProdsList($storagePath.'produtos.sql');
     }
     
     /**
@@ -66,7 +66,7 @@ class Migrate
     public function setFromLast()
     {
         //pegar o último numero de OP da base de dados
-        $lastop = $this->op->getLastOp();
+        $lastop = $this->op->lastNum();
         //varrer o array com as OPs
         if (empty($this->aOPs)) {
             return '';
@@ -195,6 +195,93 @@ class Migrate
         return $aOPs;
     }
     
+    public function setOPsList($listaFile)
+    {
+        $aOPs = array();
+        $aList = array();
+        //carregar uma matriz com os dados txt da tabela exportada
+        $aList = file($listaFile, FILE_IGNORE_NEW_LINES);
+        foreach ($aList as $registro) {
+            $aReg = explode('|', $registro);
+            
+            $numop = (int) $aReg[0]; //numero da OP (int)
+            $cliente = (string) $this->adjust($aReg[1],'C'); //nome do cliente (string)
+            $codcli = (string) $this->adjust($aReg[2],'C'); //codigo do produto do cliente (string)
+            $pedido =  (int) $this->adjust($aReg[3],'N'); //numero do pedido interno (int)
+            $prazo = (string) $this->adjust($aReg[4],'D'); //prazo de entrega (datetime)
+            $produto = (string) $this->adjust($aReg[5],'C'); //descrição do produto (string)
+            $nummaq = (string) $this->adjust($aReg[6],'C'); // numero da extrusora (int)
+            $matriz;
+            $kg1;
+            $kg1ind;
+            $kg2;
+            $kg2ind;
+            $kg3;
+            $kg3ind;
+            $kg4;
+            $kg4ind;
+            $kg5;
+            $kg5ind;
+            $kg6;
+            $kg6ind;
+            $pesototal;
+            $pesomilheiro;
+            $pesobobina;
+            $quantidade;
+            $bolbobinas;
+            $dataemissao;
+            $metragem;
+            $contadordif;
+            $isobobinas;
+            $pedcli;
+            $unidade;
+            
+            $aOPs[$numop] = $registro;
+        }
+        ksort($aOPs);
+        return $aOPs;
+    }
+    
+    private function adjust($text, $type)
+    {
+        if ($type == 'C') {
+            return $this->convertString($text);
+        } elseif ($type == 'N') {
+            return $this->convertNumber($text);
+        } elseif ($type == 'D') {
+            return $text;
+        }
+    }
+    
+    private function convertNumber($text)
+    {
+        //remover todos os digitos não numericos de uma string
+        $text = str_replace(',', '.', $text);
+        
+        if ($text == '') {
+            $number = 0;
+        } else {
+            $number = (float) $text;
+        }
+        return $number;
+    }
+    
+    private function convertString($text)
+    {
+        $text = trim($text);
+        $text = $this->removeDoubleSpace($text);
+        $text = strtoupper($text);
+        return $text;
+    }
+    
+    private function removeDoubleSpace($text)
+    {
+        $text = str_replace("  ", " ", $text);
+        if (strpos($text, "  ")) {
+            $this->removeDoubleSpace($text);
+        }
+        return $text;
+    }
     /**
      * changeSQL
      * Ajusta o comando SQL extraido do arquivo MDB com o mdbtools
@@ -341,45 +428,8 @@ class Migrate
         }
         return $sqlComm;
     }
-    
-    /**
-     * pushUnit
-     * @param string $unidade
-     * @return string
-     */
-    protected function pushUnit($unidade)
-    {
-        switch ($unidade) {
-            case "1":
-                $grandeza = "pcs";
-                break;
-            case "2":
-                $grandeza = "cen";
-                break;
-            case "3":
-                $grandeza = "mil";
-                break;
-            case "4":
-                $grandeza = "kg";
-                break;
-            case "5":
-                $grandeza = "m";
-                break;
-            case "6":
-                $grandeza = "m²";
-                break;
-            case "7":
-                $grandeza = "bob";
-                break;
-            case "8":
-                $grandeza = "cj";
-                break;
-            default:
-                $grandeza = 'pcs';
-        }
-        return $grandeza;
-    }
-    
+   
+   
     /**
      * convertData
      * @param string $data
