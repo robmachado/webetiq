@@ -11,6 +11,7 @@ namespace Webetiq;
 //use Webetiq\DBase;
 use Webetiq\Labels\Label;
 use Webetiq\Op;
+use RuntimeException;
 
 class Migrate
 {
@@ -45,157 +46,10 @@ class Migrate
             $storagePath = '../storage/';
         }
         $this->aOPs = $this->setOPsList($storagePath.'OP.txt');
-        //$this->aOPs = $this->getOPsList($storagePath.'OP.sql');
-        //$this->aProds = $this->getProdsList($storagePath.'produtos.sql');
+        $this->aProds= $this->setProdsList($storagePath.'produtos.txt');
     }
     
-    /**
-     * função destrutura
-     * deconecta a base de dados
-     */
-    public function __destruct()
-    {
-        //$this->dbase->disconnect();
-    }
-    
-    /**
-     * Carrega os dados das OP a partir do ultimo numero de OP registrado
-     * na tabela opmigrate
-     * @return string
-     */
-    public function setFromLast()
-    {
-        //pegar o último numero de OP da base de dados
-        $lastop = $this->op->lastNum();
-        //varrer o array com as OPs
-        if (empty($this->aOPs)) {
-            return '';
-        }
-        $flag = false;
-        $result = '';
-        $produto = '';
-        $offset = array_search($lastop, array_keys($this->aOPs));
-        $aOff = array_slice($this->aOPs, $offset, null, true);
-        foreach ($aOff as $key => $sql) {
-            if ($flag || $lastop == 0) {
-                //carregar os novos dados na tabela
-                $sqlComm = $this->changeSQL($sql, 'OP');
-                $sqlComm = $this->extractData($sqlComm);
-                $lastid = $this->op->insert($sqlComm);
-                if (!$lastid) {
-                    echo $this->op->getError().' ==> '.$sqlComm.'<br>';
-                } else {
-                    $sqlComm = "SELECT produto FROM OP WHERE id='$lastid'";
-                    $lstprod = $this->dbase->querySql($sqlComm);
-                    $produto = $lstprod[0]['produto'];
-                    if (empty($produto)) {
-                        $result = $this->setProds($produto);
-                    }
-                }
-                echo "INSERIDA OP $key [$lastid] ==> $produto  $result<BR>";
-            }
-            if ($key == $lastop) {
-                $flag = true;
-            }
-        }
-        return $lastop;
-    }
-    
-    /**
-     * Carrega o produto na tabela 'opmigrate\produtos'
-     * @param string $produto
-     * @param bool $truncar
-     * @return string
-     */
-    public function setProds($produto = '', $truncar = false)
-    {
-        $this->dbase->connect('', 'opmigrate');
-        if ($truncar) {
-            //limpar a tabela de produtos
-            $sqlComm = "TRUNCATE TABLE produtos";
-            if (! $this->dbase->executeSql($sqlComm)) {
-                echo $this->dbase->error;
-            }
-        }
-        if ($produto != '') {
-            //verifica se o produto já existe na tabela
-            $sqlComm = "SELECT codigo FROM produtos WHERE produto=\"$produto\"";
-            $rows = $this->dbase->querySql($sqlComm);
-            if (empty($rows)) {
-                if (array_key_exists($produto, $this->aProds)) {
-                    $sql = $this->aProds[$produto];
-                    $sqlComm = $this->changeSQL($sql, 'produtos');
-                    $sqlComm = $this->extractData($sqlComm);
-                    $lastid = $this->dbase->insertSql($sqlComm);
-                    if (! $lastid) {
-                        echo $this->dbase->error.' ==> '.$sqlComm.'<br>';
-                    }
-                    return "Produto: $produto inserido!";
-                } else {
-                    return 'Produto Não encontrado na extração do access';
-                }
-            } elseif ($rows === false) {
-                echo $this->dbase->error.' ==> '.$sqlComm.'<br>';
-            }
-        } else {
-            $i = 0;
-            foreach ($this->aProds as $key => $sql) {
-                $sqlComm = $this->changeSQL($sql, 'produtos');
-                $sqlComm = $this->extractData($sqlComm);
-                if (! $this->dbase->insertSql($sqlComm)) {
-                    echo $this->dbase->error.' ==> '.$sqlComm.'<br>';
-                } else {
-                    echo "[$i] $key <br>";
-                    $i++;
-                }
-            }
-        }
-        return '';
-    }
-    
-    //ordena a lista de produtos com o codigo do produto como chave do array e o
-    //statement sql como valor
-    public function getProdsList($listaFile)
-    {
-        $aProd = array();
-        $aList = array();
-        //carregar uma matriz com os dados sql da tabela exportada
-        //ignorando linhas em branco
-        $aList = file($listaFile, FILE_IGNORE_NEW_LINES);
-        //ordenar a tabela exportada pela descricao do produto
-        foreach ($aList as $sqlComm) {
-            $k = strpos($sqlComm, 'VALUES ("');
-            $txt = substr($sqlComm, $k+9, 150);
-            $atxt = explode('"', $txt);
-            $atxtx = str_replace("'", "", $atxt[0]);
-            $desc = trim($atxtx);
-            $aProd[$desc] = $sqlComm;
-        }
-        ksort($aProd);
-        return $aProd;
-    }
-    
-    //ordena a lista de OPs com o numero da OP como chave do array e o statement
-    //sql como valor
-    public function getOPsList($listaFile)
-    {
-        $aOPs = array();
-        $aList = array();
-        //carregar uma matriz com os dados sql da tabela exportada
-        $aList = file($listaFile, FILE_IGNORE_NEW_LINES);
-        //ordenar a tabela exportada pelo numero da OP
-        foreach ($aList as $sqlComm) {
-            $k = strrpos($sqlComm, 'VALUES (');
-            $txt = substr($sqlComm, $k+8, 6);
-            $atxt = explode(',', $txt);
-            $numop = (int) $atxt[0];
-            $aOPs[$numop] = $sqlComm;
-        }
-        ksort($aOPs);
-        return $aOPs;
-    }
-    
-    public function setOPsList($listaFile)
+    protected function setOPsList($listaFile)
     {
         $aOPs = array();
         $aList = array();
@@ -203,43 +57,97 @@ class Migrate
         $aList = file($listaFile, FILE_IGNORE_NEW_LINES);
         foreach ($aList as $registro) {
             $aReg = explode('|', $registro);
-            
             $numop = (int) $aReg[0]; //numero da OP (int)
-            $cliente = (string) $this->adjust($aReg[1],'C'); //nome do cliente (string)
-            $codcli = (string) $this->adjust($aReg[2],'C'); //codigo do produto do cliente (string)
-            $pedido =  (int) $this->adjust($aReg[3],'N'); //numero do pedido interno (int)
-            $prazo = (string) $this->adjust($aReg[4],'D'); //prazo de entrega (datetime)
-            $produto = (string) $this->adjust($aReg[5],'C'); //descrição do produto (string)
-            $nummaq = (float) $this->adjust($aReg[6],'N'); // numero da extrusora (int)
-            $matriz = (string) $this->adjust($aReg[7],'C'); //numero da  matriz
-            $kg1 = (float) $this->adjust($aReg[8],'N'); //peso m;
-            $kg1ind;
-            $kg2;
-            $kg2ind;
-            $kg3;
-            $kg3ind;
-            $kg4;
-            $kg4ind;
-            $kg5;
-            $kg5ind;
-            $kg6;
-            $kg6ind;
-            $pesototal;
-            $pesomilheiro;
-            $pesobobina;
-            $quantidade;
-            $bolbobinas;
-            $dataemissao;
-            $metragem;
-            $contadordif;
-            $isobobinas;
-            $pedcli;
-            $unidade;
-            
             $aOPs[$numop] = $registro;
         }
         ksort($aOPs);
         return $aOPs;
+    }
+    
+    protected function setProdsList($listaFile)
+    {
+        
+    }
+    
+    public function migrate()
+    {
+        //busca o ultimo registro das OPs
+        $op = new Op();
+        $num = $op->lastNum();
+        //verifica se essa OP está na lista
+        $keys = array_keys($this->aOPs);
+        if (! array_key_exists($num, $this->aOPs)) {
+            $last = $keys[(count($keys)-1)];
+            if ($last <= $num) {
+                return false;
+            }
+            //existem OPs maiores, mas não essa registrada na tabela
+            //acretita-se nesse caso que o numero foi pulado
+            //então recuar um a um até que o numero da chave seja
+            //menor que o numero da OP
+            //x+1 mostra o ponto de corte
+            for ($x=(count($keys)-1); $x=0; $x--) {
+                if ($key[$x] <= $num) {
+                    break;
+                }
+            }
+        } else {
+            $x = array_search($num, $keys);
+        }
+        //aqui estão as ops da lista que ainda não estão da tabela
+        $aOps = array_slice($this->aOPs, $x+1);
+        foreach ($aOps as $data) {
+            $aData = $this->extract($data);
+            $op->set($aData);
+            $op->save();
+        }
+        //já migrou as OPs agora deve ser migrados os produtos
+    }
+    
+    private function extract($reg = null)
+    {
+        if (is_null($reg)) {
+            return array();
+        }
+        $registro = explode('|', $reg);
+        $num = count($registro);
+        $numop = (int) $registro[0]; //numero da OP (int)
+        if ($num != 31) {
+            throw \RuntimeException("Dados errados na linha. ");
+        }
+        $aData = array(
+            'numop' => $numop,
+            'cliente' => (string) $this->adjust($registro[1], 'C'), //nome do cliente (string)
+            'codcli' => (string) $this->adjust($registro[2], 'C'), //codigo do produto do cliente (string)
+            'pedido' =>  (int) $this->adjust($registro[3], 'N'), //numero do pedido interno (int)
+            'prazo' => (string) $this->adjust($registro[4], 'D'), //prazo de entrega (datetime)
+            'produto' => (string) $this->adjust($registro[5], 'C'), //descrição do produto (string)
+            'nummaq' => (float) $this->adjust($registro[6], 'N'), // numero da extrusora (int)
+            'matriz' => (string) $this->adjust($registro[7], 'C'), //numero da  matriz
+            'kg1' => (float) $this->adjust($registro[8], 'N'), //peso ;
+            'kg1ind' => (float) $this->adjust($registro[9], 'N'), // peso
+            'kg2' => (float) $this->adjust($registro[10], 'N'), // peso;
+            'kg2ind' => (float) $this->adjust($registro[11], 'N'), // peso;
+            'kg3' => (float) $this->adjust($registro[12], 'N'), // peso;
+            'kg3ind' => (float) $this->adjust($registro[13], 'N'), // peso;
+            'kg4' => (float) $this->adjust($registro[14], 'N'), // peso;
+            'kg4ind' => (float) $this->adjust($registro[15], 'N'), // peso;
+            'kg5' => (float) $this->adjust($registro[16], 'N'), // peso;
+            'kg5ind' => (float) $this->adjust($registro[17], 'N'), // peso;
+            'kg6' => (float) $this->adjust($registro[18], 'N'), // peso;
+            'kg6ind' => (float) $this->adjust($registro[19], 'N'), // peso;
+            'pesototal' => (float) $this->adjust($registro[20], 'N'), // peso;
+            'pesomilheiro' => (float) $this->adjust($registro[21], 'N'), // peso;
+            'pesobobina' => (float) $this->adjust($registro[22], 'N'), // peso;
+            'quantidade' => (float) $this->adjust($registro[23], 'N'), // peso;
+            'bolbobinas' =>  (int) $this->adjust($registro[24], 'N'),
+            'dataemissao' => (string) $this->adjust($registro[25], 'D'),
+            'metragem' => (int) $this->adjust($registro[26], 'N'),//26
+            'contadordif' => (int) $this->adjust($registro[27], 'N'),//27
+            'isobobinas' => (int) $this->adjust($registro[28], 'N'),//28
+            'pedcli' => (string) $this->adjust($registro[29], 'C'),//29
+            'unidade' => (string) $this->adjust($registro[30], 'C'));//30
+        return $aData;
     }
     
     private function adjust($text, $type)
