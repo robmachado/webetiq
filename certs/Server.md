@@ -72,10 +72,10 @@ www.example.com.cert.pem: OK
 ```
 
 ## Forneça do certificado
-Agora você pode implantar seu novo certificado em um servidor, ou distribuir-lo para um cliente. Ao implantar a um aplicativo de servidor (por exemplo, Apache), você precisa tornar os seguintes arquivos disponíveis:
+Agora você pode implantar seu novo certificado em um servidor, ou distribuir-lo para um cliente. Ao implantar em um aplicativo de servidor (por exemplo, Apache), você precisa tornar os seguintes arquivos disponíveis:
 
 - ca-chain.cert.pem
 - www.example.com.key.pem
 - www.example.com.cert.pem
 
-Se você está assinando um CSR a partir de um fornecido por terceiro, você não tem acesso a chave privada, portando você só precisa fornecer (```ca-chain.cert.pem```) e o certificado (```www.example.com.cert.pem```).
+Se você está assinando um CSR a partir de um certificado fornecido por terceiros, você não tem acesso a chave privada, portando você só precisa fornecer (`ca-chain.cert.pem`) e o certificado (`www.example.com.cert.pem`).

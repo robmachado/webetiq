@@ -5,7 +5,7 @@ Extraido do [original](https://jamielinux.com/docs/openssl-certificate-authority
 
 Um certificado de autoridade intermediário é uma entidade capaz de assinar certificados em nome do CA raiz. O CA raiz assina o certificado intermediário, formando uma cadeia de confiança.
 
-O proposito de usar um certificado intermediário é primariamente a segurança. O CA raiz pode ser mantido offline e usado o menos frequentemente possivel. Se a chave intermediária é comprometida, o CA raiz pode revogar o certificado intermedirário e criar um novo par criptografico intermediário.
+O proposito de usar um certificado intermediário é primariamente a segurança. O CA raiz pode ser mantido offline e usado o menos frequentemente possível. Se a chave intermediária é comprometida, o CA raiz pode revogar o certificado intermedirário e criar um novo par criptografico intermediário.
 
 # Praparando o diretório
 O certificado CA raiz é mantido em ` /root/ca `. Escolha um diretorio diferente para manter os certificados intemediários.
@@ -36,7 +36,7 @@ Crie o arquivo de configuração para uso do OpenSSL em `/root/ca/intermediate/o
 # Copy to `/root/ca/intermediate/openssl.cnf`.
 
 [ ca ]
-# `man ca`
+# man ca
 default_ca = CA_default
 
 [ CA_default ]
@@ -70,7 +70,7 @@ policy            = policy_loose
 
 [ policy_strict ]
 # The root CA should only sign intermediate certificates that match.
-# See the POLICY FORMAT section of `man ca`.
+# See the POLICY FORMAT section of man ca.
 countryName             = match
 stateOrProvinceName     = match
 organizationName        = match
@@ -80,7 +80,7 @@ emailAddress            = optional
 
 [ policy_loose ]
 # Allow the intermediate CA to sign a more diverse range of certificates.
-# See the POLICY FORMAT section of the `ca` man page.
+# See the POLICY FORMAT section of the ca man page.
 countryName             = optional
 stateOrProvinceName     = optional
 localityName            = optional
@@ -90,7 +90,7 @@ commonName              = supplied
 emailAddress            = optional
 
 [ req ]
-# Options for the `req` tool (`man req`).
+# Options for the req tool (man req).
 default_bits        = 2048
 distinguished_name  = req_distinguished_name
 string_mask         = utf8only
@@ -120,21 +120,21 @@ organizationalUnitName_default  =
 emailAddress_default            =
 
 [ v3_ca ]
-# Extensions for a typical CA (`man x509v3_config`).
+# Extensions for a typical CA (man x509v3_config).
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always,issuer
 basicConstraints = critical, CA:true
 keyUsage = critical, digitalSignature, cRLSign, keyCertSign
 
 [ v3_intermediate_ca ]
-# Extensions for a typical intermediate CA (`man x509v3_config`).
+# Extensions for a typical intermediate CA (man x509v3_config).
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always,issuer
 basicConstraints = critical, CA:true, pathlen:0
 keyUsage = critical, digitalSignature, cRLSign, keyCertSign
 
 [ usr_cert ]
-# Extensions for client certificates (`man x509v3_config`).
+# Extensions for client certificates (man x509v3_config).
 basicConstraints = CA:FALSE
 nsCertType = client, email
 nsComment = "OpenSSL Generated Client Certificate"
@@ -144,7 +144,7 @@ keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, emailProtection
 
 [ server_cert ]
-# Extensions for server certificates (`man x509v3_config`).
+# Extensions for server certificates (man x509v3_config).
 basicConstraints = CA:FALSE
 nsCertType = server
 nsComment = "OpenSSL Generated Server Certificate"
@@ -154,11 +154,11 @@ keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = serverAuth
 
 [ crl_ext ]
-# Extension for CRLs (`man x509v3_config`).
+# Extension for CRLs (man x509v3_config).
 authorityKeyIdentifier=keyid:always
 
 [ ocsp ]
-# Extension for OCSP signing certificates (`man ocsp`).
+# Extension for OCSP signing certificates (man ocsp).
 basicConstraints = CA:FALSE
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer
@@ -166,9 +166,9 @@ keyUsage = critical, digitalSignature
 extendedKeyUsage = critical, OCSPSigning
 ```
 ## Crie a chave intermediaria
-Crie a chave privada intermediária (```intermediate.key.pem```). Que deve ser encriptada com AES 256-bit e uma senha forte.
+Crie a chave privada intermediária (`intermediate.key.pem`). Que deve ser encriptada com AES 256-bit e uma senha forte.
 
-```sh
+```
 # cd /root/ca
 # openssl genrsa -aes256 \
       -out intermediate/private/intermediate.key.pem 4096
@@ -178,10 +178,11 @@ Verifying - Enter pass phrase for intermediate.key.pem: secretpassword
 
 # chmod 400 intermediate/private/intermediate.key.pem
 ```
+
 ## Crie o certificado intermediário
 Use a chave intermediaria para criar o certificado (CSR). Os detalhes geralmente batem com os do CA raiz. Mas o "Common Name", necessita ser diferente.
 
-```sh
+```
 # cd /root/ca
 # openssl req -config intermediate/openssl.cnf -new -sha256 \
       -key intermediate/private/intermediate.key.pem \
@@ -199,9 +200,9 @@ Organizational Unit Name []:Alice Ltd Certificate Authority
 Common Name []:Alice Ltd Intermediate CA
 Email Address []:
 ```
-Para criar um certificado intermediário, será usado o CA raiz com a extenção ```v3_intermediate_ca``` para assinar o CSR intermediário. A validade desse certificado deverá ser menor que a do certificado CA rai, digamos 10 anos.
+Para criar um certificado intermediário, será usado o CA raiz com a extenção `v3_intermediate_ca` para assinar o CSR intermediário. A validade desse certificado deverá ser menor que a do certificado CA raiz, digamos 10 anos.
 
-```sh
+```
 # cd /root/ca
 # openssl ca -config openssl.cnf -extensions v3_intermediate_ca \
       -days 3650 -notext -md sha256 \
@@ -213,6 +214,7 @@ Sign the certificate? [y/n]: y
 
 # chmod 444 intermediate/certs/intermediate.cert.pem
 ```
+
 O arquivo `index.txt` é onde o OpenSSL `ca` armazena a base de dados dos certificados. Não apague ou edite este aquivo manualmente. Pois ele deve conter uma linha referente ao certificado intermediário criado.
 
 ```
@@ -220,7 +222,7 @@ V 250408122707Z 1000 unknown ... /CN=Alice Ltd Intermediate CA
 ```
 
 ## Verificando o certificado intermediário
-Como já foi dito o CA raiz verifica se os dados do certificado intermediário estão corretos.
+Como já foi dito, o CA raiz verifica se os dados do certificado intermediário estão corretos.
 
 ```
 # openssl x509 -noout -text \
@@ -228,6 +230,7 @@ Como já foi dito o CA raiz verifica se os dados do certificado intermediário e
 
 intermediate.cert.pem: OK
 ```
+
 ## Criando o arquivo da cadeia de certificação
 Quando uma aplicação (ex. browser) tenta verificar um certificado assinado por um CA intermediário, ele deve verificar também com o certificado CA raiz. Para completar a cadeia de acreditação, deve ser criada uma CA chain para apresentar a essa aplicação.
 
