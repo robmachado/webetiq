@@ -3,17 +3,20 @@ Extraido do [original](https://jamielinux.com/docs/openssl-certificate-authority
 
 # Certificado intermediário (CA)
 
-Um certificado de autoridade intermediário é uma entidade capaz de assinar certificados em nome do CA raiz. O Ca raiz assina o certificado intermediário, formando uma cadeia de confiança.
+Um certificado de autoridade intermediário é uma entidade capaz de assinar certificados em nome do CA raiz. O CA raiz assina o certificado intermediário, formando uma cadeia de confiança.
 
 O proposito de usar um certificado intermediário é primariamente a segurança. O CA raiz pode ser mantido offline e usado o menos frequentemente possivel. Se a chave intermediária é comprometida, o CA raiz pode revogar o certificado intermedirário e criar um novo par criptografico intermediário.
 
-# Praparando o driretorio
+# Praparando o diretório
 O certificado CA raiz é mantido em ```/root/ca```. Escolha um diretorio diferente para manter os certificados intemediários.
-```
+
+```sh
 # mkdir /root/ca/intermediate
 ```
+
 Crie a mesma estrutura anteriormente usada para os CA raiz, e também crie um diretorio ```csr``` para manter as requisições de certificados.
-```
+
+```sh
 # cd /root/ca/intermediate
 # mkdir certs crl csr newcerts private
 # chmod 700 private

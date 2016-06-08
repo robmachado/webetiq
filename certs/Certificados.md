@@ -157,6 +157,7 @@ extendedKeyUsage = critical, OCSPSigning
 ## Criando a chave raiz
 Crie a chave raiz (```ca.key.pem```) e mantenha bem segura. Qualquer um com acesso a essa chave poderá criar certificados dessa origem. Use encriptação AES 256 e uma senha forte.
 >NOTA: use sempre chaves de 4096 bits para todos os certificados raiz e também para os intermediários.
+
 ```
 # cd /root/ca
 # openssl genrsa -aes256 -out private/ca.key.pem 4096
@@ -166,8 +167,10 @@ Verifying - Enter pass phrase for ca.key.pem: secretpassword
 
 # chmod 400 private/ca.key.pem
 ```
+
 ## Criando o certificado raiz
 Use a chave raiz (```ca.key.pem```) para criar o certificado raiz (```ca.cert.pem```). Forneça ao certificado raiz um longo tempo para expiração, como 20 anos. Assim que o certificado raiz expirar todos os certificados derivados assinados com esse CA raiz ficarão inválidos.
+
 ```
 # cd /root/ca
 # openssl req -config openssl.cnf \
@@ -191,7 +194,9 @@ Email Address []:
 ```
 
 ## Verifique o certificado criado
+
 ```
 # openssl x509 -noout -text -in certs/ca.cert.pem
 ```
+
 Esse comando irá mostar os dados referentes ao certificado.
