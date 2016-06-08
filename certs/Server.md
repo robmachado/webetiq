@@ -9,7 +9,7 @@ Nós vamos assinar certificados usando nosso certificado intermediário. Nós po
 Nossos para raiz de intermediário são de 4096 bits. Os certificados de servidores e de clientes normalmente expiram em um ano e podem seguramente ser de 2048 bits.
 >NOTA: Com certeza chaves maiores são mais seguras mas para usar em servidores elas iriam demorar mais para serem processadas e iriam carregar muito mais os servidores, por esse motivo usamos chaves de 2048 bits.
 
-Se você está cirando pares de chaves criptogravicas para uso em um webserver (ex. apache) você teria que netrar com a senha dessa chave cada vez que você reinicia-se o serviço. Como forma de otimizar omita o argumento `-aes256` de forma a criar uma chave sem senha.
+Se você está criando pares de chaves criptograficas para uso em um webserver (ex. apache) você teria que entrar com a senha dessa chave, cada vez que você reinicia-se o serviço. Como forma de otimizar omita o argumento `-aes256` de forma a criar uma chave sem senha.
 ```
 # cd /root/ca
 # openssl genrsa -aes256 \
@@ -18,7 +18,7 @@ Se você está cirando pares de chaves criptogravicas para uso em um webserver (
 ```
 
 ## Criando o certificado
-Use a chave privada criada para assianr o certificado (CSR). Os detalhes desse CSR não necessitam bater com os do CA intermediário. Pra certificados de servidores, o "Common Name" deverá ser um nome de dominio totalmente qualificado (```ex. www.example.com```), enquanto que para os certificados de cliente pode ser qualquer identificador exclusivo (por exemplo, um endereço de e-mail). Note-se que o nome comum não pode ser o mesmo que foi usado no CA raiz ou no CA intermediário.
+Use a chave privada criada para assinar o certificado (CSR). Os detalhes desse CSR não necessitam *bater* com os do CA intermediário. Para certificados de servidores, o "Common Name" deverá ser um nome de dominio totalmente qualificado (`ex. www.example.com`), enquanto que para os certificados de cliente pode ser qualquer identificador exclusivo (por exemplo, um endereço de e-mail). Note-se que o nome comum não pode ser o mesmo que foi usado no CA raiz ou no CA intermediário.
 ```
 # cd /root/ca
 # openssl req -config intermediate/openssl.cnf \
