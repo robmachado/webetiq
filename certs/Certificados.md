@@ -1,13 +1,16 @@
 # Criação de Certificados (Auto Assinados)
 Extraido do [original](https://jamielinux.com/docs/openssl-certificate-authority/create-the-root-pair.html) 
+
 # Certificado raiz (CA root)
 
 ## Prepare o diretorio
-Crie um diretorio (``` /root/ca ```) para armazenar as chaves.
+Crie um diretorio (` /root/ca `) para armazenar as chaves.
+
 ```
 # mkdir /root/ca
 ```
-Crie a estrutura do diretorio. Os arquivos ```index.txt``` e ```serial``` agem como uma base de dados para rastrear os certificados emitidos.
+
+Crie a estrutura do diretorio. Os arquivos `index.txt` e `serial` agem como uma base de dados para rastrear os certificados emitidos.
 
 ```
 # cd /root/ca
@@ -16,15 +19,16 @@ Crie a estrutura do diretorio. Os arquivos ```index.txt``` e ```serial``` agem c
 # touch index.txt
 # echo 1000 > index.txt
 ```
+
 ## Prepare a configuração
-Deve ser criado um arquivo para que o OpenSSL use e saiba o que deve ser feito. Esse arquivo ```/root/ca/openssl.cnf``` deverá conter o seguinte conteúdo.
+Deve ser criado um arquivo para que o OpenSSL use e saiba o que deve ser feito. Esse arquivo `/root/ca/openssl.cnf` deverá conter o seguinte conteúdo.
 
 ```
 # OpenSSL root CA configuration file.
-# Copy to `/root/ca/openssl.cnf`.
+# Copy to /root/ca/openssl.cnf.
 
 [ ca ]
-# `man ca`
+# man ca
 default_ca = CA_default
 
 [ CA_default ]
@@ -58,7 +62,7 @@ policy            = policy_strict
 
 [ policy_strict ]
 # The root CA should only sign intermediate certificates that match.
-# See the POLICY FORMAT section of `man ca`.
+# See the POLICY FORMAT section of man ca.
 countryName             = match
 stateOrProvinceName     = match
 organizationName        = match
@@ -68,7 +72,7 @@ emailAddress            = optional
 
 [ policy_loose ]
 # Allow the intermediate CA to sign a more diverse range of certificates.
-# See the POLICY FORMAT section of the `ca` man page.
+# See the POLICY FORMAT section of the ca man page.
 countryName             = optional
 stateOrProvinceName     = optional
 localityName            = optional
@@ -78,7 +82,7 @@ commonName              = supplied
 emailAddress            = optional
 
 [ req ]
-# Options for the `req` tool (`man req`).
+# Options for the req tool (man req).
 default_bits        = 2048
 distinguished_name  = req_distinguished_name
 string_mask         = utf8only
@@ -108,21 +112,21 @@ organizationalUnitName_default  =
 emailAddress_default            =
 
 [ v3_ca ]
-# Extensions for a typical CA (`man x509v3_config`).
+# Extensions for a typical CA (man x509v3_config).
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always,issuer
 basicConstraints = critical, CA:true
 keyUsage = critical, digitalSignature, cRLSign, keyCertSign
 
 [ v3_intermediate_ca ]
-# Extensions for a typical intermediate CA (`man x509v3_config`).
+# Extensions for a typical intermediate CA (man x509v3_config).
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always,issuer
 basicConstraints = critical, CA:true, pathlen:0
 keyUsage = critical, digitalSignature, cRLSign, keyCertSign
 
 [ usr_cert ]
-# Extensions for client certificates (`man x509v3_config`).
+# Extensions for client certificates (man x509v3_config).
 basicConstraints = CA:FALSE
 nsCertType = client, email
 nsComment = "OpenSSL Generated Client Certificate"
@@ -132,7 +136,7 @@ keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
 extendedKeyUsage = clientAuth, emailProtection
 
 [ server_cert ]
-# Extensions for server certificates (`man x509v3_config`).
+# Extensions for server certificates (man x509v3_config).
 basicConstraints = CA:FALSE
 nsCertType = server
 nsComment = "OpenSSL Generated Server Certificate"
@@ -142,11 +146,11 @@ keyUsage = critical, digitalSignature, keyEncipherment
 extendedKeyUsage = serverAuth
 
 [ crl_ext ]
-# Extension for CRLs (`man x509v3_config`).
+# Extension for CRLs (man x509v3_config).
 authorityKeyIdentifier=keyid:always
 
 [ ocsp ]
-# Extension for OCSP signing certificates (`man ocsp`).
+# Extension for OCSP signing certificates (man ocsp).
 basicConstraints = CA:FALSE
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer
@@ -155,7 +159,8 @@ extendedKeyUsage = critical, OCSPSigning
 ```
 
 ## Criando a chave raiz
-Crie a chave raiz (```ca.key.pem```) e mantenha bem segura. Qualquer um com acesso a essa chave poderá criar certificados dessa origem. Use encriptação AES 256 e uma senha forte.
+
+Crie a chave raiz (`ca.key.pem`) e mantenha bem segura. Qualquer um com acesso a essa chave poderá criar certificados dessa origem. Use encriptação AES 256 e uma senha forte.
 >NOTA: use sempre chaves de 4096 bits para todos os certificados raiz e também para os intermediários.
 
 ```
@@ -169,7 +174,7 @@ Verifying - Enter pass phrase for ca.key.pem: secretpassword
 ```
 
 ## Criando o certificado raiz
-Use a chave raiz (```ca.key.pem```) para criar o certificado raiz (```ca.cert.pem```). Forneça ao certificado raiz um longo tempo para expiração, como 20 anos. Assim que o certificado raiz expirar todos os certificados derivados assinados com esse CA raiz ficarão inválidos.
+Use a chave raiz (`ca.key.pem`) para criar o certificado raiz (`ca.cert.pem`). Forneça ao certificado raiz um longo tempo para expiração, como 20 anos. Assim que o certificado raiz expirar todos os certificados derivados assinados com esse CA raiz ficarão inválidos.
 
 ```
 # cd /root/ca

@@ -9,7 +9,7 @@ Nós vamos assinar certificados usando nosso certificado intermediário. Nós po
 Nossos para raiz de intermediário são de 4096 bits. Os certificados de servidores e de clientes normalmente expiram em um ano e podem seguramente ser de 2048 bits.
 >NOTA: Com certeza chaves maiores são mais seguras mas para usar em servidores elas iriam demorar mais para serem processadas e iriam carregar muito mais os servidores, por esse motivo usamos chaves de 2048 bits.
 
-Se você está cirando pares de chaves criptogravicas para uso em um webserver (ex. apache) você teria que netrar com a senha dessa chave cada vez que você reinicia-se o serviço. Como forma de otimizar omita o argumento ```-aes256``` de forma a criar uma chave sem senha.
+Se você está cirando pares de chaves criptogravicas para uso em um webserver (ex. apache) você teria que netrar com a senha dessa chave cada vez que você reinicia-se o serviço. Como forma de otimizar omita o argumento `-aes256` de forma a criar uma chave sem senha.
 ```
 # cd /root/ca
 # openssl genrsa -aes256 \
@@ -37,7 +37,9 @@ Organizational Unit Name []:Alice Ltd Web Services
 Common Name []:www.example.com
 Email Address []:
 ```
+
 Para criar um certificado, use o CA intermediário para assinar o CSR. Se o certificado vai ser usado em um servidor, use a extensão ```server_cert```. Se o certificado vai ser usado para autenticação do usuário, use a extensão ```usr_cert```. Os certificados são geralmente dada uma validade de um ano, embora a CA irá tipicamente dar alguns dias extra para conveniência.
+
 ```
 # cd /root/ca
 # openssl ca -config intermediate/openssl.cnf \
@@ -46,31 +48,34 @@ Para criar um certificado, use o CA intermediário para assinar o CSR. Se o cert
       -out intermediate/certs/www.example.com.cert.pem
 # chmod 444 intermediate/certs/www.example.com.cert.pem
 ```
-O arquivo ```intermediate/index.txt``` deve conter uma linha referindo-se a esse novo certificado.
+
+O arquivo `intermediate/index.txt` deve conter uma linha referindo-se a esse novo certificado.
 
 ```
 V 160420124233Z 1000 unknown ... /CN=www.example.com
 ```
 
 ## Verificando o certificado
+
 ```
 # openssl x509 -noout -text \
       -in intermediate/certs/www.example.com.cert.pem
 ```
 
-Use o arquivo com a cadeia de certificação criado anteriormente (```ca-chain.cert.pem```) para verificar se esse novo certificado é valido por essa cadeia de acreditação.
+Use o arquivo com a cadeia de certificação criado anteriormente (`ca-chain.cert.pem`) para verificar se esse novo certificado é valido por essa cadeia de acreditação.
+
 ```
 # openssl verify -CAfile intermediate/certs/ca-chain.cert.pem \
       intermediate/certs/www.example.com.cert.pem
 
 www.example.com.cert.pem: OK
 ```
+
 ## Forneça do certificado
 Agora você pode implantar seu novo certificado em um servidor, ou distribuir-lo para um cliente. Ao implantar a um aplicativo de servidor (por exemplo, Apache), você precisa tornar os seguintes arquivos disponíveis:
 
 - ca-chain.cert.pem
 - www.example.com.key.pem
 - www.example.com.cert.pem
-
 
 Se você está assinando um CSR a partir de um fornecido por terceiro, você não tem acesso a chave privada, portando você só precisa fornecer (```ca-chain.cert.pem```) e o certificado (```www.example.com.cert.pem```).
