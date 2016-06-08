@@ -241,3 +241,25 @@ Para criar a cadeia de certificação, devemos concatenar o certificado intermed
       certs/ca.cert.pem > intermediate/certs/ca-chain.cert.pem
 # chmod 444 intermediate/certs/ca-chain.cert.pem
 ```
+
+## CONVERTENDO FORMATOS
+
+As vezes é necessário alterar o formato dos certificados para uso com outros sistemas e recursos.
+
+### PEM => CRT
+
+```
+# openssl x509 -outform der -in intermediate/certs/intermediate.cert.pem -out intermediate/certs/intermediate.cert.crt
+```
+
+### PEM => PFX (p12) usado com certificados de servidor ou cliente
+
+```
+openssl pkcs12 -export -in my.crt -inkey my.key -chain -CAfile ca-certs.pem -name "my-domain.com" -out my.p12
+```
+
+### PFX => JKS (formato java keystore)
+
+```
+# keytool -importkeystore -deststorepass MY-KEYSTORE-PASS -destkeystore my-keystore.jks -srckeystore my.p12 -srcstoretype PKCS12
+```
