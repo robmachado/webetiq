@@ -8,15 +8,15 @@ Um certificado de autoridade intermediário é uma entidade capaz de assinar cer
 O proposito de usar um certificado intermediário é primariamente a segurança. O CA raiz pode ser mantido offline e usado o menos frequentemente possivel. Se a chave intermediária é comprometida, o CA raiz pode revogar o certificado intermedirário e criar um novo par criptografico intermediário.
 
 # Praparando o diretório
-O certificado CA raiz é mantido em ```sh /root/ca ```. Escolha um diretorio diferente para manter os certificados intemediários.
+O certificado CA raiz é mantido em ``` /root/ca ```. Escolha um diretorio diferente para manter os certificados intemediários.
 
-```bash
+```sh
 # mkdir /root/ca/intermediate
 ```
 
 Crie a mesma estrutura anteriormente usada para os CA raiz, e também crie um diretorio ```csr``` para manter as requisições de certificados.
 
-```shell
+```sh
 # cd /root/ca/intermediate
 # mkdir certs crl csr newcerts private
 # chmod 700 private
@@ -24,11 +24,13 @@ Crie a mesma estrutura anteriormente usada para os CA raiz, e também crie um di
 # echo 1000 > serial
 ```
 Adicione o arquivo ```crlnumber```. Ele será usado para manter o rastreamento para a lista de certificados revogados.
-```
+
+```sh
 # echo 1000 > /root/ca/intermediate/crlnumber
 ```
 Crie o arquivo de configuração para uso do OpenSSL em ```/root/ca/intermediate/openssl.cnf```, conforme estrutura abaixo:
-```
+
+```sh
 # OpenSSL intermediate CA configuration file.
 # Copy to `/root/ca/intermediate/openssl.cnf`.
 
@@ -163,8 +165,9 @@ keyUsage = critical, digitalSignature
 extendedKeyUsage = critical, OCSPSigning
 ```
 ## Crie a chave intermediaria
-Crie a chave privada intermediária (```intermediate.key.pem```). Que deve ser encriptada com AES 256-bit e uma senha forte
-```
+Crie a chave privada intermediária (```intermediate.key.pem```). Que deve ser encriptada com AES 256-bit e uma senha forte.
+
+```sh
 # cd /root/ca
 # openssl genrsa -aes256 \
       -out intermediate/private/intermediate.key.pem 4096
@@ -176,7 +179,8 @@ Verifying - Enter pass phrase for intermediate.key.pem: secretpassword
 ```
 ## Crie o certificado intermediário
 Use a chave intermediaria para criar o certificado (CSR). Os detalhes geralmente batem com os do CA raiz. Mas o "Common Name", necessita ser diferente.
-```
+
+```sh
 # cd /root/ca
 # openssl req -config intermediate/openssl.cnf -new -sha256 \
       -key intermediate/private/intermediate.key.pem \
@@ -195,7 +199,8 @@ Common Name []:Alice Ltd Intermediate CA
 Email Address []:
 ```
 Para criar um certificado intermediário, será usado o CA raiz com a extenção ```v3_intermediate_ca``` para assinar o CSR intermediário. A validade desse certificado deverá ser menor que a do certificado CA rai, digamos 10 anos.
-```
+
+```sh
 # cd /root/ca
 # openssl ca -config openssl.cnf -extensions v3_intermediate_ca \
       -days 3650 -notext -md sha256 \
@@ -208,13 +213,15 @@ Sign the certificate? [y/n]: y
 # chmod 444 intermediate/certs/intermediate.cert.pem
 ```
 O arquivo ```index.txt``` é onde o OpenSSL ```ca``` armazena a base de dados dos certificados. Não apague ou edite este aquivo manualmente. Pois ele deve conter uma linha referente ao certificado intermediário criado.
-```
+
+```sh
 V 250408122707Z 1000 unknown ... /CN=Alice Ltd Intermediate CA
 ```
 
 ## Verificando o certificado intermediário
 Como já foi dito o CA raiz verifica se os dados do certificado intermediário estão corretos.
-```
+
+```sh
 # openssl x509 -noout -text \
       -in intermediate/certs/intermediate.cert.pem
 
@@ -224,7 +231,8 @@ intermediate.cert.pem: OK
 Quando uma aplicação (ex. browser) tenta verificar um certificado assinado por um CA intermediário, ele deve verificar também com o certificado CA raiz. Para completar a cadeia de acreditação, deve ser criada uma CA chain para apresentar a essa aplicação.
 
 Para criar a cadeia de certificação, devemos concatenar o certificado intermediário e o certificado raiz juntos. E vamos usar isso depois para veridicar os certificados assinados pelo CA intermediário.
-```
+
+```sh
 # cat intermediate/certs/intermediate.cert.pem \
       certs/ca.cert.pem > intermediate/certs/ca-chain.cert.pem
 # chmod 444 intermediate/certs/ca-chain.cert.pem
