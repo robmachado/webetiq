@@ -8,15 +8,15 @@ Um certificado de autoridade intermediário é uma entidade capaz de assinar cer
 O proposito de usar um certificado intermediário é primariamente a segurança. O CA raiz pode ser mantido offline e usado o menos frequentemente possivel. Se a chave intermediária é comprometida, o CA raiz pode revogar o certificado intermedirário e criar um novo par criptografico intermediário.
 
 # Praparando o diretório
-O certificado CA raiz é mantido em ```/root/ca```. Escolha um diretorio diferente para manter os certificados intemediários.
+O certificado CA raiz é mantido em ```sh /root/ca ```. Escolha um diretorio diferente para manter os certificados intemediários.
 
-```sh
+```bash
 # mkdir /root/ca/intermediate
 ```
 
 Crie a mesma estrutura anteriormente usada para os CA raiz, e também crie um diretorio ```csr``` para manter as requisições de certificados.
 
-```sh
+```shell
 # cd /root/ca/intermediate
 # mkdir certs crl csr newcerts private
 # chmod 700 private
