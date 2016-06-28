@@ -11,6 +11,7 @@ namespace Webetiq;
 //use Webetiq\DBase;
 use Webetiq\Labels\Label;
 use Webetiq\Op;
+use Webetiq\Products;
 use RuntimeException;
 
 class Migrate
@@ -66,10 +67,20 @@ class Migrate
     
     protected function setProdsList($listaFile)
     {
-        
+        $aProds = array();
+        $aList = array();
+        //carregar uma matriz com os dados txt da tabela exportada
+        $aList = file($listaFile, FILE_IGNORE_NEW_LINES);
+        foreach ($aList as $registro) {
+            $aReg = explode('|', $registro);
+            $produto = $aReg[0]; //descrição do produto
+            $aProds[$produto] = $registro;
+        }
+        ksort($aProds);
+        return $aProds;
     }
     
-    public function migrate()
+    public function setFromLast()
     {
         //busca o ultimo registro das OPs
         $op = new Op();
@@ -82,7 +93,7 @@ class Migrate
                 return false;
             }
             //existem OPs maiores, mas não essa registrada na tabela
-            //acretita-se nesse caso que o numero foi pulado
+            //acredita-se nesse caso que o numero foi pulado
             //então recuar um a um até que o numero da chave seja
             //menor que o numero da OP
             //x+1 mostra o ponto de corte
@@ -98,10 +109,127 @@ class Migrate
         $aOps = array_slice($this->aOPs, $x+1);
         foreach ($aOps as $data) {
             $aData = $this->extract($data);
+            
             $op->set($aData);
             $op->save();
         }
         //já migrou as OPs agora deve ser migrados os produtos
+        
+    }
+    
+    public function setFromProds()
+    {
+        $prods = new Products();
+        foreach ($this->aProds as $data)
+        {
+            $aData = $this->extractProd($data);
+            $prods->set($aData);
+            $prods->save();
+        }
+    }
+    
+    private function extractProd($reg = null)
+    {
+        if (is_null($reg)) {
+            return array();
+        }
+        $registro = explode('|', $reg);
+        $num = count($registro);
+        if ($num != 90) {
+            throw \RuntimeException("Dados errados na linha. ");
+        }
+        $aData = array(
+            'produto' => $this->adjust($registro[0], 'C'),
+            'codigo' => $this->adjust($registro[1], 'C'),
+            'ean' => $this->adjust($registro[2], 'C'),
+            'validade' => (int) $this->adjust($registro[3], 'N'),
+            'mp1' => $this->adjust($registro[4], 'C'),
+            'p1' => (float) $this->adjust($registro[5], 'N'),
+            'mp2' => $this->adjust($registro[6], 'C'),
+            'p2' => (float) $this->adjust($registro[7], 'N'),
+            'mp3' => $this->adjust($registro[8], 'C'),
+            'p3' => (float) $this->adjust($registro[9], 'N'),
+            'mp4' => $this->adjust($registro[10], 'C'),
+            'p4' => (float) $this->adjust($registro[11], 'N'),
+            'mp5' => $this->adjust($registro[12], 'C'),
+            'p5' => (float) $this->adjust($registro[13], 'N'),
+            'mp6' => (string) $this->adjust($registro[14], 'C'),
+            'p6' => (float) $this->adjust($registro[15], 'N'),
+            'densidade' => (float) $this->adjust($registro[16], 'N'),
+            'gramatura' => (float) $this->adjust($registro[17], 'N'),
+            'tipobobina' => (string) $this->adjust($registro[18], 'C'),
+            'tratamento' => (string) $this->adjust($registro[19], 'C'),
+            'lados' => (string) $this->adjust($registro[20], 'C'),
+            'boblargura' => (float) $this->adjust($registro[21], 'N'),
+            'tollargbobmax' => (float) $this->adjust($registro[22], 'N'),
+            'tollargbobmin' => (float) $this->adjust($registro[23], 'N'),
+            'refilar' => (string) $this->adjust($registro[24], 'C'),
+            'bobinasporvez' => (string) $this->adjust($registro[25], 'C'),
+            'espessura1' => (float) $this->adjust($registro[26], 'N'),
+            'tolespess1max' => (float) $this->adjust($registro[27], 'N'),
+            'tolespess1min' => (float) $this->adjust($registro[28], 'N'),
+            'espessura2' => (float) $this->adjust($registro[29], 'N'),
+            'tolespess2max' => (float) $this->adjust($registro[30], 'N'),
+            'tolespess2min' => (float) $this->adjust($registro[31], 'N'),
+            'sanfona' => (float) $this->adjust($registro[32], 'N'),
+            'tolsanfonamax' => (float) $this->adjust($registro[33], 'N'),
+            'tolsanfonamin' => (float) $this->adjust($registro[34], 'N'),
+            'impressao' => (string) $this->adjust($registro[35], 'C'),
+            'cilindro' => (int) $this->adjust($registro[36], 'N'),
+            'cyrel1' => (string) $this->adjust($registro[37], 'C'),
+            'cyrel2' => (string) $this->adjust($registro[38], 'C'),
+            'cyrel3' => (string) $this->adjust($registro[39], 'C'),
+            'cyrel4' => (string) $this->adjust($registro[40], 'C'),
+            'cor1' => (string) $this->adjust($registro[41], 'C'),
+            'cor2' => (string) $this->adjust($registro[42], 'C'),
+            'cor3' => (string) $this->adjust($registro[43], 'C'),
+            'cor4' => (string) $this->adjust($registro[44], 'C'),
+            'cor5' => (string) $this->adjust($registro[45], 'C'),
+            'cor6' => (string) $this->adjust($registro[46], 'C'),
+            'cor7' => (string) $this->adjust($registro[47], 'C'),
+            'cor8' => (string) $this->adjust($registro[48], 'C'),
+            'modelosaco' => (string) $this->adjust($registro[49], 'C'),
+            'ziper' => (string) $this->adjust($registro[50], 'C'),
+            'nziper' => (int) $this->adjust($registro[51], 'N'),
+            'solda' => (string) $this->adjust($registro[52], 'C'),
+            'cortarporvez' => (string) $this->adjust($registro[53], 'C'),
+            'largboca' => (float) $this->adjust($registro[54], 'N'),
+            'tollargbocamax' => (float) $this->adjust($registro[55], 'N'),
+            'tollargbocamin' => (float) $this->adjust($registro[56], 'N'),
+            'comprimento' => (float) $this->adjust($registro[57], 'N'),
+            'tolcomprmax' => (float) $this->adjust($registro[58], 'N'),
+            'tolcomprmin' => (float) $this->adjust($registro[59], 'N'),
+            'sacoespess' => (float) $this->adjust($registro[60], 'N'),
+            'tolsacoespessmax' => (float) $this->adjust($registro[61], 'N'),
+            'tolsacoespessmin' => (float) $this->adjust($registro[62], 'N'),
+            'microperfurado' => (string) $this->adjust($registro[63], 'C'),
+            'estampado' => (string) $this->adjust($registro[64], 'C'),
+            'estampar' => (string) $this->adjust($registro[65], 'C'),
+            'laminado' => (string) $this->adjust($registro[66], 'C'),
+            'laminar' => (string) $this->adjust($registro[67], 'C'),
+            'bolha' => (string) $this->adjust($registro[68], 'C'),
+            'bolhar' => (string) $this->adjust($registro[69], 'C'),
+            'isolmanta' => (string) $this->adjust($registro[70], 'C'),
+            'isolmantar' => (string) $this->adjust($registro[71], 'C'),
+            'colagem' => (string) $this->adjust($registro[72], 'C'),
+            'dinas' => (string) $this->adjust($registro[73], 'C'),
+            'sanfcorte' => (float) $this->adjust($registro[74], 'N'),
+            'tolsanfcortemax' => (float) $this->adjust($registro[75], 'N'),
+            'tolsanfcortemin' => (float) $this->adjust($registro[76], 'N'),
+            'aba' => (float) $this->adjust($registro[77], 'N'),
+            'tolabamax' => (float) $this->adjust($registro[78], 'N'),
+            'tolabamin' => (float) $this->adjust($registro[79], 'N'),
+            'amarrar' => (int) $this->adjust($registro[80], 'N'),
+            'qtdpcbobbolha' => (int) $this->adjust($registro[81], 'N'),
+            'fatiar' => (int) $this->adjust($registro[82], 'N'),
+            'qtdpcbobmanta' => (int) $this->adjust($registro[83], 'N'),
+            'bolhafilm1' => (string) $this->adjust($registro[84], 'C'),
+            'bolhafilm2' => (string) $this->adjust($registro[85], 'C'),
+            'bolhafilm3' => (string) $this->adjust($registro[86], 'C'),
+            'bolhafilm4' => (string) $this->adjust($registro[87], 'C'),
+            'pacote' => (int) $this->adjust($registro[88], 'N'),
+            'embalagem' => (string) $this->adjust($registro[89], 'C'));
+        return $aData;
     }
     
     private function extract($reg = null)
@@ -164,6 +292,7 @@ class Migrate
     private function convertNumber($text)
     {
         //remover todos os digitos não numericos de uma string
+        $text = trim($text);
         $text = preg_replace("/[^0-9,.\s]/", "", $text);
         $text = str_replace(',', '.', $text);
         if ($text == '') {
@@ -178,14 +307,27 @@ class Migrate
     {
         $text = trim($text);
         $text = $this->removeDoubleSpace($text);
+        $text = $this->removeSpecials($text);
         $text = strtoupper($text);
+        return $text;
+    }
+    
+    private function removeSpecials($text)
+    {
+        $text = trim($text);
+        $aFind = array('&','á','à','ã','â','é','ê','í','ó','ô','õ','ú','ü',
+            'ç','Á','À','Ã','Â','É','Ê','Í','Ó','Ô','Õ','Ú','Ü','Ç');
+        $aSubs = array('e','a','a','a','a','e','e','i','o','o','o','u','u',
+            'c','A','A','A','A','E','E','I','O','O','O','U','U','C');
+        $text = str_replace($aFind, $aSubs, $text);
+        $text = preg_replace("/[^A-Za-z0-9\- .]/", "", $text);
         return $text;
     }
     
     private function removeDoubleSpace($text)
     {
-        $text = str_replace("  ", " ", $text);
-        if (strpos($text, "  ")) {
+        $text = str_replace('  ', ' ', $text);
+        if (strpos($text, '  ')) {
             $this->removeDoubleSpace($text);
         }
         return $text;
@@ -357,7 +499,7 @@ class Migrate
     /**
      * Remonta o comando SQL efetuando uma limpeza nos dados
      * a serem gravados
-     * NOTA: quando o mdbtools extrai os dados do MDB vários caompos
+     * NOTA: quando o mdbtools extrai os dados do MDB vários campos
      * podem conter aspas simpes e duplas e os numeros estão formatados
      * com virgula. E a separação dos valores é feita por ";" ao invés de uma
      * virgula para facilitar a extração desses dados. Veja console/migrate.sh

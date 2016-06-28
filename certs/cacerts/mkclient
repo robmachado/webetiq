@@ -1,0 +1,25 @@
+#!/bin/bash
+
+rm fimatec.*
+
+#openssl genrsa -out fimatec.key.pem -aes256 -passout pass:fima 2048
+openssl genrsa -out fimatec.key.pem 2048
+
+#openssl req -new -key fimatec.key.pem -out fimatec.csr.pem -subj '/C=BR/ST=SP/L=Sao Paulo/O=Fimatec Ltda/OU=Fimatec Ltda/CN=fimtec.com.br/emailAddress=roberto@fimatec.com.br' -passin pass:fima
+
+openssl req -new -key fimatec.key.pem -out fimatec.csr.pem -subj '/C=BR/ST=SP/L=Sao Paulo/O=Fimatec Ltda/OU=Fimatec Ltda/CN=fimtec.com.br/emailAddress=roberto@fimatec.com.br'
+
+openssl x509 -req -in fimatec.csr.pem -CA intermediate.crt.pem -CAkey intermediate.key.pem -CAcreateserial -CAserial intermediate.srl -out fimatec.crt.pem -days 365 -sha256 -passin pass:monitor5
+
+openssl x509 -noout -text -in fimatec.crt.pem
+
+openssl verify -CAfile intermediate.crt.pem fimatec.crt.pem
+
+
+cat fimatec.crt.pem > digital-certificate.txt
+echo "--START INTERMEDIATE CERT--" >> digital-certificate.txt
+cat intermediate.crt.pem >> digital-certificate.txt 
+
+openssl pkcs8 -topk8 -inform pem -in fimatec.key.pem -outform pem -nocrypt -out private-key.pem
+
+

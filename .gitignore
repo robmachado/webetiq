@@ -1,7 +1,6 @@
 nbproject
+/noup
 *~
-*.pfx
-*.pem
 config.json
 composer.lock
 vendor

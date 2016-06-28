@@ -40,7 +40,7 @@ $lbl = new Label();
 if (isset($numop)) {
     //buscar dados da OP
     $migrate = new Op();
-    $op = $migrate->getOP($numop);
+    $op = $migrate->get($numop);
     //caso não seja encontrada a OP na base migrate 
     //retornar e avisar o usuário
     if ($op->numop == '') {

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+rm *.pem
+
+openssl genrsa -out ca.key.pem -aes256 -passout pass:monitor5 2048
+
+openssl req -x509 -new -key ca.key.pem -out ca.crt.pem -subj '/C=BR/ST=SP/L=Sao Paulo/O=NFePHP Org/OU=NFePHP Org/CN=nfephp.org/emailAddress=linux.rlm@gmail.com' -days 36500 -sha256 -passin pass:monitor5
+
+openssl genrsa -out intermediate.key.pem -aes256 -passout pass:monitor5 4096
+
+openssl req -new -key intermediate.key.pem -out intermediate.csr.pem -subj '/C=BR/ST=SP/L=Sao Paulo/O=NFePHP Org/OU=NFePHP Org/CN=nfephp.org/emailAddress=linux.rlm@gmail.com' -passin pass:monitor5
+
+openssl x509 -req -in intermediate.csr.pem -CA ca.crt.pem -CAkey ca.key.pem -CAcreateserial -CAserial serial -extfile v3_ca.ext -out intermediate.crt.pem -days 3650 -sha256 -passin pass:monitor5
+
+openssl x509 -noout -text -in ca.crt.pem
+
+openssl x509 -noout -text -in intermediate.crt.pem
+
+openssl verify -CAfile ca.crt.pem intermediate.crt.pem
+
+
+

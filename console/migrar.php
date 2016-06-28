@@ -14,4 +14,5 @@ use Webetiq\Migrate;
 //exec('/var/www/webetiq/console/migrate.sh');
 //carrega os dados na base opmigrate
 $mig = new Migrate();
-$mig->setFromLast();
+//$mig->setFromLast();
+$mig->setFromProds();

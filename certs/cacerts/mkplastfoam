@@ -1,0 +1,21 @@
+#!/bin/bash
+
+rm plastfoam.*
+
+openssl genrsa -out plastfoam.key.pem 2048
+
+openssl req -new -key plastfoam.key.pem -out plastfoam.csr.pem -subj '/C=BR/ST=SP/L=Sao Paulo/O=Plastfoam Ltda/OU=Plastfoam Ltda/CN=plastfoam.com.br/emailAddress=roberto@plastfoam.com.br'
+
+openssl x509 -req -in plastfoam.csr.pem -CA intermediate.crt.pem -CAkey intermediate.key.pem -CAcreateserial -CAserial intermediate.srl -out plastfoam.crt.pem -days 365 -sha256 -passin pass:monitor5
+
+openssl x509 -noout -text -in plastfoam.crt.pem
+
+openssl verify -CAfile intermediate.crt.pem plastfoam.crt.pem
+
+cat plastfoam.crt.pem > plastfoam-certificate.txt
+echo "--START INTERMEDIATE CERT--" >> plastfoam-certificate.txt
+cat intermediate.crt.pem >> plastfoam-certificate.txt 
+
+openssl pkcs8 -topk8 -inform pem -in plastfoam.key.pem -outform pem -nocrypt -out plastfoam-private_key.pem
+
+
