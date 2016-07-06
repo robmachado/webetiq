@@ -93,7 +93,7 @@ class Op
         if (is_null($num)) {
             return $this;
         }
-        $sqlComm = "SELECT * FROM OP WHERE numop = '$this->num'";
+        $sqlComm = "SELECT * FROM OP WHERE numop = '$num'";
         $rows = $this->dbase->querySql($sqlComm);
         if (! empty($rows)) {
             foreach ($rows as $row) {

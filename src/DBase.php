@@ -149,7 +149,7 @@ class DBase
     {
         $rows = array();
         try {
-            $sth = $this->conn->prepare($sqlComm);
+            $sth = $this->conn->prepare($sqlComm, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
             $sth->execute();
             $rows = $sth->fetchAll();
         } catch (PDOException $e) {

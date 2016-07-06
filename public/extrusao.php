@@ -3,29 +3,99 @@ ini_set("display_errors", 1);
 error_reporting(E_ALL);
 require_once '../bootstrap.php';
 
-$numop = filter_input(INPUT_GET, 'numop', FILTER_SANITIZE_STRING);
-$peca = filter_input(INPUT_GET, 'cod', FILTER_SANITIZE_NUMBER_INT);
-$pBruto = filter_input(INPUT_GET, 'cod', FILTER_SANITIZE_NUMBER_FLOAT);
-$tara = filter_input(INPUT_GET, 'cod', FILTER_SANITIZE_NUMBER_FLOAT);
-$pLiq = filter_input(INPUT_GET, 'cod', FILTER_SANITIZE_NUMBER_FLOAT);
-$nOp = filter_input(INPUT_GET, 'cod', FILTER_SANITIZE_NUMBER_INT);
-$nExt = filter_input(INPUT_GET, 'cod', FILTER_SANITIZE_NUMBER_INT);
-$cod = filter_input(INPUT_GET, 'cod', FILTER_SANITIZE_STRING);
-
 //procurar op trazer o codigo e o numero da peça a ser considerada
 //o numero da bobina é sequencial e não leva em consideração o numero da maquina
 //por principio uma OP é produzida por uma unica extrusora
 
 
-$script = "<script src=\"js/op.js\"></script>"
-        . "<script>
+$script = "";
+        
+$extras = "<script type = \"text/javascript\" language = \"javascript\">
+            $(document).ready(function() {
+                $('#numop').focus();
+                $('#numop').on('keydown', function(event) {
+                    if (event.which == 13) {
+                        getValues();
+                    }    
+                });
+                $('#btnGetOP').click(function () {
+                    getValues();
+                });
+                $('#pbruto').bind('input', function() {
+                    upLiq();
+                });
+                $('#tara').bind('input', function() {
+                    upLiq();
+                });
+                $('#ext').on('keydown', function(event) {
+                    if (event.which == 13) {
+                        $('#operador').focus().select();
+                    }    
+                });
+                $('#operador').on('keydown', function(event) {
+                    if (event.which == 13) {
+                        $('#pbruto').focus().select();
+                    }    
+                });
+                $('#pbruto').on('keydown', function(event) {
+                    if (event.which == 13) {
+                        $('#tara').focus().select();
+                    }    
+                });
+                $('#tara').on('keydown', function(event) {
+                    if (event.which == 13) {
+                        $('#pliq').focus().select();
+                    }    
+                });
+                $('#pliq').on('keydown', function(event) {
+                    if (event.which == 13) {
+                        $('#btnExtSave').focus();
+                    }    
+                });
+                $('#btnExtSave').click(function (event) {
+                    event.preventDefault();
+                    clearValues();
+                });
+                $('#btnExtPrint').click(function (event) {
+                    clearValues();
+                });
+            });
+            
+            function clearValues() {
+                window.location.reload(true);
+            }
+
+            function getValues() {
+                var nop = $('#numop').val();
+                if (!!nop) {
+                    //console.log('Aqui '+nop);
+                    $.getJSON('retopdata.php?op='+nop, function (data) {
+                        //console.log(data);
+                        $('#cod').attr('value', data.cod);
+                        $('#seq').attr('value', data.seq);
+                        $('#desc').attr('value', data.desc);
+                        $('#ext').focus();
+                    });
+                }    
+            }
+            
             function checkInput(ob) {
                 var invalidChars = /[^0-9]/gi
                 if (invalidChars.test(ob.value)) {
                     ob.value = ob.value.replace(invalidChars,\"\");
                 }
             }
+            
+            function upLiq() {
+                var pb = $('#pbruto').val();
+                var tar = $('#tara').val();
+                if (!!pb && !!tar) {
+                    $('#pliq').attr('value', (pb-tar))
+                    //$('#btnExtSave').focus();
+                }
+            }
         </script>";
+
 $title = "Extrusao";
 
 $body = "
@@ -40,7 +110,7 @@ $body = "
     <div class=\"row\">
         <div class=\"col-md-4\">
             <div class=\"input-group\">
-                <input type=\"text\" class=\"form-control\" id=\"numop\" name=\"numop\" value=\"$numop\" placeholder=\"Entre com o numero da OP\" onkeyup=\"checkInput(this)\">
+                <input type=\"text\" class=\"form-control\" id=\"numop\" name=\"numop\" value=\"\" placeholder=\"Entre com o numero da OP\" onkeyup=\"checkInput(this)\">
                 <span class=\"input-group-btn\">
                     <button class=\"btn btn-primary\" type=\"button\" id=\"btnGetOP\" name=\"btnGetOP\"><span class=\"glyphicon glyphicon-search\"></span> Busca </button>
                 </span>
@@ -48,12 +118,12 @@ $body = "
         </div>    
         <div class=\"col-md-4\">               
             <div class=\"input-group\">
-                <input type=\"text\" class=\"form-control\" id=\"cod\" name=\"cod\" value=\"$cod\" placeholder=\"Codigo do produto\">
+                <input type=\"text\" class=\"form-control\" id=\"cod\" name=\"cod\" value=\"\" placeholder=\"Codigo do produto\">
             </div>                        
         </div>
         <div class=\"col-md-4\">
             <div class=\"input-group\">
-                <input type=\"text\" class=\"form-control\" id=\"peca\" name=\"peca\" value=\"$peca\" placeholder=\"Numero da bobina\">
+                <input type=\"text\" class=\"form-control\" id=\"seq\" name=\"seq\" value=\"\" placeholder=\"Numero da bobina\">
             </div>                        
         </div>    
     </div>
@@ -61,17 +131,17 @@ $body = "
     <div class=\"row\">
           <div class=\"col-md-4\">
             <div class=\"input-group\">
-                <input type=\"text\" class=\"form-control\" id=\"desc\" name=\"desc\" value=\"$cod\" placeholder=\"Descrição do produto\">
+                <input type=\"text\" class=\"form-control\" id=\"desc\" name=\"desc\" value=\"\" placeholder=\"Descrição do produto\">
             </div>
         </div>
         <div class=\"col-md-4\">
             <div class=\"input-group\">
-                <input type=\"text\" class=\"form-control\" id=\"nExt\" name=\"nExt\" value=\"$nExt\" placeholder=\"Numero da extrusora\">
+                <input type=\"text\" class=\"form-control\" id=\"ext\" name=\"ext\" value=\"\" placeholder=\"Numero da extrusora\">
             </div>                        
         </div>
         <div class=\"col-md-4\">
             <div class=\"input-group\">                        
-                <input type=\"text\" class=\"form-control\" id=\"operador\" name=\"operador\" value=\"$nOp\" placeholder=\"Operador\">
+                <input type=\"text\" class=\"form-control\" id=\"operador\" name=\"operador\" value=\"\" placeholder=\"Operador\">
             </div>
         </div>
     </div>
@@ -79,17 +149,17 @@ $body = "
     <div class=\"row\">
         <div class=\"col-md-4\">
             <div class=\"input-group\">                        
-             <input type=\"text\" class=\"form-control\" id=\"pBruto\" name=\"pBruto\" value=\"$pBruto\" placeholder=\"Entre com o peso Bruto\">
+             <input type=\"text\" class=\"form-control\" id=\"pbruto\" name=\"pbruto\" value=\"\" placeholder=\"Entre com o peso Bruto\">
             </div>                 
         </div>
         <div class=\"col-md-4\">
             <div class=\"input-group\">                        
-                <input type=\"text\" class=\"form-control\" id=\"tara\" name=\"tara\" value=\"$tara\" placeholder=\"Entre com o peso da tara\">
+                <input type=\"text\" class=\"form-control\" id=\"tara\" name=\"tara\" value=\"\" placeholder=\"Entre com o peso da tara\">
             </div>                        
         </div>
         <div class=\"col-md-4\">
             <div class=\"input-group\">
-                <input type=\"text\" class=\"form-control\" id=\"pLiq\" name=\"pLiq\" value=\"$pLiq\" placeholder=\"Peso Liquido\">
+                <input type=\"text\" class=\"form-control\" id=\"pliq\" name=\"pliq\" value=\"\" placeholder=\"Peso Liquido\" readonly>
             </div>                        
         </div>
     </div>
@@ -110,7 +180,7 @@ $body = "
 $script
 ";
 $html = file_get_contents('assets/main.html');
-$html = str_replace("{{extras}}", '', $html);
+$html = str_replace("{{extras}}", $extras, $html);
 $html = str_replace("{{title}}", $title, $html);
 $html = str_replace("{{content}}", $body, $html);
 echo $html;
