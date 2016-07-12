@@ -148,7 +148,7 @@ class Products
             return false;
         }
         foreach ($data as $key => $value) {
-            $this->$key = $value;
+            $this->$key = strtoupper(trim($value));
         }
     }    
     
@@ -158,6 +158,7 @@ class Products
             return false;
         }
         $sqlComm = "SELECT * FROM produtos WHERE produto = '$prod'";
+        echo $sqlComm.'<br>';
         $rows = $this->dbase->querySql($sqlComm);
         if (empty($rows)) {
             return false;
@@ -447,8 +448,8 @@ class Products
                 "'$this->bolhafilm4',".
                 "'$this->pacote',".
                 "'$this->embalagem');";
-        echo $sqlComm.'<BR><BR><BR>';
-        die;
+        //echo $sqlComm.'<BR><BR><BR>';
+        //die;
         $this->id = $this->dbase->insertSql($sqlComm);
         if ($this->id === false) {
             echo $sqlComm.'<BR><BR><BR>';

@@ -23,11 +23,11 @@
 // #########################################################
 
 // Sample key.  Replace with one used for CSR generation
-$KEY = '../../../certs/plastfoam-private_key.pem';
+$key = '../../../certs/plastfoam-private_key.pem';
 //$PASS = '';
 
 $req = $_GET['request'];
-$privateKey = openssl_get_privatekey(file_get_contents($KEY));
+$privateKey = openssl_get_privatekey(file_get_contents($key));
 
 $signature = null;
 openssl_sign($req, $signature, $privateKey);
