@@ -11,27 +11,18 @@ class DBase
     public $error = '';
     public $dsn = '';
     public $conn= null;
-    public $host = 'localhost';
-    public $dbname = 'opmigrate';
-    public $user = 'etiqueta';
-    public $pass = 'forever';
+    public $host = '';
+    public $dbname = '';
+    public $user = '';
+    public $pass = '';
     public $aPrinters = array();
     public $aUnid = array();
     
     /**
      * Construtora
-     * Caso sejam passados dados de acesso ao MySQL
-     * será feita a conexão e os parametros de coneção serão registrados
-     * @param string $host
-     * @param string $dbname
-     * @param string $user
-     * @param string $pass
      */
-    public function __construct($host = '', $dbname = '', $user = '', $pass = '')
+    public function __construct()
     {
-        if (!empty($host) && !empty($dbname) && !empty($user) && !empty($pass)) {
-            $this->connect($host, $dbname, $user, $pass);
-        }
         $this->aUnid = array(
             'pcs',
             'cen',
@@ -54,18 +45,27 @@ class DBase
      */
     public function connect($host = '', $dbname = '', $user = '', $pass = '')
     {
+        if (! is_null($this->conn)) {
+            return true;
+        }
         $this->disconnect();
         $this->setUser($user);
         $this->setPass($pass);
         $this->setHost($host);
         $this->setDBname($dbname);
-        $this->dsn = "mysql:host=$this->host;dbname=$this->dbname";
+        $this->dsn = "mysql:host=$this->host";
+        if ($dbname != '') {
+            $this->dsn .= ";dbname=$this->dbname";
+        }    
         try {
             $this->conn = new PDO($this->dsn, $this->user, $this->pass);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             $this->error = $e->getMessage();
+            $this->disconnect();
+            return false;
         }
+        return true;
     }
     
     /**
@@ -98,6 +98,32 @@ class DBase
         }
     }
     
+    public function dbExists($dbname)
+    {
+        if (is_null($this->conn)) {
+            return false;
+        }
+        try {
+            $stmt = $this->conn->query("SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '$dbname'");
+            return (bool) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            $this->error = $e->getMessage();
+            return false;
+        }
+    }
+
+    public function createDbase($dbname)
+    {
+        try {
+            $sqlComm = "CREATE DATABASE `$dbname` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci; CREATE USER '$this->user'@'localhost' IDENTIFIED BY '$this->pass'; GRANT ALL ON `$dbname`.* TO '$this->user'@'localhost'; FLUSH PRIVILEGES; ";
+            $sth = $this->conn->query($sqlComm);
+        } catch (PDOException $e) {
+            $this->error = $e->getMessage();
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Define o nome do usuário da base de dados
      * @param string $user

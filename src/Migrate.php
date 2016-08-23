@@ -21,19 +21,24 @@ class Migrate
      * @var string
      */
     public $error;
+    
+    public $storagePath;
     /**
      * Array com as OP's extraidas da base access OP.mdb
      * na estrutura array('<numero da OP>, '<sql gerado pelo mdbtools>', ...
      * @var array
      */
-    protected $aOPs;
+    public $aOPs;
     /**
      * Array com os produtos extraidos da base access OP.mdb
      * na estrutura array('<descrição do produto>, '<sql gerado pelo mdbtools>', ...
      * @var array
      */
-    protected $aProds;
+    public $aProds;
     
+    protected $listProd = array();
+
+
     /**
      * função construtora
      * Intancia a classe de acesso a base de dados,
@@ -41,53 +46,51 @@ class Migrate
      * e carrega nos arrays os dados extraidos pelo script
      * console/migrate.sh que usa os recursos do mdbtools
      */
-    public function __construct($storagePath = '')
+    public function __construct($storagePath = '../storage/')
     {
-        if ($storagePath =='') {
-            $storagePath = '../storage/';
-        }
-        $this->aOPs = $this->setOPsList($storagePath.'OP.txt');
-        $this->aProds= $this->setProdsList($storagePath.'produtos.txt');
+        $this->storagePath = $storagePath;
     }
     
-    protected function setOPsList($listaFile)
+    public function setOPsList($listaFile = 'OP.txt')
     {
         $aOPs = array();
         $aList = array();
+        $listaFile = $this->storagePath.$listaFile;
         //carregar uma matriz com os dados txt da tabela exportada
         $aList = file($listaFile, FILE_IGNORE_NEW_LINES);
         foreach ($aList as $registro) {
             $aReg = explode('|', $registro);
             $numop = (int) $aReg[0]; //numero da OP (int)
-            $aOPs[$numop] = $registro;
+            $aOPs[$numop] = $this->rectifyOPField($registro);
         }
         ksort($aOPs);
         return $aOPs;
     }
     
-    protected function setProdsList($listaFile)
+    public function setProdsList($listaFile = 'produtos.txt')
     {
         $aProds = array();
         $aList = array();
+        $listaFile = $this->storagePath.$listaFile;
         //carregar uma matriz com os dados txt da tabela exportada
         $aList = file($listaFile, FILE_IGNORE_NEW_LINES);
         foreach ($aList as $registro) {
             $aReg = explode('|', $registro);
             $produto = $aReg[0]; //descrição do produto
-            $aProds[$produto] = $registro;
+            $aProds[$produto] = $this->rectifyProdField($registro);
         }
         ksort($aProds);
         return $aProds;
     }
     
-    public function setFromLast()
+    public function setFromLast($aOps = array())
     {
         //busca o ultimo registro das OPs
         $op = new Op();
         $num = $op->lastNum();
         //verifica se essa OP está na lista
-        $keys = array_keys($this->aOPs);
-        if (! array_key_exists($num, $this->aOPs)) {
+        $keys = array_keys($aOPs);
+        if (! array_key_exists($num, $aOPs)) {
             $last = $keys[(count($keys)-1)];
             if ($last <= $num) {
                 return false;
@@ -106,7 +109,7 @@ class Migrate
             $x = array_search($num, $keys);
         }
         //aqui estão as ops da lista que ainda não estão da tabela
-        $aOps = array_slice($this->aOPs, $x+1);
+        $aOps = array_slice($aOPs, $x+1);
         foreach ($aOps as $data) {
             $aData = $this->extract($data);
             
@@ -117,18 +120,21 @@ class Migrate
         
     }
     
-    public function setFromProds()
+    public function setFromOPs($aOps = array())
+    {
+        
+    }
+    
+    public function setFromProds($aProds = array())
     {
         $prods = new Products();
-        foreach ($this->aProds as $data)
-        {
-            $aData = $this->extractProd($data);
+        foreach ($aProds as $data) {
             $prods->set($aData);
             $prods->save();
         }
     }
     
-    private function extractProd($reg = null)
+    private function rectifyProdField($reg = null)
     {
         if (is_null($reg)) {
             return array();
@@ -138,20 +144,24 @@ class Migrate
         if ($num != 90) {
             throw \RuntimeException("Dados errados na linha. ");
         }
+        $desc = $registro[0];
+        $codigo = (string) $this->adjust($registro[1], 'C');
+        $this->listProd[$desc] = $codigo;
+        
         $aData = array(
-            'produto' => $this->adjust($registro[0], 'C'),
-            'codigo' => $this->adjust($registro[1], 'C'),
-            'ean' => $this->adjust($registro[2], 'C'),
+            'produto' => (string) $this->adjust($registro[0], 'C'),
+            'codigo' => (string) $this->adjust($registro[1], 'C'),
+            'ean' => (string) $this->adjust($registro[2], 'C'),
             'validade' => (int) $this->adjust($registro[3], 'N'),
-            'mp1' => $this->adjust($registro[4], 'C'),
+            'mp1' => (string) $this->adjust($registro[4], 'C'),
             'p1' => (float) $this->adjust($registro[5], 'N'),
-            'mp2' => $this->adjust($registro[6], 'C'),
+            'mp2' => (string) $this->adjust($registro[6], 'C'),
             'p2' => (float) $this->adjust($registro[7], 'N'),
-            'mp3' => $this->adjust($registro[8], 'C'),
+            'mp3' => (string) $this->adjust($registro[8], 'C'),
             'p3' => (float) $this->adjust($registro[9], 'N'),
-            'mp4' => $this->adjust($registro[10], 'C'),
+            'mp4' => (string) $this->adjust($registro[10], 'C'),
             'p4' => (float) $this->adjust($registro[11], 'N'),
-            'mp5' => $this->adjust($registro[12], 'C'),
+            'mp5' => (string) $this->adjust($registro[12], 'C'),
             'p5' => (float) $this->adjust($registro[13], 'N'),
             'mp6' => (string) $this->adjust($registro[14], 'C'),
             'p6' => (float) $this->adjust($registro[15], 'N'),
@@ -232,7 +242,7 @@ class Migrate
         return $aData;
     }
     
-    private function extract($reg = null)
+    private function rectifyOPField($reg = null)
     {
         if (is_null($reg)) {
             return array();
@@ -243,6 +253,7 @@ class Migrate
         if ($num != 31) {
             throw \RuntimeException("Dados errados na linha. ");
         }
+        $desc = $registro[5];
         $aData = array(
             'numop' => $numop,
             'cliente' => (string) $this->adjust($registro[1], 'C'), //nome do cliente (string)
@@ -250,6 +261,7 @@ class Migrate
             'pedido' =>  (int) $this->adjust($registro[3], 'N'), //numero do pedido interno (int)
             'prazo' => (string) $this->adjust($registro[4], 'D'), //prazo de entrega (datetime)
             'produto' => (string) $this->adjust($registro[5], 'C'), //descrição do produto (string)
+            'codigo' => (string) !empty($this->listProd[$desc]) ? $this->listProd[$desc] : '',
             'nummaq' => (float) $this->adjust($registro[6], 'N'), // numero da extrusora (int)
             'matriz' => (string) $this->adjust($registro[7], 'C'), //numero da  matriz
             'kg1' => (float) $this->adjust($registro[8], 'N'), //peso ;
@@ -332,154 +344,7 @@ class Migrate
         }
         return $text;
     }
-    /**
-     * changeSQL
-     * Ajusta o comando SQL extraido do arquivo MDB com o mdbtools
-     * para os nomes corretos dos campos da base de dados do MySQL
-     * @param string $sqlComm
-     * @param string $table
-     * @return string
-     */
-    protected function changeSQL($sqlComm, $table)
-    {
-        $aMOP = array(
-            'Número da OP' => 'numop',
-            'Cliente' => 'cliente',
-            'CODIGO CLIENTE' => 'codcli',
-            'Numero Pedido' => 'pedido',
-            'Prazo de entrega' => 'prazo',
-            'Nome da Peça' => 'produto',
-            'Número da Máquina' => 'nummaq',
-            'Matriz' => 'matriz',
-            '`kg`' => '`kg1`',
-            'Kg ind' => 'kg1ind',
-            'kg2' => 'kg2',
-            'kg2 ind' => 'kg2ind',
-            'kg3' => 'kg3',
-            'kg3 ind' => 'kg3ind',
-            'Kg 4' => 'kg4',
-            'kg4 ind' => 'kg4ind',
-            'kg5' => 'kg5',
-            'kg5ind' => 'kg5ind',
-            'kg6' => 'kg6',
-            'kg6ind' => 'kg6ind',
-            'Peso Total' => 'pesototal',
-            'peso milheiro' => 'pesomilheiro',
-            'peso bobina' => 'pesobobina',
-            'Quantidade' => 'quantidade',
-            'bol bobinas' => 'bolbobinas',
-            'Data emissão' => 'dataemissao',
-            'metragem' => 'metragem',
-            'contador dif' => 'contadordif',
-            'iso bobinas' => 'isobobinas',
-            'pedcli' => 'pedcli',
-            'unidade' => 'unidade');
-        
-        $aMProd = array(
-            'Nome da peça'              => 'produto',
-            'Código da Peça'            => 'codigo',
-            'ean'                       => 'ean',
-            'validade'                  => 'validade',
-            'Materia prima'             => 'mp1',
-            '%1'                        => 'p1',
-            'MP2'                       => 'mp2',
-            '%2'                        => 'p2',
-            'MP3'                       => 'mp3',
-            '%3'                        => 'p3',
-            'materia prima 4'           => 'mp4',
-            '% 4'                       => 'p4',
-            'mp5'                       => 'mp5',
-            'qmp5'                      => 'p5',
-            'mp6'                       => 'mp6',
-            'qmp6'                      => 'p6',
-            'densidade'                 => 'densidade',
-            'gramatura'                 => 'gramatura',
-            'Tipo de Bobina'            => 'tipobobina',
-            'Tratamento porcentagem'    => 'tratamento',
-            'Lados'                     => 'lados',
-            'Bobina Largura (cm)'       => 'boblargura',
-            '`tol largura bob`'           => '`tollargbobmax`',
-            'tol largura bob -'         => 'tollargbobmin',
-            'refilar'                   => 'refilar',
-            'bobinas por vez'           => 'bobinasporvez',
-            'Bobina Espessura 1 (micras)' => 'espessura1',
-            '`tol espess1`'               => '`tolespess1max`',
-            'tol espess1 -'             => 'tolespess1min',
-            'Bobina Espessura 2 (micras)' => 'espessura2',
-            '`tol espess2`'               => '`tolespess2max`',
-            'tol espess2 -'             => 'tolespess2min',
-            'Bobina Sanfona (cm)'       => 'sanfona',
-            '`tol sanfona ext`'           => '`tolsanfonamax`',
-            'tol sanfona ext -'         => 'tolsanfonamin',
-            'Impressão'                 => 'impressao',
-            'Dentes do Cilindro'        => 'cilindro',
-            'Codigo Cyrel1'             => 'cyrel1',
-            'Codigo Cyrel2'             => 'cyrel2',
-            'Codigo Cyrel3'             => 'cyrel3',
-            'Codigo Cyrel4'             => 'cyrel4',
-            'Cor 1'                     => 'cor1',
-            'Cor 2'                     => 'cor2',
-            'Cor 3'                     => 'cor3',
-            'Cor 4'                     => 'cor4',
-            'Cor 5'                     => 'cor5',
-            'Cor 6'                     => 'cor6',
-            'Cor 7'                     => 'cor7',
-            'Cor 8'                     => 'cor8',
-            'Modelo Saco'               => 'modelosaco',
-            '`Ziper`'                     => '`ziper`',
-            'N Ziper'                   => 'nziper',
-            'Tipo Solda'                => 'solda',
-            'Cortar por vez'            => 'cortarporvez',
-            'Saco Largura/Boca'         => 'largboca',
-            '`tol largura`'               => '`tollargbocamax`',
-            'tol largura -'             => 'tollargbocamin',
-            'Saco Comprimento'          => 'comprimento',
-            '`tol comprimento`'           => '`tolcomprmax`',
-            'tol comprimento -'         => 'tolcomprmin',
-            'Saco Espessura'            => 'sacoespess',
-            '`tol espessura`'             => '`tolsacoespessmax`',
-            'tol espessura -'           => 'tolsacoespessmin',
-            'microperfurado'            => 'microperfurado',
-            'estampado'                 => 'estampado',
-            'estampar'                  => 'estampar',
-            'laminado'                  => 'laminado',
-            'laminar'                   => 'laminar',
-            'bolha'                     => 'bolha',
-            'bolhar'                    => 'bolhar',
-            '`isolmanta`'                 => '`isolmanta`',
-            'isolmantar'                => 'isolmantar',
-            'colagem'                   => 'colagem',
-            'teste dinas'               => 'dinas',
-            'sanfona corte'             => 'sanfcorte',
-            '`tol sanf corte`'            => '`tolsanfcortemax`',
-            'tol sanf corte -'          => 'tolsanfcortemin',
-            'Aba'                       => 'aba',
-            '`tol aba`'                   => '`tolabamax`',
-            'tol aba -'                 => 'tolabamin',
-            'AMARRAR'                   => 'amarrar',
-            'QT PECAS BOB BOLHA'        => 'qtdpcbobbolha',
-            'FATIAR EM'                 => 'fatiar',
-            'QT PECAS BOB MANTA'        => 'qtdpcbobmanta',
-            'bolhaFilm1'                => 'bolhafilm1',
-            'bolhaFilm2'                => 'bolhafilm2',
-            'bolhaFilm3'                => 'bolhafilm3',
-            'bolhaFilm4'                => 'bolhafilm4',
-            'PACOTE COM'                => 'pacote',
-            'EMBALAGEM'                 => 'embalagem');
-        
-        if ($table ==  'OP') {
-            foreach ($aMOP as $key => $campo) {
-                $sqlComm = str_replace($key, $campo, $sqlComm);
-            }
-        } elseif ($table == 'produtos') {
-            foreach ($aMProd as $key => $campo) {
-                $sqlComm = str_replace($key, $campo, $sqlComm);
-            }
-        }
-        return $sqlComm;
-    }
-   
-   
+    
     /**
      * convertData
      * @param string $data
@@ -494,43 +359,5 @@ class Migrate
             $demi = $aDH[2].'/'.$aDH[1].'/'.$aDH[0];
         }
         return $demi;
-    }
-    
-    /**
-     * Remonta o comando SQL efetuando uma limpeza nos dados
-     * a serem gravados
-     * NOTA: quando o mdbtools extrai os dados do MDB vários campos
-     * podem conter aspas simpes e duplas e os numeros estão formatados
-     * com virgula. E a separação dos valores é feita por ";" ao invés de uma
-     * virgula para facilitar a extração desses dados. Veja console/migrate.sh
-     *
-     * @param string $sqlComm
-     * @return string
-     */
-    public function extractData($sqlComm, &$values = array())
-    {
-        $aPartial = explode(') VALUES (', $sqlComm);
-        $part1 = 'xxxx'.$aPartial[0];
-        $numfields = 31;
-        if (strpos($part1, 'INSERT INTO `produtos`') > 0) {
-            $numfields = 90;
-        }
-        $tvalues = str_replace(');', '', $aPartial[1]);
-        $tvalues = str_replace("'", '', $tvalues);
-        $tvalues = str_replace(',', '.', $tvalues);
-        $tvalues = str_replace('"', '', $tvalues);
-        $values = explode(';', $tvalues);
-        $sqlComm = str_replace('`', '', $aPartial[0]) . ') VALUES (';
-        if (count($values) != $numfields) {
-            return '';
-        }
-        foreach ($values as $value) {
-            $nvalue = (string) trim($value);
-            $sqlComm .= "'$nvalue',";
-        }
-        $sqlComm = substr($sqlComm, 0, strlen($sqlComm)-1);
-        $sqlComm .= ");";
-        $sqlComm = str_replace(array("\n", "\r"), '', $sqlComm);
-        return $sqlComm;
     }
 }

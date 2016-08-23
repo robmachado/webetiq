@@ -105,11 +105,9 @@ class Products
     /**
      *
      */
-    public function __construct()
+    public function __construct(DBase $dbase)
     {
-        $this->dbase = new DBase();
-        $this->dbase->setDBname('opmigrate');
-        $this->dbase->connect();
+        $this->dbase = $dbase;
     }
     
     /**
