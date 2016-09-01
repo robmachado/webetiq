@@ -29,7 +29,7 @@ class Printer
      * Printer IP para uso de impressão por IPP
      * @var string
      */
-    public $printIp = '';
+    public $printIP = '';
     /**
      * Linguagem da impressora
      * Para definir o template a ser usado

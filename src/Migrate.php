@@ -17,7 +17,7 @@ use RuntimeException;
 class Migrate
 {
     /**
-     * Erros capturados dos excptions
+     * Erros capturados dos exceptions
      * @var string
      */
     public $error;

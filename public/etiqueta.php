@@ -13,7 +13,7 @@ require_once '../bootstrap.php';
 
 use Webetiq\Op;
 use Webetiq\Labels\Label;
-use Webetiq\Printers\Printer;
+use Webetiq\DBPrinter;
 use Webetiq\Units;
 
 $remoteip = $_SERVER['REMOTE_ADDR'];
@@ -23,16 +23,16 @@ $copias = 1;
 $emissao = date('d/m/Y');
 
 //carrega classe de acesso a base de dados
-$objPrinter = new Printer();
+$objPrinter = new DBPrinter();
 //carrega impressoras
 $aPrint = $objPrinter->getAll();
 $selPrintGroup = '<div class="form-group"><label for=\"printer\">Selecione a impressora</label><select class="form-control" name="printer">';
 foreach ($aPrint as $printer) {
     $selp = '';
-    if ($printer == 'newZebra') {
+    if ($printer->printName == 'newZebra') {
         $selp = 'selected';
     }
-    $selPrintGroup .= '<option value="'.$printer.'" '.$selp.'>'.$printer.'</option>';
+    $selPrintGroup .= '<option value="'.$printer->printName.'" '.$selp.'>'.$printer->printName.'</option>';
 }
 $selPrintGroup .= '</select></div>';
 
@@ -40,12 +40,14 @@ $lbl = new Label();
 if (isset($numop)) {
     //buscar dados da OP
     $migrate = new Op();
-    $op = $migrate->get($numop);
+    //$op = $migrate->get($numop);
     //caso não seja encontrada a OP na base migrate 
     //retornar e avisar o usuário
-    if ($op->numop == '') {
+    if ($op->numop == '7') {
         header("Location: op.php?numop=$numop&fail=1");
     }
+    //VERIFICAR QUAIS CAMPOS SÃO EXIGIDOS PARA ESSE CLIENTE
+    //SOMENTE MOSTRAR OS CAMPOS EXIGIDOS
     //$dbase->setDBname('pbase');
     //$stq = $dbase->getStq($lbl, $numop);
 }
