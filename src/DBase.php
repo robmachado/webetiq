@@ -21,8 +21,21 @@ class DBase
     /**
      * Construtora
      */
-    public function __construct()
+    public function __construct($config = '')
     {
+        $conf = null;
+        if (is_file($config)) {
+            $conf = json_decode(file_get_contents($config));
+        } elseif ($config != '') {
+            $conf = json_decode($config);
+        }
+        
+        if (! is_null($conf)) {
+            $this->setUser($conf->user);
+            $this->setPass($conf->pass);
+            $this->setHost($conf->host);
+            $this->setDBname($conf->dbname);
+        }
         $this->aUnid = array(
             'pcs',
             'cen',
@@ -54,7 +67,7 @@ class DBase
         $this->setHost($host);
         $this->setDBname($dbname);
         $this->dsn = "mysql:host=$this->host";
-        if ($dbname != '') {
+        if ($this->dbname != '') {
             $this->dsn .= ";dbname=$this->dbname";
         }    
         try {

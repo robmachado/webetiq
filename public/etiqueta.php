@@ -1,5 +1,5 @@
 <?php
-ini_set("display_errors", 1);
+ini_set("display_errors", E_ALL);
 error_reporting(E_ALL);
 require_once '../bootstrap.php';
 
@@ -13,7 +13,7 @@ require_once '../bootstrap.php';
 
 use Webetiq\Op;
 use Webetiq\Labels\Label;
-use Webetiq\Printer;
+use Webetiq\Printers\Printer;
 use Webetiq\Units;
 
 $remoteip = $_SERVER['REMOTE_ADDR'];
@@ -23,7 +23,7 @@ $copias = 1;
 $emissao = date('d/m/Y');
 
 //carrega classe de acesso a base de dados
-$objPrinter = new Webetiq\Printer();
+$objPrinter = new Printer();
 //carrega impressoras
 $aPrint = $objPrinter->getAll();
 $selPrintGroup = '<div class="form-group"><label for=\"printer\">Selecione a impressora</label><select class="form-control" name="printer">';

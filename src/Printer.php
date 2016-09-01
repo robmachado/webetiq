@@ -4,52 +4,8 @@ namespace Webetiq;
 
 use Webetiq\DBase;
 
-class Printer
+class DBPrinter
 {
-    /**
-     * Id da printer na base de dados
-     * @var int
-     */
-    public $printId = 0;
-    /**
-     * Nome da impressora no cadastro -> Unique Key
-     * @var string
-     */
-    public $printName = '';
-    /**
-     * Tipo de impressora
-     * T termica, D deskjet, L laser, S sublimação
-     * @var string
-     */
-    public $printType = '';
-    /**
-     * Descrição da impressora
-     * @var string
-     */
-    public $printDesc = '';
-    /**
-     * Printer IP para uso de impressão por IPP
-     * @var string
-     */
-    public $printIp = '';
-    /**
-     * Linguagem da impressora
-     * Para definir o template a ser usado
-     * @var string
-     */
-    public $printLang = '';
-    /**
-     * Interface de comunicação a ser usada
-     * LPR, IPP, Local(QZ)
-     * @var string
-     */
-    public $printInterface = '';
-    /**
-     * Flag de bloqueio para impedir o uso
-     * usado em fase de manutenção da impressora
-     * @var bool
-     */
-    public $printBlock = 0;
     /**
      * Lista com o nome de todas as impressoras cadastradas
      * @var array
@@ -85,10 +41,13 @@ class Printer
      */
     public function getAll()
     {
-        $this->dbase->connect('', 'printers');
+        $host = 'localhost';
+        $dbname = 'printers';
+        $user = 'root';
+        $pass = 'monitor5';
+        $this->dbase->connect($host, $dbname, $user, $pass);
         $sqlComm = "SELECT * FROM printers WHERE printType = 'T' AND printBlock = '0'";
         $sqlComm .= " ORDER BY printName";
-        
         $dados = $this->dbase->querySql($sqlComm);
         if (! is_array($dados)) {
             return '';
@@ -109,7 +68,7 @@ class Printer
         if ($printer == '') {
             return '';
         }
-        $this->dbase->connect('', 'printers');
+        $this->dbase->connect();
         $sqlComm = "SELECT * FROM printers WHERE printType = 'T' AND printBlock = '0'";
         $sqlComm .= " AND printName = '$printer'";
         $sqlComm .= " ORDER BY printName";
