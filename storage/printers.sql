@@ -1,52 +1,61 @@
 -- phpMyAdmin SQL Dump
--- version 3.4.11.1deb2+deb7u5
+-- version 4.5.4
 -- http://www.phpmyadmin.net
 --
--- Máquina: localhost
--- Data de Criação: 01-Set-2016 às 09:26
--- Versão do servidor: 5.5.50
--- versão do PHP: 5.4.45-0+deb7u4
+-- Host: localhost
+-- Tempo de geração: 09/09/2016 às 10:58
+-- Versão do servidor: 5.5.50-0ubuntu0.14.04.1
+-- Versão do PHP: 7.0.10-2+deb.sury.org~trusty+1
 
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de Dados: `printers`
+-- Banco de dados: `blabel`
 --
 
 -- --------------------------------------------------------
 
 --
--- Estrutura da tabela `printers`
+-- Estrutura para tabela `printers`
 --
 
-CREATE TABLE IF NOT EXISTS `printers` (
-  `printId` int(11) NOT NULL AUTO_INCREMENT,
-  `printName` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `printType` varchar(10) COLLATE utf8_unicode_ci NOT NULL,
-  `printDesc` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `printIP` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `printLang` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `printInterface` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `printBlock` tinyint(4) NOT NULL,
-  PRIMARY KEY (`printId`),
-  UNIQUE KEY `printName` (`printName`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Lista de impressoras' AUTO_INCREMENT=3 ;
+CREATE TABLE `printers` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `type` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `language` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `interface` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `location` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `description` varchar(200) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Printers Table';
 
 --
--- Extraindo dados da tabela `printers`
+-- Índices de tabelas apagadas
 --
 
-INSERT INTO `printers` (`printId`, `printName`, `printType`, `printDesc`, `printIP`, `printLang`, `printInterface`, `printBlock`) VALUES
-(1, 'newZebra', 'T', 'ZT230', '192.168.1.20', 'ZPL2', 'LPR', 0),
-(2, 'Local', 'T', 'TLP2844', '0.0.0.0', 'EPL2', 'QZ', 0);
+--
+-- Índices de tabela `printers`
+--
+ALTER TABLE `printers`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
 
+--
+-- AUTO_INCREMENT de tabelas apagadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `printers`
+--
+ALTER TABLE `printers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

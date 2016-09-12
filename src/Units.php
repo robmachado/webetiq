@@ -2,49 +2,48 @@
 
 namespace Webetiq;
 
-use Webetiq\DBase;
+use Webetiq\DBase\DBase;
 
 class Units
 {
-    protected $aUnit = array();
-    
+    protected $dbase;
+    protected $table = 'units';
+
     /**
      * função construtora
      * instancia a conexão com a base de dados
      * E carrega o array com as unidades com os registros da
      * base de dados, se houverem
      */
-    public function __construct()
+    public function __construct(DBase $dbase)
     {
-        $this->dbase = new DBase();
-        $this->dbase->setDBname('opmigrate');
+        $this->dbase = $dbase;
         $this->dbase->connect();
-        $this->all(true);
+        if (! $this->dbase->tableExists($this->table)) {
+            $this->create();
+            $this->pushDefault();
+        }
     }
     
-    /**
-     * função destrutora
-     * deconecta a base de dados
-     */
-    public function __destruct()
+    public function create()
     {
-        $this->dbase->disconnect();
+        $sqlComm = [
+            "CREATE TABLE `$this->table` (`id` int(11) NOT NULL, `unit` varchar(50) COLLATE utf8_unicode_ci NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Units Table';",
+            "ALTER TABLE `$this->table` ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `unit` (`unit`);",
+            "ALTER TABLE `$this->table` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;'"
+        ];
+        $this->dbase->execute($sqlComm);
     }
     
     /**
      * Insere nova unidade na base de dados
      * e no array base
-     * @param string $unidade
+     * @param string $unit
      */
-    public function insert($unidade = null)
+    public function insert($unit)
     {
-        if (! is_null($unidade)) {
-            $sqlComm = "INSERT INTO unidades (unidade) VALUES ('$unidade');";
-            $resp = $this->dbase->insertSql($sqlComm);
-            if ($resp) {
-                $this->aUnit[$resp] = $unidade;
-            }
-        }
+        $sqlComm = "INSERT INTO $this->table (unit) VALUES ('$unit');";
+        return $this->dbase->execute($sqlComm);
     }
     
     /**
@@ -52,44 +51,45 @@ class Units
      * @param int $id
      * @return string
      */
-    public function get($id = null)
+    public function get($id)
     {
-        if (! is_null($id)) {
-            $sqlComm = "SELECT unidade FROM unidades WHERE id='$id';";
-            $resp = $this->dbase->querySql($sqlComm);
-            if (!empty($resp)) {
-                $unidade = $resp[0]['unidade'];
-            }
+        $unit = '';
+        $sqlComm = "SELECT unit FROM $this->table WHERE id='$id';";
+        $resp = $this->dbase->query($sqlComm);
+        if (!empty($resp)) {
+            $unidade = $resp[0]['unit'];
         }
-        return $unidade;
+        return $unit;
     }
     
     /**
      * Busca e retorna as unidades e seus ids
-     * @param bool $force se true força que a busca seja refeita na base de dados, se false apenas retorna o array já obtido
      * @return array
      */
-    public function all($force = false)
+    public function all()
     {
-        if ($force) {
-            $sqlComm = "SELECT * FROM unidades ORDER BY unidade;";
-            $resp = $this->dbase->querySql($sqlComm);
-            if (!empty($resp)) {
-                $this->aUnit = array();
-                foreach ($resp as $row) {
-                    $id = $row['id'];
-                    $unidade = $row['unidade'];
-                    $this->aUnit[$id] = $unidade;
-                }
+        $sqlComm = "SELECT * FROM $this->table ORDER BY unit;";
+        $resp = $this->dbase->query($sqlComm);
+        if (!empty($resp)) {
+            $aUnit = array();
+            foreach ($resp as $row) {
+                $id = $row['id'];
+                $unidade = $row['unit'];
+                $aUnit[$id] = $unidade;
             }
         }
-        return $this->aUnit;
+        return $aUnit;
+    }
+    
+    public function delete()
+    {
+        
     }
        
     /**
      * Grava as unidades padrões na tabela da base de dados
      */
-    public function push()
+    public function pushDefault()
     {
         $aUnit = [
             1 => "pcs",
@@ -101,20 +101,9 @@ class Units
             7 => "bob",
             8 => "cj"
         ];
-        $this->truncate();
+        $this->dbase->truncate($this->table);
         foreach ($aUnit as $unidade) {
             $this->insert($unidade);
         }
-    }
-    
-    /**
-     * Trunca a tabela unidades
-     * Eliminando todos os registros
-     * @return bool
-     */
-    protected function truncate()
-    {
-        $sqlComm = "TRUNCATE TABLE unidades;";
-        return $this->dbase->executeSql($sqlComm);
     }
 }

@@ -3,12 +3,13 @@ ini_set("display_errors", E_ALL);
 error_reporting(E_ALL);
 require_once '../bootstrap.php';
 
+use Webetiq\DBase\DBase;
 
-use Webetiq\DBase;
+$config = json_encode(['host' => 'localhost','user'=>'root', 'pass'=>'monitor5', 'db'=>'blabel']);
+$dbase = new DBase($config);
 
-$dbase = new DBase('../config/config.json');
-$dbase->connect();
-$sqlComm = "SELECT * FROM printers WHERE printType = 'T' AND printBlock = '0'";
-$sqlComm .= " ORDER BY printName";
-$dados = $dbase->querySql($sqlComm);
-print_r($dados);
+//$units = new \Webetiq\Units($dbase);
+
+//$printers = new \Webetiq\Printers($dbase);
+
+$ops = new \Webetiq\Ops($dbase);
