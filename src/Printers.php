@@ -119,21 +119,17 @@ class Printers
      * e carrega os parametros da classe
      * @return string
      */
-    public function get($search = [])
+    public function get($search)
     {
         if ($printer == '') {
             return '';
         }
-        $sqlComm = "SELECT * FROM $this->table WHERE ";
-        foreach ($search as $key => $value) {
-            $sqlComm .= "$key = '$value' AND";
-        }
-        $sqlComm = substr($sqlComm, 0, strlen($sqlComm)-4);
+        $sqlComm = "SELECT * FROM $this->table WHERE name='$search'";
         $dados = $this->dbase->query($sqlComm);
         if (! is_array($dados)) {
             return '';
         }
-        return $this->loadFields($dados[0]);
+        return $dados[0];
     }
     
     private function loadFields($dados)

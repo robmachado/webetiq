@@ -53,11 +53,14 @@ class Migrate
         $this->storagePath = __DIR__ . DIRECTORY_SEPARATOR . '../storage/';
     }
     
-    public function setOPsList()
+    public function setOPs()
     {
         $listaFile = 'OP.txt';
         $aOPs = array();
         $aList = array();
+        if (empty($this->aProds)) {
+            $this->setProds();
+        }
         $listaFile = $this->storagePath.$listaFile;
         //carregar uma matriz com os dados txt da tabela exportada
         $aList = file($listaFile, FILE_IGNORE_NEW_LINES);
@@ -72,7 +75,7 @@ class Migrate
         return $aOPs;
     }
     
-    public function setProdsList()
+    public function setProds()
     {
         $listaFile = 'produtos.txt';
         $aProds = array();
@@ -158,44 +161,21 @@ class Migrate
     public function setFromLast($aOps = array())
     {
         //busca o ultimo registro das OPs
-        $op = new Op();
-        $num = $op->lastNum();
-        //verifica se essa OP está na lista
-        $keys = array_keys($aOPs);
-        if (! array_key_exists($num, $aOPs)) {
-            $last = $keys[(count($keys)-1)];
-            if ($last <= $num) {
-                return false;
-            }
-            //existem OPs maiores, mas não essa registrada na tabela
-            //acredita-se nesse caso que o numero foi pulado
-            //então recuar um a um até que o numero da chave seja
-            //menor que o numero da OP
-            //x+1 mostra o ponto de corte
-            for ($x=(count($keys)-1); $x=0; $x--) {
-                if ($key[$x] <= $num) {
-                    break;
-                }
-            }
-        } else {
-            $x = array_search($num, $keys);
-        }
-        //aqui estão as ops da lista que ainda não estão da tabela
-        $aOps = array_slice($aOPs, $x+1);
-        foreach ($aOps as $data) {
-            $aData = $this->extract($data);
-            
-            $op->set($aData);
-            $op->save();
-        }
-        
-        
+        $ops = new Ops($this->dbase);
+        $num = $ops->last();
+        $aOPs = $this->setOPs();
+        //localiza a OP no array
+        $offset = array_search($num, array_keys($aOPs));
+        $length = count($aOPs) - $offset - 1;
+        // trunca o array
+        $result = array_slice($aOPs, $offset, $length, true);
+        //salva 
+        $this->insertOPs();
     }
     
-    public function setAllOPs()
+    public function insertOPs()
     {
         $ops = new Ops($this->dbase);
-        $ops->truncate();
         foreach($this->aOPs as $data) {
             $op = new \Webetiq\Op();
             foreach($data as $parameter => $value) {
@@ -214,7 +194,7 @@ class Migrate
         } elseif ($type == 'N') {
             return $this->convertNumber($text);
         } elseif ($type == 'D') {
-            return $text;
+            return str_replace('"', '', $text);
         }
     }
     

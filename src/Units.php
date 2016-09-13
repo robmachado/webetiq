@@ -57,7 +57,7 @@ class Units
         $sqlComm = "SELECT unit FROM $this->table WHERE id='$id';";
         $resp = $this->dbase->query($sqlComm);
         if (!empty($resp)) {
-            $unidade = $resp[0]['unit'];
+            $unit = $resp[0]['unit'];
         }
         return $unit;
     }
