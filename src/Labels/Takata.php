@@ -8,8 +8,9 @@ namespace Webetiq\Labels;
  *
  */
 use Webetiq\Labels\Label;
+use Webetiq\Labels\LabelsInterface;
 
-class Takata
+class Takata extends LabelsInterface
 {
     //constantes
     const GS = '\1D';

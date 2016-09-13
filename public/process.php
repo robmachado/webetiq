@@ -3,8 +3,9 @@ ini_set("display_errors", 1);
 error_reporting(E_ALL);
 require_once '../bootstrap.php';
 
+use Webetiq\DBase\DBase;
 use Webetiq\Labels\Label;
-use Webetiq\Printer;
+use Webetiq\Printers;
 
 /**
  * Seleciona a impressora e forma de conexão dependendo da origem
@@ -24,7 +25,9 @@ foreach ($propNames as $key => $value) {
 }
 //carrega o modelo de impressora
 $printer = filter_input(INPUT_POST, 'printer', FILTER_SANITIZE_STRING);
-$objPrinter = new Printer($printer);
+$oPrinters = new Printers($dbase);
+$printer = $oPrinters->get($printer);
+
 
 //$objLbl objeto label contem os dados a serem impressos passados pela pagina etiquetas.php
 //$objPrinter objeto que contem os dados da impressora escolhida

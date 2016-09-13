@@ -10,11 +10,21 @@ require_once '../bootstrap.php';
  * depois de completar os dados requeridos passa os dados para
  * impressão
  */
-
-use Webetiq\Op;
+use Webetiq\DBase\DBase;
+use Webetiq\Ops;
+use Webetiq\Movements;
 use Webetiq\Labels\Label;
-use Webetiq\DBPrinter;
+use Webetiq\Printers;
 use Webetiq\Units;
+
+$config = json_encode(['host' => 'localhost','user'=>'root', 'pass'=>'monitor5', 'db'=>'blabel']);
+$dbase = new DBase($config);
+
+$oPrinters = new Printers($dbase);
+$oOPs = new Ops($dbase);
+$oMovements = new Movements($dbase);
+$oUnits = new Units($dbase);
+$lbl = new Label();
 
 $remoteip = $_SERVER['REMOTE_ADDR'];
 $numop = filter_input(INPUT_POST, 'numop', FILTER_SANITIZE_STRING);
@@ -22,36 +32,36 @@ $numop = filter_input(INPUT_POST, 'numop', FILTER_SANITIZE_STRING);
 $copias = 1;
 $emissao = date('d/m/Y');
 
-//carrega classe de acesso a base de dados
-$objPrinter = new DBPrinter();
 //carrega impressoras
-$aPrint = $objPrinter->getAll();
+$aPrint = $oPrinters->all();
 $selPrintGroup = '<div class="form-group"><label for=\"printer\">Selecione a impressora</label><select class="form-control" name="printer">';
 foreach ($aPrint as $printer) {
     $selp = '';
-    if ($printer->printName == 'newZebra') {
+    if ($printer->name == 'newZebra') {
         $selp = 'selected';
     }
-    $selPrintGroup .= '<option value="'.$printer->printName.'" '.$selp.'>'.$printer->printName.'</option>';
+    $selPrintGroup .= '<option value="'.$printer->name.'" '.$selp.'>'.$printer->name.'</option>';
 }
 $selPrintGroup .= '</select></div>';
 
-$lbl = new Label();
 if (isset($numop)) {
-    //buscar dados da OP
-    $migrate = new Op();
-    //$op = $migrate->get($numop);
-    //caso não seja encontrada a OP na base migrate 
-    //retornar e avisar o usuário
-    if ($op->numop == '7') {
+    $op = $oOPs->get($numop);
+    if ($op->id == 0) {
         header("Location: op.php?numop=$numop&fail=1");
     }
-    //VERIFICAR QUAIS CAMPOS SÃO EXIGIDOS PARA ESSE CLIENTE
-    //SOMENTE MOSTRAR OS CAMPOS EXIGIDOS
-    //$dbase->setDBname('pbase');
-    //$stq = $dbase->getStq($lbl, $numop);
 }
-$lbl->volume = $stq->volume + 1;
+$lbl->volume = $oMovements->getLastVolume($numop) + 1;
+$lbl->numdias = $op->shelflife;
+$lbl->cliente = $op->customer;
+$lbl->cod = $op->code;
+$lbl->codcli = $op->customercode;
+$lbl->desc = $op->description;
+$lbl->emissao = $op->created_at;
+$lbl->pedcli = $op->pourchaseorder;
+$lbl->pedido = $op->salesorder;
+$lbl->numop = $op->id;
+$lbl->unidade = $op->salesunit;
+    
 
 if ($lbl->numdias == 0) {
     $lbl->numdias == 365;
@@ -61,7 +71,8 @@ if ($lbl->validade == '') {
 }
 
 $selUnidGroup = '<div class="form-group"><label for=\"unidade\">Selecione a unidade</label><select class="form-control" name="unidade">';
-foreach ($dbase->aUnid as $unid) {
+$units = $oUnits->all();
+foreach ($units as $unid) {
     $selp = '';
     if ($lbl->unidade == $unid) {
         $selp = 'selected';

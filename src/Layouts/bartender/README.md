@@ -1,0 +1,1 @@
+Aqui devem ser colocadas as etiquetas no formato BARTENDER, que é a origem dos layouts
