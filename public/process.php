@@ -6,6 +6,9 @@ require_once '../bootstrap.php';
 use Webetiq\DBase\DBase;
 use Webetiq\Labels\Label;
 use Webetiq\Printers;
+use Webetiq\Render;
+use Webetiq\Job;
+use Webetiq\Movements;
 
 /**
  * Seleciona a impressora e forma de conexão dependendo da origem
@@ -16,17 +19,30 @@ use Webetiq\Printers;
  * Chama o metodo de impressão
  *
  */
+$config = json_encode(['host' => 'localhost','user'=>'root', 'pass'=>'monitor5', 'db'=>'blabel']);
+$dbase = new DBase($config);
 
 //carrega o modelo de Label
-$objLbl = new Label();
-$propNames = get_object_vars($objLbl);
+$lbl = new Label();
+$propNames = get_object_vars($lbl);
 foreach ($propNames as $key => $value) {
-    $objLbl->$key = filter_input(INPUT_POST, $key, FILTER_SANITIZE_STRING);
+    $lbl->$key = filter_input(INPUT_POST, $key, FILTER_SANITIZE_STRING);
 }
 //carrega o modelo de impressora
 $printer = filter_input(INPUT_POST, 'printer', FILTER_SANITIZE_STRING);
+
 $oPrinters = new Printers($dbase);
 $printer = $oPrinters->get($printer);
+
+$rend = new Render($lbl, $printer);
+$aLbs = $rend->renderize();
+
+$mov = new Movements($dbase);
+$mov->insertLabel($lbl, $aLbs);
+
+$job = new Job($printer);
+$job->send($aLbs);
+
 
 
 //$objLbl objeto label contem os dados a serem impressos passados pela pagina etiquetas.php

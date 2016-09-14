@@ -15,14 +15,14 @@ $dbase = new DBase($config);
 
 
 //exec('/var/www/webetiq/console/migrate.sh');
+
 //carrega os dados na base opmigrate
 $mig = new Migrate($dbase);
-//converte os dados dos produtos
-$aProds = $mig->setProdsList();
 //converte os dados das OPs
-$aOP = $mig->setOPsList();
-
-$mig->setAllOPs();
+$aOP = $mig->setOPs();
+//insere na base dados
+//$mig->insertOPs();
+$mig->setFromLast();
 
 echo "<pre>";
 print_r($aOP);

@@ -5,30 +5,10 @@ use Webetiq\Labels\Label;
 
 class LabelBase
 {
-    /**
-     * Data de emissão
-     * @var timestamp
-     */
     protected static $datats = 0;
-    /**
-     * Lista das propriedades da classe
-     * @var array
-     */
     protected static $propNames = '';
-    /**
-     * Dados da etiqueta
-     * @var Label
-     */
     protected static $lbl;
-    /**
-     * numero da OP
-     * @var string
-     */
     protected static $numop = '';
-    /**
-     * Nome do cliente
-     * @var string
-     */
     protected static $cliente = '';
     protected static $pedido = '';
     protected static $cod = '';
@@ -45,52 +25,20 @@ class LabelBase
     protected static $qtdade = 0;
     protected static $unidade = '';
     protected static $doca = '111';
-    /**
-     * Numero da NF
-     * @var string
-     */
     protected static $numnf = '';
-    /**
-     * Numero de volume id do pacote
-     * @var int
-     */
     protected static $volume = 0;
-    /**
-     * Numero de cópias/etiquetas
-     * @var int
-     */
     protected static $copias = 1;
-    /**
-     * Template da etiqueta
-     * @var string
-     */
     protected static $template = '';
-    /**
-     * Path para o template
-     * @var string
-     */
-    protected static $templateFile = '';
-    /**
-     * Identificação da impressora
-     * @var string
-     */
-    protected static $printer;
-    /**
-     * Buffer de dados
-     * @var array
-     */
     protected static $buffer = array();
     
     /**
      * Contrutora da classe
-     * @param string $folder
      */
-    public function __construct($folder)
+    public function __construct($layout)
     {
-        $this->setTemplate($folder.'corrpack.dat');
+        self::$template = file_get_contents($layout);
         self::$datats = time();
     }
-
     
     /**
      * Carrega os dados da etiqueta

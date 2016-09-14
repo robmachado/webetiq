@@ -9,6 +9,7 @@ class Op
     public $pourchaseorder = '';
     public $customercode = '';
     public $salesorder = 0;
+    public $packagedamount = 0;
     public $salesunit = '';
     public $code = '';
     public $description = '';

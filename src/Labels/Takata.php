@@ -8,9 +8,10 @@ namespace Webetiq\Labels;
  *
  */
 use Webetiq\Labels\Label;
+use Webetiq\Labels\LabelBase;
 use Webetiq\Labels\LabelsInterface;
 
-class Takata extends LabelsInterface
+class Takata extends LabelBase implements LabelsInterface
 {
     //constantes
     const GS = '\1D';
@@ -105,15 +106,11 @@ class Takata extends LabelsInterface
      */
     protected static $propNames = '';
     
-    /**
-     * Função construtora inicializa
-     * o timestamp para impressão da data
-     */
-    public function __construct()
+    public function __construct($layout)
     {
-        self::$datats = time();
+        parent::__construct($layout);
     }
-    
+
     /**
      * Seta a partir da classe etiqueta
      * as propriedades desta classe
@@ -129,6 +126,7 @@ class Takata extends LabelsInterface
         $this->setLot($lbl->numop);
         $this->setPart($lbl->codcli);
         $this->setQtd($lbl->qtdade);
+        $this->setCopies($lbl->copias);
         $this->setVersion();
     }
     
@@ -234,29 +232,32 @@ class Takata extends LabelsInterface
     
     /**
      * Constroi a etiqueta com base no template
-     * @param int $seqnum
-     * @return string
+     * @return array
      */
-    public function renderize($seqnum)
+    public function renderize()
     {
-        //cria barcodes
-        self::make2D($seqnum);
-        //carrega template
-        $template = self::$template;
-        //substitui campos
-        $template = str_replace('{bar2d}', self::$bar2d, $template);
-        $template = str_replace('{bar1d}', self::$bar1d, $template);
-        $template = str_replace('{dock}', self::$dock, $template);
-        $template = str_replace('{part}', self::$part, $template);
-        $template = str_replace('{desc}', self::$desc, $template);
-        $template = str_replace('{ped}', self::$ped, $template);
-        $template = str_replace('{data}', date('Y-m-d', self::$datats), $template);
-        $template = str_replace('{qtd}', number_format(self::$qtd, 3, '.', ''), $template);
-        $template = str_replace('{lot}', self::formField('lot', self::$lot), $template);
-        $template = str_replace('{licplate}', self::$licplate, $template);
-        $template = str_replace('{version}', self::$version, $template);
-        $template = str_replace('{copias}', self::$copies, $template);
-        return $template;
+        for ($x=0; $x <= self::$copies; $x++) {
+            $seqnum = self::$volume + $x;
+            //cria barcodes
+            self::make2D($seqnum);
+            //carrega template
+            $template = self::$template;
+            //substitui campos
+            $template = str_replace('{bar2d}', self::$bar2d, $template);
+            $template = str_replace('{bar1d}', self::$bar1d, $template);
+            $template = str_replace('{dock}', self::$dock, $template);
+            $template = str_replace('{part}', self::$part, $template);
+            $template = str_replace('{desc}', self::$desc, $template);
+            $template = str_replace('{ped}', self::$ped, $template);
+            $template = str_replace('{data}', date('Y-m-d', self::$datats), $template);
+            $template = str_replace('{qtd}', number_format(self::$qtd, 3, '.', ''), $template);
+            $template = str_replace('{lot}', self::formField('lot', self::$lot), $template);
+            $template = str_replace('{licplate}', self::$licplate, $template);
+            $template = str_replace('{version}', self::$version, $template);
+            $template = str_replace('{copias}', 1, $template);
+            $response[] = $template;
+        }    
+        return $response;
     }
     
     /**

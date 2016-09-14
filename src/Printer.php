@@ -1,6 +1,7 @@
 <?php
 
-namespace Webetiq\Printers;
+namespace Webetiq;
+
 
 class Printer
 {

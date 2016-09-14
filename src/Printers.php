@@ -3,7 +3,7 @@
 namespace Webetiq;
 
 use Webetiq\DBase\DBase;
-use Webetiq\Printers\Printer;
+use Webetiq\Printer;
 
 class Printers
 {
@@ -21,8 +21,6 @@ class Printers
         $this->dbase->connect();
         if (! $this->dbase->tableExists($this->table)) {
             $this->create();
-            $this->pushDefault();
-        } elseif ($this->dbase->isEmpty($this->table)) {
             $this->pushDefault();
         }
     }
@@ -108,6 +106,7 @@ class Printers
         if (! is_array($dados)) {
             return '';
         }
+        $aPrinters = [];
         foreach ($dados as $printer) {
             $aPrinters[] = $this->loadFields($printer);
         }
@@ -117,21 +116,27 @@ class Printers
     /**
      * Obtem os dados da impressora
      * e carrega os parametros da classe
-     * @return string
+     * @return Printer
      */
     public function get($search)
     {
-        if ($printer == '') {
+        if ($search == '') {
             return '';
         }
         $sqlComm = "SELECT * FROM $this->table WHERE name='$search'";
         $dados = $this->dbase->query($sqlComm);
-        if (! is_array($dados)) {
-            return '';
+        $print = new Printer();
+        foreach ($dados as $printer) {
+            $print = $this->loadFields($printer);
         }
-        return $dados[0];
+        return $print;
     }
     
+    /**
+     * Load Printer Class
+     * @param array $dados
+     * @return Printer
+     */
     private function loadFields($dados)
     {
         $p = new Printer();

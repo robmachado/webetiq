@@ -60,6 +60,7 @@ $lbl->emissao = $op->created_at;
 $lbl->pedcli = $op->pourchaseorder;
 $lbl->pedido = $op->salesorder;
 $lbl->numop = $op->id;
+$lbl->qtdade = $op->packagedamount;
 $lbl->unidade = $op->salesunit;
     
 

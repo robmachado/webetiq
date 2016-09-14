@@ -111,7 +111,8 @@ class Migrate
             'code' => (string) $this->adjust($registro[1], 'C'),
             'description' => (string) $this->adjust($registro[0], 'C'),
             'eancode' => (string) $this->adjust($registro[2], 'C'),
-            'shelflife' => (int) $this->adjust($registro[3], 'N')
+            'shelflife' => (int) $this->adjust($registro[3], 'N'),
+            'packagedamount' => (int) $this->adjust($registro[88], 'N')
         );
         return $aData;
     }
@@ -132,10 +133,12 @@ class Migrate
             $code = $this->listProd[$desc];
             $eancode = (string) $this->aProds[$code]['eancode'];
             $shelflife = ($this->aProds[$code]['shelflife'] != 0) ? $this->aProds[$code]['shelflife'] : 365;
+            $packagedamount = $this->aProds[$code]['packagedamount'];
         } else {
             $code = "FAIL$numop";
             $eancode = '';
             $shelflife = 365;
+            $packagedamount = 0;
         }
         $codeunit = $this->adjust($registro[30],'N');
         if ($codeunit == 0) {
@@ -149,10 +152,11 @@ class Migrate
             'pourchaseorder' => (string) $this->adjust($registro[29], 'C'),//29
             'salesunit' => $salesunit,//30
             'salesorder' =>  (int) $this->adjust($registro[3], 'N'), //numero do pedido interno (int)
-            'code' => $code,
+            'code' => str_replace(' ', '', $code),
             'description' => (string) $this->adjust($registro[5], 'C'), //descrição do produto (string)
             'eancode' => $eancode,
             'shelflife' => $shelflife,
+            'packagedamount' => $packagedamount,
             'created_at' => (string) $this->adjust($registro[25], 'D')
         );
         return $aData;
@@ -168,15 +172,18 @@ class Migrate
         $offset = array_search($num, array_keys($aOPs));
         $length = count($aOPs) - $offset - 1;
         // trunca o array
-        $result = array_slice($aOPs, $offset, $length, true);
+        $result = array_slice($aOPs, $offset + 1, $length, true);
         //salva 
-        $this->insertOPs();
+        $this->insertOPs($result);
     }
     
-    public function insertOPs()
+    public function insertOPs($result = [])
     {
+        if (empty($result)) {
+            $result = $this->aOPs;
+        }
         $ops = new Ops($this->dbase);
-        foreach($this->aOPs as $data) {
+        foreach($result as $data) {
             $op = new \Webetiq\Op();
             foreach($data as $parameter => $value) {
                 $op->$parameter = $value;
@@ -184,8 +191,6 @@ class Migrate
             $ops->insert($op);
         }
     }
-   
-
     
     private function adjust($text, $type)
     {

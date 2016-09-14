@@ -22,7 +22,7 @@ class Ops
     public function create()
     {
         $sqlComm = [
-            "CREATE TABLE `$this->table` (`id` int(11) NOT NULL,`customer` varchar(100) COLLATE utf8_unicode_ci NOT NULL,`customercode` varchar(100) COLLATE utf8_unicode_ci NOT NULL,`pourchaseorder` varchar(100) COLLATE utf8_unicode_ci NOT NULL,`salesorder` int(11) NOT NULL,`code` varchar(30) COLLATE utf8_unicode_ci NOT NULL,`description` varchar(100) COLLATE utf8_unicode_ci NOT NULL,`eancode` varchar(50) COLLATE utf8_unicode_ci NOT NULL,`shelflife` int(11) NOT NULL,`salesunit` varchar(10) COLLATE utf8_unicode_ci NOT NULL,`created_at` datetime NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Production Orders Table';",
+            "CREATE TABLE `$this->table` (`id` int(11) NOT NULL,`customer` varchar(100) COLLATE utf8_unicode_ci NOT NULL,`customercode` varchar(100) COLLATE utf8_unicode_ci NOT NULL,`pourchaseorder` varchar(100) COLLATE utf8_unicode_ci NOT NULL,`salesorder` int(11) NOT NULL,`code` varchar(30) COLLATE utf8_unicode_ci NOT NULL,`description` varchar(100) COLLATE utf8_unicode_ci NOT NULL,`eancode` varchar(50) COLLATE utf8_unicode_ci NOT NULL,`shelflife` int(11) NOT NULL,`packagedamount` int(11) NOT NULL,`salesunit` varchar(10) COLLATE utf8_unicode_ci NOT NULL,`created_at` datetime NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='Production Orders Table';",
             "ALTER TABLE `$this->table` ADD PRIMARY KEY (`id`);",
         ];
         $this->dbase->execute($sqlComm);
@@ -76,7 +76,7 @@ class Ops
     {
         $num = 0;
         $sqlComm = "SELECT max(id) FROM `$this->table`;";
-        $rows = $this->dbase->querySql($sqlComm);
+        $rows = $this->dbase->query($sqlComm);
         if (!empty($rows)) {
             $num = $rows[0][0];
         }
