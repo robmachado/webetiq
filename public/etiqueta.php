@@ -75,7 +75,7 @@ $selUnidGroup = '<div class="form-group"><label for=\"unidade\">Selecione a unid
 $units = $oUnits->all();
 foreach ($units as $unid) {
     $selp = '';
-    if ($lbl->unidade == $unid) {
+    if ($unid == 'pcs') {
         $selp = 'selected';
     }
     $selUnidGroup .= '<option value="'.$unid.'" '.$selp.'>'.$unid.'</option>';
@@ -97,25 +97,25 @@ $body = "
         <div class=\"row\">
             <div class=\"col-md-5\">
                 <div class=\"form-group\">
-                    <label for=\"numop\">Numero da OP</label>
+                    <label for=\"numop\">Número da Ordem de Produção</label>
                     <input type=\"text\" class=\"form-control\" id=\"numop\" name=\"numop\" value=\"$lbl->numop\" placeholder=\"Entre com o número da OP\" readonly>
                 </div>
                 <div class=\"form-group\">
                     <label for=\"qtdade\">Quantidade na embalagem</label>
-                    <input type=\"number\" step=\"0.01\" class=\"form-control\" id=\"qtdade\" name=\"qtdade\" value=\"$lbl->qtdade\" placeholder=\"Entre com a quantidade contida na embalagem\" required>
+                    <input type=\"number\" min=\"0\" step=\"0.01\" class=\"form-control\" id=\"qtdade\" name=\"qtdade\" value=\"$lbl->qtdade\" placeholder=\"Entre com a quantidade contida na embalagem\" required>
                 </div>
                 $selUnidGroup
                 <div class=\"form-group\">
                     <label for=\"pesoBruto\">Peso Bruto (kg)</label>
-                    <input type=\"number\" step=\"0.01\" class=\"form-control\" id=\"pesoBruto\" name=\"pesoBruto\" value=\"$lbl->pesoBruto\" placeholder=\"Entre com o peso bruto do pacote (produto+embalagem)\" onfocusout=\"calcula(this)\" required>
+                    <input type=\"number\" min=\"0\" step=\"0.01\" class=\"form-control\" id=\"pesoBruto\" name=\"pesoBruto\" value=\"$lbl->pesoBruto\" placeholder=\"Entre com o peso bruto do pacote (produto+embalagem)\" onfocusout=\"calcula(this)\" required>
                 </div>
                 <div class=\"form-group\">
                     <label for=\"tara\">Tara (kg)</label>
-                    <input type=\"number\" step=\"0.01\" class=\"form-control\" id=\"tara\" name=\"tara\" value=\"$lbl->tara\" placeholder=\"Entre com a tara (peso da embalagem)\" onfocusout=\"calcula(this)\" required>
+                    <input type=\"number\" min=\"0\" step=\"0.01\" class=\"form-control\" id=\"tara\" name=\"tara\" value=\"$lbl->tara\" placeholder=\"Entre com a tara (peso da embalagem)\" onfocusout=\"calcula(this)\" required>
                 </div>
                 <div class=\"form-group\">
                     <label for=\"pesoLiq\">Peso Líquido (kg)</label>
-                    <input type=\"number\" step=\"0.01\" class=\"form-control\" id=\"pesoLiq\" name=\"pesoLiq\" value=\"$lbl->pesoLiq\" placeholder=\"Entre com peso liquido (só produto) (será calculado sozinho) \" onfocusout=\"calcula(this)\">
+                    <input type=\"number\" min=\"0\" step=\"0.01\" class=\"form-control\" id=\"pesoLiq\" name=\"pesoLiq\" value=\"$lbl->pesoLiq\" placeholder=\"Entre com peso liquido (só produto) (será calculado sozinho) \" onfocusout=\"calcula(this)\">
                 </div>
                 <div class=\"form-group\">
                     <label for=\"numnf\">Nota Fiscal</label>
@@ -123,11 +123,11 @@ $body = "
                 </div>
                 <div class=\"form-group\">
                     <label for=\"volume\">Número do próximo Volume</label>
-                    <input type=\"number\" class=\"form-control\" id=\"volume\" name=\"volume\" value=\"$lbl->volume\" placeholder=\"Entre com o numero do volume\" required>
+                    <input type=\"number\" min=\"1\" class=\"form-control\" id=\"volume\" name=\"volume\" value=\"$lbl->volume\" placeholder=\"Entre com o numero do volume\" required>
                 </div>
                 <div class=\"form-group\">
                     <label for=\"copias\">Número de Etiquetas a imprimir</label>
-                    <input type=\"number\" class=\"form-control\" id=\"copias\" name=\"copias\" value=\"$lbl->copias\" placeholder=\"Entre com o numero de etiquetas\" required>
+                    <input type=\"number\" min=\"0\" class=\"form-control\" id=\"copias\" name=\"copias\" value=\"$lbl->copias\" placeholder=\"Entre com o numero de etiquetas\" required>
                 </div>
                 $selPrintGroup
                 <button type=\"submit\" class=\"btn btn-info\"><span class=\"glyphicon glyphicon-print\"></span> Imprimir & Salvar </button>
@@ -163,8 +163,8 @@ $body = "
                     <input type=\"text\" class=\"form-control\" id=\"ean\" name=\"ean\" value=\"$lbl->ean\" placeholder=\"Entre com o código GS1 do produto (EAN)\">
                 </div>
                 <div class=\"form-group\">
-                    <label for=\"emissao\">Data de Fabricação</label>
-                    <input type=\"text\" class=\"form-control\" id=\"emissao\" name=\"emissao\" value=\"$emissao\" placeholder=\"Entre com a data de fabricação\" required>
+                    <label for=\"emissao\">Data da Emissão da Etiqueta</label>
+                    <input type=\"text\" class=\"form-control\" id=\"emissao\" name=\"emissao\" value=\"$emissao\" placeholder=\"Entre com a data de emissão\" required>
                 </div>
                 <div class=\"form-group\">
                     <label for=\"numdias\">Validade em dias</label>

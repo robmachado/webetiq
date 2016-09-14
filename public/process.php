@@ -10,15 +10,6 @@ use Webetiq\Render;
 use Webetiq\Job;
 use Webetiq\Movements;
 
-/**
- * Seleciona a impressora e forma de conexão dependendo da origem
- * Carrega a classe para conexão
- * Seleciona o modelo de etiqueta baseado no cliente e na impressora destino
- * Carrega a classe do modelo
- * Passa para a classe construtora a conexão, modelo e os dados da Label
- * Chama o metodo de impressão
- *
- */
 $config = json_encode(['host' => 'localhost','user'=>'root', 'pass'=>'monitor5', 'db'=>'blabel']);
 $dbase = new DBase($config);
 
@@ -28,13 +19,7 @@ $propNames = get_object_vars($lbl);
 foreach ($propNames as $key => $value) {
     $lbl->$key = filter_input(INPUT_POST, $key, FILTER_SANITIZE_STRING);
 }
-/*
-echo "<pre>";
-print_r($lbl);
-echo "</pre>";
-die;
- * 
- */
+
 //carrega o modelo de impressora
 $printer = filter_input(INPUT_POST, 'printer', FILTER_SANITIZE_STRING);
 
@@ -49,7 +34,44 @@ $aLbs = $rend->renderize();
 //grava os dados
 $mov = new Movements($dbase);
 if ($mov->insertLabel($lbl, $aLbs)) {
+    $divalert = "alert-success";
     //imprime
     $job = new Job($printer);
     $job->send($aLbs);
+    $msg = "Sucesso !!";
+} else {
+    $divalert = "alert-danger";
+    $msg = "Houve falha na gravação dos dados. Verifque se não errou no numero do volume.";
 }
+$script = "<script src=\"js/printback.js\"></script>";
+$title = "Impressão Etiquetas";
+$body = "<center>"
+        . "<div class=\"container\">"
+        . "<h3>$title</h3><br><br>"
+        . "<div class=\"row\">"
+        . "<div class=\"col-md-3\">"
+        . "</div>"
+        . "<div class=\"col-md-6\">"
+        . "<div class=\"alert $divalert\" role=\"alert\"><h3>$msg</h3></div>"
+        . "</div>"
+        . "<div class=\"col-md-3\">"
+        . "</div>"
+        . "</div>"
+        . "<div class=\"row\">"
+        . "<div class=\"col-md-3\">"
+        . "</div>"
+        . "<div class=\"col-md-6\">"
+        . "<button type=\"button\" class=\"btn btn-default \" id=\"btnback\" name=\"btnback\"><span class=\"glyphicon glyphicon glyphicon-repeat\"></span>  Voltar</button>"
+        . "</div>"
+        . "<div class=\"col-md-3\">"
+        . "</div>"
+        . "</div>"
+        . "</div>"
+        . "</center>$script";
+
+//retorna informação em caso de erro e volta para a pagina inicial
+$html = file_get_contents('assets/main.html');
+$html = str_replace("{{extras}}", '', $html);
+$html = str_replace("{{title}}", $title, $html);
+$html = str_replace("{{content}}", $body, $html);
+echo $html;

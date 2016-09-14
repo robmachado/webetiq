@@ -37,7 +37,7 @@ class Movements
         if (count($blbl) == 1) {
             //insere uma vez ajustando o numero do volume = ant + copias
             $volume = $lbl->volume + $lbl->copias;
-            $baselayout = base64_encode($blbl[0]);
+            $baselayout = base64_encode(gzencode($blbl[0]));
             $flag &= $this->insert(
                 $lbl->numop,
                 $volume,
@@ -53,7 +53,7 @@ class Movements
             $flag = true;
             for ($x=0; $x<$lbl->copias; $x++) {
                 $volume = $lbl->volume + $x;
-                $baselayout = base64_encode($blbl[$x]);
+                $baselayout = base64_encode(gzencode($blbl[$x]));
                 $flag &= $this->insert(
                     $lbl->numop,
                     $volume,

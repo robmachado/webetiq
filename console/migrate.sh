@@ -27,7 +27,7 @@ for i in $( mdb-tables /var/www/webetiq/storage/OP.mdb );
         ## extrai os dados para arquivo txt com os campos separados por ; e as linhas com \n
         mdb-export -D "%Y-%m-%d %H:%M:%S" -H -d"|" -R"\n" /var/www/webetiq/storage/OP.mdb $i > /var/www/webetiq/storage/$i.txt;
         ## extrai os dados para arquivo SQL com os campos separados por ; 
-        mdb-export -D "%Y-%m-%d %H:%M:%S" -H -d";" -I mysql /var/www/webetiq/storage/OP.mdb $i > /var/www/webetiq/storage/$i.sql;
+        ##mdb-export -D "%Y-%m-%d %H:%M:%S" -H -d";" -I mysql /var/www/webetiq/storage/OP.mdb $i > /var/www/webetiq/storage/$i.sql;
     fi
     # extrai dados da tabela produtos
     if [ $i = $spro ]; then
@@ -35,6 +35,6 @@ for i in $( mdb-tables /var/www/webetiq/storage/OP.mdb );
         ## extrai os dados para arquivo txt com os campos separados por ; e as linhas com \n 
         mdb-export -D "%Y-%m-%d %H:%M:%S" -H -d"|" -R"\n" /var/www/webetiq/storage/OP.mdb $i > /var/www/webetiq/storage/$i.txt;
         ## extrai os dados para arquivo SQL com os campos separados por ; 
-        mdb-export -D "%Y-%m-%d %H:%M:%S" -H -d";" -I mysql /var/www/webetiq/storage/OP.mdb $i > /var/www/webetiq/storage/$i.sql;
+        ##mdb-export -D "%Y-%m-%d %H:%M:%S" -H -d";" -I mysql /var/www/webetiq/storage/OP.mdb $i > /var/www/webetiq/storage/$i.sql;
     fi
 done;

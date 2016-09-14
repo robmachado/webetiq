@@ -169,10 +169,13 @@ class Migrate
         $num = $ops->last();
         $aOPs = $this->setOPs();
         //localiza a OP no array
-        $offset = array_search($num, array_keys($aOPs));
-        $length = count($aOPs) - $offset - 1;
+        $offset = 0;
+        if ($num > 0) {
+            $offset = array_search($num, array_keys($aOPs)) + 1;
+        }    
+        //$length = count($aOPs) - $offset - 1;
         // trunca o array
-        $result = array_slice($aOPs, $offset + 1, $length, true);
+        $result = array_slice($aOPs, $offset, null, true);
         //salva 
         $this->insertOPs($result);
     }
