@@ -22,59 +22,34 @@ use Webetiq\Movements;
 $config = json_encode(['host' => 'localhost','user'=>'root', 'pass'=>'monitor5', 'db'=>'blabel']);
 $dbase = new DBase($config);
 
-//carrega o modelo de Label
+//carrega o dados da etiqueta enviados pelo etiqueta.php
 $lbl = new Label();
 $propNames = get_object_vars($lbl);
 foreach ($propNames as $key => $value) {
     $lbl->$key = filter_input(INPUT_POST, $key, FILTER_SANITIZE_STRING);
 }
+/*
+echo "<pre>";
+print_r($lbl);
+echo "</pre>";
+die;
+ * 
+ */
 //carrega o modelo de impressora
 $printer = filter_input(INPUT_POST, 'printer', FILTER_SANITIZE_STRING);
 
+//carrega dados da impressora
 $oPrinters = new Printers($dbase);
 $printer = $oPrinters->get($printer);
 
+//renderiza as etiquetas
 $rend = new Render($lbl, $printer);
 $aLbs = $rend->renderize();
 
+//grava os dados
 $mov = new Movements($dbase);
-$mov->insertLabel($lbl, $aLbs);
-
-$job = new Job($printer);
-$job->send($aLbs);
-
-
-
-//$objLbl objeto label contem os dados a serem impressos passados pela pagina etiquetas.php
-//$objPrinter objeto que contem os dados da impressora escolhida
-//$objConnector objeto que contem o conector para envio dos dados até a impressora
-//$objRender objeto que renderiza a etiqueta para a linguagem da impressora destino
-//$ojJob objeto responsável pela impressão propriamente dita
-
-//$objRender depende de Label e de Printer
-//$objConnector depende de Printer e está sendo chamado dentro de Render
-//$objJob depende Connector e Render
-
-//carrega Label
-//carrega Printer
-//carrega Render(Label, Printer)
-//carrega Job(Render)
-
-/*
-//instancia Factory de labels
-$fact = new Factory();
-//estabelece a impressora
-$fact::setPrinter($printer);
-//Se print é LPR 
-//      monta e imprime as etiquetas, e retorna o array vazio
-//Se print é QZ
-//      monta as etiquetas e retorna o base64 de todas para passar para QZprint
-$aRet = $fact::make($lbl);
-if (empty($aRet)) {
-    //apos a impressão retornar
-    $aRet = array('success' => true, 'message' => '');
-} else {
-    $aRet = array('success' => true, 'message' => $aRet);
+if ($mov->insertLabel($lbl, $aLbs)) {
+    //imprime
+    $job = new Job($printer);
+    $job->send($aLbs);
 }
-echo json_encode($aRet);
-*/

@@ -93,6 +93,7 @@ $body = "
 </center>
 <div class=\"container\">
     <form role=\"form\" name=\"form\" id=\"form\" method=\"POST\" action=\"process.php\">
+        <input type=\"hidden\" id=\"validade\" name=\"validade\" value=\"$lbl->validade\" >
         <div class=\"row\">
             <div class=\"col-md-5\">
                 <div class=\"form-group\">
@@ -146,6 +147,10 @@ $body = "
                     <input type=\"text\" class=\"form-control\" id=\"pedcli\" name=\"pedcli\" value=\"$lbl->pedcli\" placeholder=\"Entre com o número do pedido do cliente\">
                 </div>
                 <div class=\"form-group\">
+                    <label for=\"validade\">Código do Cliente</label>
+                    <input type=\"text\" class=\"form-control\" id=\"codcli\" name=\"codcli\" value=\"$lbl->codcli\" placeholder=\"Entre com a data de validade\">
+                </div>
+                <div class=\"form-group\">
                     <label for=\"cod\">Código Interno</label>
                     <input type=\"text\" class=\"form-control\" id=\"cod\" name=\"cod\" value=\"$lbl->cod\" placeholder=\"Entre com o código interno do produto\" required>
                 </div>
@@ -164,10 +169,6 @@ $body = "
                 <div class=\"form-group\">
                     <label for=\"numdias\">Validade em dias</label>
                     <input type=\"text\" class=\"form-control\" id=\"numdias\" name=\"numdias\" value=\"$lbl->numdias\" placeholder=\"Entre com a quantidade de dias de validade\" onfocusout=\"valDate(this)\" required>
-                </div>
-                <div class=\"form-group\">
-                    <label for=\"validade\">Data de Validade</label>
-                    <input type=\"text\" class=\"form-control\" id=\"validade\" name=\"validade\" value=\"$lbl->validade\" placeholder=\"Entre com a data de validade\">
                 </div>
                 <div class=\"form-group\">
                     <label for=\"doca\">Doca de descarga <i>(normalmente para TAKATA)</i></label>

@@ -19,7 +19,7 @@ class Nefab extends LabelBase implements LabelsInterface
         parent::setLbl($lbl);
     }
     
-    public function renderize($seqnum)
+    public function renderize()
     {
         $aS = [
             '{desc}',
