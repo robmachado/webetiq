@@ -9,6 +9,9 @@ require_once '../bootstrap.php';
  * Mostra essas informações na tela e pede outras informações
  * depois de completar os dados requeridos passa os dados para
  * impressão
+ * 
+ * Mostra o total já registrado
+ * SELECT SUM(amount*labels) AS qtd, SUM(netweight*labels) AS peso FROM  `movements` WHERE  `op_id`='67450'
  */
 use Webetiq\DBase\DBase;
 use Webetiq\Ops;
@@ -107,11 +110,11 @@ $body = "
                 $selUnidGroup
                 <div class=\"form-group\">
                     <label for=\"pesoBruto\">Peso Bruto (kg)</label>
-                    <input type=\"number\" min=\"0\" step=\"0.01\" class=\"form-control\" id=\"pesoBruto\" name=\"pesoBruto\" value=\"$lbl->pesoBruto\" placeholder=\"Entre com o peso bruto do pacote (produto+embalagem)\" onfocusout=\"calcula(this)\" required>
+                    <input type=\"number\" min=\"0\" step=\"0.01\" class=\"form-control\" id=\"pesoBruto\" name=\"pesoBruto\" value=\"$lbl->pesoBruto\" placeholder=\"Entre com o peso bruto do pacote (produto+embalagem)\" onfocusout=\"calcula(this)\">
                 </div>
                 <div class=\"form-group\">
                     <label for=\"tara\">Tara (kg)</label>
-                    <input type=\"number\" min=\"0\" step=\"0.01\" class=\"form-control\" id=\"tara\" name=\"tara\" value=\"$lbl->tara\" placeholder=\"Entre com a tara (peso da embalagem)\" onfocusout=\"calcula(this)\" required>
+                    <input type=\"number\" min=\"0\" step=\"0.01\" class=\"form-control\" id=\"tara\" name=\"tara\" value=\"$lbl->tara\" placeholder=\"Entre com a tara (peso da embalagem)\" onfocusout=\"calcula(this)\">
                 </div>
                 <div class=\"form-group\">
                     <label for=\"pesoLiq\">Peso Líquido (kg)</label>

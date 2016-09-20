@@ -6,13 +6,12 @@ use Webetiq\Labels\LabelBase;
 use Webetiq\Labels\Label;
 use Webetiq\Labels\LabelsInterface;
 
-class Visteon extends Base implements LabelsInterface
+class Visteon extends LabelBase implements LabelsInterface
 {
     public function __construct($layout)
     {
         parent::__construct($layout);
     }
-    
    
     public function renderize()
     {
