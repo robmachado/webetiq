@@ -12,11 +12,6 @@ class Corrpack extends LabelBase implements LabelsInterface
     {
         parent::__construct($layout);
     }
-   
-    public function setLbl(Label $lbl)
-    {
-        parent::setLbl($lbl);
-    }
         
     public function renderize()
     {
@@ -39,7 +34,7 @@ class Corrpack extends LabelBase implements LabelsInterface
             self::$desc,
             self::$pedcli,
             self::$numop,
-            date('Y-m-d', self::$datats),
+            date('Y-m-d'),
             self::$validade,
             number_format(self::$qtdade, 3, '.', ''),
             self::$unidade,

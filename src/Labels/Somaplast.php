@@ -13,11 +13,6 @@ class Somaplast extends LabelBase implements LabelsInterface
         parent::__construct($layout);
     }
    
-    public function setLbl(Label $lbl)
-    {
-        parent::setLbl($lbl);
-    }
-    
     public function renderize()
     {
         $aS = [
@@ -34,7 +29,7 @@ class Somaplast extends LabelBase implements LabelsInterface
         $aR = [
             self::$desc,
             self::$numop,
-            date('d/m/Y', self::$datats),
+            date('d/m/Y'),
             number_format(self::$qtdade, 3, '.', ''),
             self::$unidade,
             self::$numnf,

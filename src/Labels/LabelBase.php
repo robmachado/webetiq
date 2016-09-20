@@ -5,7 +5,6 @@ use Webetiq\Labels\Label;
 
 class LabelBase
 {
-    protected static $datats = 0;
     protected static $propNames = '';
     protected static $lbl;
     protected static $numop = '';
@@ -37,7 +36,6 @@ class LabelBase
     public function __construct($layout)
     {
         self::$template = file_get_contents($layout);
-        self::$datats = time();
     }
     
     /**

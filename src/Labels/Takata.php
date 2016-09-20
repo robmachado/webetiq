@@ -177,9 +177,9 @@ class Takata extends LabelBase implements LabelsInterface
      */
     public function setPed($data = 'JU4227')
     {
-        if ($data == '') {
+        //if ($data == '') {
             $data = 'JU4227';
-        }
+        //}
         self::$ped = $data;
     }
     
@@ -236,7 +236,7 @@ class Takata extends LabelBase implements LabelsInterface
      */
     public function renderize()
     {
-        for ($x=0; $x <= self::$copies; $x++) {
+        for ($x=0; $x < self::$copies; $x++) {
             $seqnum = self::$volume + $x;
             //cria barcodes
             self::make2D($seqnum);
@@ -249,7 +249,7 @@ class Takata extends LabelBase implements LabelsInterface
             $template = str_replace('{part}', self::$part, $template);
             $template = str_replace('{desc}', self::$desc, $template);
             $template = str_replace('{ped}', self::$ped, $template);
-            $template = str_replace('{data}', date('Y-m-d', self::$datats), $template);
+            $template = str_replace('{data}', date('Y-m-d'), $template);
             $template = str_replace('{qtd}', number_format(self::$qtd, 3, '.', ''), $template);
             $template = str_replace('{lot}', self::formField('lot', self::$lot), $template);
             $template = str_replace('{licplate}', self::$licplate, $template);

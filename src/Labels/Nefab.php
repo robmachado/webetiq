@@ -13,11 +13,6 @@ class Nefab extends LabelBase implements LabelsInterface
     {
         parent::__construct($layout);
     }
-   
-    public function setLbl(Label $lbl)
-    {
-        parent::setLbl($lbl);
-    }
     
     public function renderize()
     {
@@ -31,7 +26,7 @@ class Nefab extends LabelBase implements LabelsInterface
         ];
         $aR = [
             self::$desc,
-            date('d/m/Y', self::$datats),
+            date('d/m/Y'),
             number_format(self::$qtdade, 3, '.', ''),
             self::$codcli,
             self::$pedcli,
