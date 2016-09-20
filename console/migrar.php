@@ -12,21 +12,7 @@ use Webetiq\Migrate;
 
 $config = json_encode(['host' => 'localhost','user'=>'root', 'pass'=>'monitor5', 'db'=>'blabel']);
 $dbase = new DBase($config);
-
 //exec(__DIR__ . 'migrate.sh');
-
-echo "MIGRANDO !!!";
-sleep(10);
-//carrega os dados na base opmigrate
 $mig = new Migrate($dbase);
-//converte os dados das OPs
-//$aOP = $mig->setOPs();
-//insere na base dados
-//$mig->insertOPs();
-//$mig->setFromLast();
-
-/*
-echo "<pre>";
-print_r($aOP);
-echo "</pre>";
-*/
+sleep(1);
+$mig->setFromLast();

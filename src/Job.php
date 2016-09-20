@@ -27,6 +27,7 @@ class Job
     public function send($labels)
     {
         foreach($labels as $label) {
+            time_nanosleep(0, 100000000);
             $this->connector->send($label);
         }
     }

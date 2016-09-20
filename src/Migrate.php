@@ -162,7 +162,7 @@ class Migrate
         return $aData;
     }
 
-    public function setFromLast($aOps = array())
+    public function setFromLast()
     {
         //busca o ultimo registro das OPs
         $ops = new Ops($this->dbase);

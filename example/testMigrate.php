@@ -11,5 +11,6 @@ $dbase = new DBase($config);
 $mig = new \Webetiq\Migrate($dbase);
 
 $mig->setOPs();
-$mig->insertOPs();
+$mig->setFromLast();
+//$mig->insertOPs();
 

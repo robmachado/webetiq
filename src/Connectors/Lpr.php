@@ -19,7 +19,7 @@ class Lpr implements ConnetorInterface
         $file = new File('', $this->printerName);
         $temporario = $file->send($data);
         $comando = "lpr -P $this->printerName $temporario";
-        //system($comando, $retorno);
+        system($comando, $retorno);
         unlink($temporario);
     }
 }

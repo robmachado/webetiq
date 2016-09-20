@@ -40,8 +40,8 @@ class Printers
         $print = new Printer();
         $print->name = 'newZebra';
         $print->type = 'Thermal';
-        $print->location = '192.168.0.1';
-        $print->description = 'Zebra Z230';
+        $print->location = '192.168.1.20';
+        $print->description = 'Zebra ZT230';
         $print->interface = 'lpr';
         $print->language = 'ZPL2';
         

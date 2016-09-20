@@ -77,7 +77,7 @@ $('#btn2').on('click', function(event) {
         diag(msg);
     } else {
         //inicia a migração da OP selecionada
-        var uri = 'migrarmdb.php?f=UNO&id='+document.getElementById('numop').value;
+        var uri = 'migrar.php?f=UNO&id='+document.getElementById('numop').value;
         var message = uri;
         var alerttype = 'alert-danger';
         showalert(message, alerttype);
