@@ -13,7 +13,7 @@ use Webetiq\Migrate;
 $config = json_encode(['host' => 'localhost','user'=>'root', 'pass'=>'monitor5', 'db'=>'blabel']);
 $dbase = new DBase($config);
 
-exec(__DIR__ . 'migrate.sh');
+exec(__DIR__ . '/migrate.sh');
 
 $mig = new Migrate($dbase);
 sleep(1);
