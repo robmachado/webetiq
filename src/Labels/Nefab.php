@@ -24,10 +24,15 @@ class Nefab extends LabelBase implements LabelsInterface
             '{pedcli}',
             '{copias}'
         ];
+        $uni = str_replace("Ç", "C", strtoupper(self::$unidade));
+        $qtd = number_format(self::$qtdade, 3, ',', '.');
+        if ($uni == 'PCS') {
+            $qtd = number_format(self::$qtdade, 0, '.', '');
+        }
         $aR = [
             self::$desc,
             date('d/m/Y'),
-            number_format(self::$qtdade, 3, '.', ''),
+            $qtd,
             self::$codcli,
             self::$pedcli,
             self::$copias

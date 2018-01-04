@@ -43,6 +43,8 @@ class Render
             case 'CORRPA':
                 $layout = 'corrpack';
                 break;
+            case 'DAUBER':
+                $layout = 'daubert';
             default:
                 $layout = 'generic';
         }

@@ -1,7 +1,7 @@
 <?php
 ini_set("display_errors", 1);
 error_reporting(E_ALL);
-require_once '../bootstrap.php';
+require_once '/var/www/webetiq/bootstrap.php';
 
 /* 
  * Este arquivo executa a importação automatica dos dados das OP

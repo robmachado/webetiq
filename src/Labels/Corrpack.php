@@ -30,13 +30,18 @@ class Corrpack extends LabelBase implements LabelsInterface
             '{nf}',
             '{copias}'
         ];
+        $uni = str_replace("Ç", "C", strtoupper(self::$unidade));
+        $qtd = number_format(self::$qtdade, 3, ',', '.');
+        if ($uni == 'PCS') {
+            $qtd = number_format(self::$qtdade, 0, '.', '');
+        }
         $aR = [
             self::$desc,
             self::$pedcli,
             self::$numop,
             date('Y-m-d'),
             self::$validade,
-            number_format(self::$qtdade, 3, '.', ''),
+            $qtd,
             self::$unidade,
             self::$pesoLiq,
             self::$pesoBruto,

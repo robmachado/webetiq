@@ -102,7 +102,7 @@ class Migrate
         $registro = explode('|', $reg);
         $num = count($registro);
         if ($num != 90) {
-            throw \RuntimeException("Dados errados na linha. ");
+            throw new \RuntimeException("Dados errados na linha. ");
         }
         $desc = $registro[0];
         $codigo = (string) $this->adjust($registro[1], 'C');
@@ -125,8 +125,8 @@ class Migrate
         $registro = explode('|', $reg);
         $num = count($registro);
         $numop = (int) $registro[0]; //numero da OP (int)
-        if ($num != 31) {
-            throw \RuntimeException("Dados errados na linha. ");
+        if ($num != 32) {
+            throw new \RuntimeException("Dados errados na linha. ");
         }
         $desc = $registro[5];
         if (array_key_exists($desc, $this->listProd)) {

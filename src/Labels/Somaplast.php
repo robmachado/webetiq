@@ -26,11 +26,16 @@ class Somaplast extends LabelBase implements LabelsInterface
             '{pedcli}',
             '{copias}'
         ];
+        $uni = str_replace("Ç", "C", strtoupper(self::$unidade));
+        $qtd = number_format(self::$qtdade, 3, ',', '.');
+        if ($uni == 'PCS') {
+            $qtd = number_format(self::$qtdade, 0, '.', '');
+        }
         $aR = [
             self::$desc,
             self::$numop,
             date('d/m/Y'),
-            number_format(self::$qtdade, 3, '.', ''),
+            $qtd,
             self::$unidade,
             self::$numnf,
             self::$codcli,

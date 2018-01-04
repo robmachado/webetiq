@@ -37,7 +37,9 @@ class Ops
             return $op;
         }
         foreach ($rows[0] as $key => $value) {
-            $op->$key = $value;
+            if (!is_numeric($key)) {
+                $op->$key = $value;
+            }
         }
         return $op;
     }

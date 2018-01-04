@@ -30,13 +30,18 @@ class Generic extends LabelBase implements LabelsInterface
             '{pedido}',
             '{copias}'
         ];
+        $uni = str_replace("Ç", "C", strtoupper(self::$unidade));
+        $qtd = number_format(self::$qtdade, 3, ',', '.');
+        if ($uni == 'PCS') {
+            $qtd = number_format(self::$qtdade, 0, '.', '');
+        }
         $aR = [
             self::$desc,
             self::$cod,
             self::$numop,
             date('d/m/Y'),
             self::$validade,
-            number_format(self::$qtdade, 3, '.', ''),
+            $qtd,
             self::$unidade,
             self::$pesoLiq,
             self::$pesoBruto,

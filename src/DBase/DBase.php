@@ -92,6 +92,11 @@ class DBase
         return $this->execute("TRUNCATE TABLE $table;");
     }
     
+    public function drop($table)
+    {
+        return $this->execute("DROP TABLE $table;");
+    }
+    
     /**
      * Executa uma pesquisa SQL
      * @param string $sqlComm
@@ -113,8 +118,11 @@ class DBase
                 $sth->execute($data);
                 $aRet = $sth->fetchAll();
             } else {
-                foreach ($this->dbh->query($sqlComm) as $row) {
-                    $aRet[]=$row;
+                $resp = $this->dbh->query($sqlComm);
+                if (!empty($resp)) {        
+                    foreach($resp as $row) {
+                        $aRet[]=$row;
+                    }
                 }
             }
         } catch (PDOException $e) {

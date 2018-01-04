@@ -18,7 +18,8 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "~3.3.5",
-    "bootstrap3-dialog": "bootstrap-dialog#~1.34.9"
+    "bootstrap": "v4.0.0-alpha.6",
+    "bootstrap3-dialog": "bootstrap-dialog#~1.34.9",
+    "bootstrap-datagrid": "^0.3.0"
   }
 }
