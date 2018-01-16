@@ -123,7 +123,7 @@ if (!empty($maq) && !empty($data) && !empty($hrIn) && !empty($hrFim) && !empty($
         $hrIn = $hrFim;
         $hrFim = null;
         $falta = 1440 - $totalmin;
-        $alert = "Total lançado $totalmin minutos, faltam $falta minutos.";
+        $alert .= "Total lançado $totalmin minutos, faltam $falta minutos.";
     }
     //prosseguir para o proximo bloco de dados
 }

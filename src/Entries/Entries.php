@@ -85,14 +85,9 @@ class Entries
                 . "'$std->aparas'";
         }
         $sqlComm .= ");";    
-        //echo $sqlComm;
-        //die;
-        //$config = json_encode(['host' => 'localhost','user'=>'root', 'pass'=>'monitor5', 'db'=>'legacy']);
-        //$dbase = new DBase($config);
-        //$resp = $this->dbase->query($sqlCheck);
-        //if (empty($resp)) {
-        //    throw new \Exception('OP não localizada!');
-        //}
-        $this->dbase->execute($sqlComm);
+        if (!$this->dbase->execute($sqlComm)) {
+            return "Não gravou DUPLICIDADE de dados.";
+        }
+        return "";
     }
 }
