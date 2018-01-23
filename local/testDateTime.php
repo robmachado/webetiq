@@ -84,7 +84,7 @@ foreach ($hrs as $h) {
     $decI = DT::convertTimeToDec($h[0]);
     $dif = $decF-$decI;
     $total += $dif;
-    echo "[" . $h[1] . "] - [" . $h[0] . "] = $dif <br>";
+    echo "[" . $h[0] . "] - [" . $h[1] . "] = $dif <br>";
     echo ".................. sub: $total <br>";
 }
 echo "TOTAL = $total minutos";

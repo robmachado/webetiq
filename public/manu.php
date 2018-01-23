@@ -5,12 +5,19 @@ require_once '../bootstrap.php';
 
 use Webetiq\DBase\Request;
 
-$numop = filter_input(INPUT_POST, 'numop', FILTER_SANITIZE_STRING);
+$maq = filter_input(INPUT_POST, 'maq', FILTER_SANITIZE_STRING);
+$data= filter_input(INPUT_POST, 'data', FILTER_SANITIZE_STRING);
+
 $cont = "";
-if (!empty($numop)) {
-    //buscar os dados lançados da OP e colocar em uma tabela
-    $sqlComm = "SELECT * FROM entries WHERE numop='$numop' ORDER BY fase, maq, datain;";
+if (!empty($maq) && !empty($data)) {
+    //buscar os dados lançados e colocar em uma tabela
+    $sqlComm = "SELECT ap.*, pa.descricao FROM apontamentos ap INNER JOIN motivoparada pa ON ap.parada = pa.id "
+        . "WHERE ap.maq='$maq' AND ap.data='$dia' ORDER BY ap.shifttimeini";
     $resp = Request::get($sqlComm);
+    echo "<pre>";
+    print_r($reps);
+    echo "</pre>";
+    die;
     if (!empty($resp)) {
         $cont = "<div class=\"row\">"
             . "<table class=\"table table-hover\" id=\"some-table\" data-provide=\"datagrid\">"
@@ -175,16 +182,25 @@ $body = "
     </div> 
     <form role=\"form\" method=\"POST\" action=\"manu.php\" autocomplete=\"off\">
         <div class=\"row\">
-            <div class=\"col-md-4\"></div>
-            <div class=\"col-md-4\">
+            <div class=\"col-md-3\"></div>
+            <div class=\"col-md-3\">
+                <label for=\"maq\">Maquina</label> 
                 <div class=\"input-group\">
-                    <input type=\"text\" class=\"form-control\" id=\"numop\" name=\"numop\" value=\"$numop\"  onkeypress=\"return isNumber(event)\" autofocus placeholder=\"Entre com o numero da OP\" required>
-                        <span class=\"input-group-btn\">
-                        <button class=\"btn btn-primary\" type=\"submit\"><span class=\"glyphicon glyphicon-search\"></span> Busca </button>
-                    </span>
+                    <input type=\"text\" class=\"form-control\" id=\"maq\" name=\"maq\" value=\"$maq\" autofocus placeholder=\"Entre com a maquina\" required>
                 </div>
             </div>
-            <div class=\"col-md-4\"></div>
+            <div class=\"col-md-3\">
+                <div class=\"input-group\">
+                    <label for=\"data\">Data</label> 
+                    <div class=\"input-group\">
+                        <input type=\"text\" pattern=\"\d{2}\.\d{2}\.\d{2}\" title=\"dd.mm.yy\" class=\"form-control\" id=\"data\" name=\"data\" value=\"$data\" onfocusout=\"isSunday(event);\" placeholder=\"Data ex.12.12.17\" required>
+                        <span class=\"input-group-btn\">
+                            <button class=\"btn btn-primary\" type=\"submit\"><span class=\"glyphicon glyphicon-search\"></span> Busca </button>
+                        </span>
+                    </div>
+                </div>
+            </div>            
+            <div class=\"col-md-3\"></div>
         </div>    
         <br/>
         <div class=\"row\">    
@@ -196,21 +212,6 @@ $body = "
 
 
 $title = "Pesquisa/manutencao";
-
-
-/**	
-id
-numop
-fase
-datain
-datafim
-maq
-operador
-qtd
-uni
-sucata
-*/
-
 $menu = file_get_contents('assets/menu.html');
 $html = file_get_contents('assets/newmain.html');
 $html = str_replace("{{extras}}", $script, $html);

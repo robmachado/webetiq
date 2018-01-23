@@ -53,7 +53,7 @@ class DateTime
     
     /**
      * Converte de horario decima de turno para horario decimal
-     * @param type $shiftDecTime
+     * @param integer $shiftDecTime
      * @return float
      */
     public static function convertShiftModeToDec($shiftDecTime)
@@ -79,5 +79,11 @@ class DateTime
             return 2;
         }
         return 3;
+    }
+    
+    public static function toDate($data)
+    {
+        $a = explode('.', $data);
+        return '20'.$a[2].'-'.$a[1].'-'.$a[0];
     }
 }

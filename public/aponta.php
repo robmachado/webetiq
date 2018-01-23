@@ -8,20 +8,6 @@ use Webetiq\DateTime\DateTime;
 
 $entries = new Entries();
 
-$mqnas = $entries->getMaquinas();
-$dlist = "<datalist id=\"mqnas\">\n";
-foreach($mqnas as $p) {
-    $dlist .= "<option value=\"" . $p['maq'] . "-" . $p['descricao'] . "\">\n";
-}
-$dlist .= "</datalist>\n";
-$paradas = $entries->getCodParadas();
-$dlist .= "<datalist id=\"paradas\">\n";
-$dlist .= "<option value=\"0-Em Operação\">\n";
-foreach($paradas as $p) {
-    $dlist .= "<option value=\"" . $p['id'] . "-" . $p['descricao'] . "\">\n";
-}
-$dlist .= "</datalist>";
-
 $maq = filter_input(INPUT_POST, 'maq', FILTER_SANITIZE_STRING);
 $data = filter_input(INPUT_POST, 'data', FILTER_SANITIZE_STRING);
 $hrIn = filter_input(INPUT_POST, 'hrIn', FILTER_SANITIZE_STRING);
@@ -43,16 +29,38 @@ if (empty($maq)) {
     $hrIn = '06:00';
 }
 
+function loadLists($data) 
+{
+    $entries = new Entries();
+    $mqnas = $entries->getMaquinas($data);
+    $dlist = "<datalist id=\"mqnas\">\n";
+    foreach($mqnas as $p) {
+        $dlist .= "<option value=\"" . $p['maq'] . "-" . $p['descricao'] . "\">\n";
+    }
+    $dlist .= "</datalist>\n";
+    $paradas = $entries->getCodParadas();
+    $dlist .= "<datalist id=\"paradas\">\n";
+    $dlist .= "<option value=\"0-Em Operação\">\n";
+    foreach($paradas as $p) {
+        $dlist .= "<option value=\"" . $p['id'] . "-" . $p['descricao'] . "\">\n";
+    }
+    $dlist .= "</datalist>";
+    return $dlist;
+}
+
+$dlist = loadLists($data);
+
 if (!empty($maq) && !empty($data) && !empty($hrIn) && !empty($hrFim) && !empty($parada)) {
     $maquina = explode('-', $maq);
     $d = explode('.', $data);
     $dt = '20'. $d[2] . '-' . $d[1] . '-' . $d[0];
     if ($hrFim === '00:00') {
         $hrFim = '24:00';
-    } elseif ($hrFim === '06:00') {
-        $hrFim = '5:59';
     }
-    
+    $af = explode(':', $hrFim);
+    if ($af[0] === '06') { 
+        $hrFim = '06:00';
+    }
     $codparada = explode('-', $parada);
     if ($codparada[0] !== 0) {
         //limpar outros dados
@@ -76,7 +84,7 @@ if (!empty($maq) && !empty($data) && !empty($hrIn) && !empty($hrFim) && !empty($
     $std->shifttimeini = DateTime::convertDecToShiftMode(DateTime::convertTimeToDec($hrIn));
     $std->shifttimefim = DateTime::convertDecToShiftMode(DateTime::convertTimeToDec($hrFim));
     if ($hrFim === '06:00') {
-        $std->shifttimefim = 24;
+        $std->shifttimefim = 24.000;
     }
     $std->turno  = DateTime::getShiftValue($std->shifttimeini);
     $std->parada = $codparada[0];
@@ -94,16 +102,33 @@ if (!empty($maq) && !empty($data) && !empty($hrIn) && !empty($hrFim) && !empty($
     $totalmin = 0;
     $al = $entries->getAll($maquina[0], $dt);
     if (!empty($al['lanc'])) {
-        $lista = "<br/><table class=\"table\"><thead><tr><th>#</th><th>Hin</th><th>Hfim</th><th>dif</th><th>Codigo</th><th>OP</th></tr></thead><tbody>";
+        $lista = "<br/><table class=\"table\"><thead><tr><th>#</th><th>Maq</th><th>Hin</th><th>Hfim</th><th>dif</th><th>Codigo</th><th>OP</th></tr></thead><tbody>";
+        $oldFim = '06:00';
         foreach ($al['lanc'] as $a) {
+            if ($a['hIn'] != $oldFim) {
+                $om = DateTime::convertTimeToDec($oldFim);
+                $fm = DateTime::convertTimeToDec($a['hIn']);
+                $dif = $fm-$om;
+                $lista .= "<tr>";
+                $lista .= "<td>"."Insert"."</td>";
+                $lista .= "<td>".$a['maq']."</td>";
+                $lista .= "<td>".$oldFim."</td>";
+                $lista .= "<td>".$a['hIn']."</td>";
+                $lista .= "<td>".$dif."</td>";
+                $lista .= "<td></td>";
+                $lista .= "<td></td>";
+                $lista .= "</tr>";
+            }
             $lista .= "<tr>";
             $lista .= "<td>"."Edit"."</td>";
+            $lista .= "<td>".$a['maq']."</td>";
             $lista .= "<td>".$a['hIn']."</td>";
             $lista .= "<td>".$a['hOut']."</td>";
             $lista .= "<td>".$a['dif']."</td>";
             $lista .= "<td>".$a['cod']."</td>";
             $lista .= "<td>".$a['op']."</td>";
             $lista .= "</tr>";
+            $oldFim = $a['hOut'];
         }
         $lista .= "</tbody></table>";
         $totalmin = $al['totmin'];
@@ -122,10 +147,25 @@ if (!empty($maq) && !empty($data) && !empty($hrIn) && !empty($hrFim) && !empty($
         }
         $hrIn = $hrFim;
         $hrFim = null;
+        $parada = null;
+        $numop = null;
+        $qtd = null;
+        $uni = null;
+        $refile = null;
+        $aparas = null;
+        $ops = null;
+        $fator = null;
+        $setup = null;
+        $velocidade = null; 
         $falta = 1440 - $totalmin;
         $alert .= "Total lançado $totalmin minutos, faltam $falta minutos.";
+        if ($falta == 0) {
+            $dlist = loadLists($data);
+            $maq = null;
+        }
     }
     //prosseguir para o proximo bloco de dados
+    
 }
 
 $script = "<script type=\"text/javascript\">     
@@ -136,6 +176,17 @@ $script = "<script type=\"text/javascript\">
             return false;
         }
         return true;
+    }
+    
+    function isSunday() {
+        var d = document.getElementById('data').value;
+        var myarr = d.split('.');
+        var myDate = new Date('20'+myarr[2], myarr[1]-1, myarr[0]);
+        if (myDate.getDay() == 0) { 
+            alert('Domingo');
+            document.getElementById('hrFim').value = '06:00';
+            document.getElementById('parada').value = '5-Domingo/Feriado';
+        }
     }
 </script>";
 
@@ -148,7 +199,7 @@ $body = "
         <h2>Apontamento de Produção</h2>
         </center>
     </div> 
-    <form role=\"form\" method=\"POST\" action=\"aponta.php\" autocomplete=\"on\">
+    <form role=\"form\" method=\"POST\" action=\"aponta.php\" autocomplete=\"off\">
     $dlist
     <datalist id=\"units\">
         <option value=\"KG\">
@@ -163,15 +214,15 @@ $body = "
         <div class=\"row\">
             <div class=\"col-md-2\"></div>
             <div class=\"col-md-3\">
+                <label for=\"data\">Data</label> 
+                <div class=\"input-group\">
+                    <input type=\"text\" pattern=\"\d{2}\.\d{2}\.\d{2}\" title=\"dd.mm.yy\" class=\"form-control\" id=\"data\" name=\"data\" value=\"$data\" onfocusout=\"isSunday(event);\" placeholder=\"Data ex.12.12.17\" required>
+                </div>
+            </div>            
+            <div class=\"col-md-3\">
                 <label for=\"maq\">Máquina de Produção</label> 
                 <div class=\"input-group\">
                     <input type=\"text\" list=\"mqnas\" maxlength=\"15\" class=\"form-control\" id=\"maq\" name=\"maq\" value=\"$maq\" placeholder=\"Entre com a maquina\" required>
-                </div>
-            </div>
-            <div class=\"col-md-3\">
-                <label for=\"data\">Data</label> 
-                <div class=\"input-group\">
-                    <input type=\"text\" pattern=\"\d{2}\.\d{2}\.\d{2}\" title=\"dd.mm.yy\" class=\"form-control\" id=\"data\" name=\"data\" value=\"$data\" placeholder=\"Data ex.12.12.17\" required>
                 </div>
             </div>
             <div class=\"col-md-3\"></div>
@@ -274,9 +325,9 @@ $body = "
             <button type=\"submit\" class=\"btn btn btn-primary\" id=\"btn1\" name=\"btn1\"><span class=\"glyphicon glyphicon-floppy-disk\"></span> Salvar</button>            
         </div>
     </div>
-    </form>    
+    </form>
 </div>
-$lista
+$lista   
 $script
 ";
 $menu = file_get_contents('assets/menu.html');

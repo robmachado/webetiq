@@ -16,9 +16,21 @@ class Entries
         $this->dbase = new DBase($config);
     }
     
-    public function getMaquinas()
+    public function getMaquinas($data)
     {
-        $sqlComm = "SELECT * FROM maquinas ORDER BY maq;";
+        $filter = '';
+        if (!empty($data)) {
+            $dt = DateTime::toDate($data);
+            $sqlComm = "SELECT DISTINCT maq FROM apontamentos WHERE data='$dt' ORDER BY maq;";
+            $rsp = $this->dbase->query($sqlComm);
+            if (!empty($rsp)) {
+                foreach ($rsp as $r) {
+                    $a[] = "'" . $r['maq'] . "'";
+                }
+                $filter = ' WHERE maq NOT IN ('.implode(',',$a).')';
+            }
+        }
+        $sqlComm = "SELECT * FROM maquinas $filter ORDER BY maq;";
         return $this->dbase->query($sqlComm);
     }
     
@@ -40,7 +52,7 @@ class Entries
             $minF = DateTime::convertShiftModeToDec($d['shifttimefim']);
             $minI = DateTime::convertShiftModeToDec($d['shifttimeini']);
             //$dif = $minF-$minI;
-            $dif = $d['shifttimefim']-$d['shifttimeini'];
+            $dif = ($d['shifttimefim']-$d['shifttimeini']) * 60;
             
             $tot += $dif;
             $hIn = DateTime::convertDecToTime($minI);
@@ -48,6 +60,7 @@ class Entries
             $cod = $d['parada'].'-'.$d['descricao'];
             $op = $d['numop'];
             $r[] = [
+                'maq' => $d['maq'],
                 'hIn' => $hIn,
                 'hOut' => $hOut,
                 'dif' => $dif,
