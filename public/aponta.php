@@ -13,6 +13,7 @@ $data = filter_input(INPUT_POST, 'data', FILTER_SANITIZE_STRING);
 $hrIn = filter_input(INPUT_POST, 'hrIn', FILTER_SANITIZE_STRING);
 $hrFim = filter_input(INPUT_POST, 'hrFim', FILTER_SANITIZE_STRING);
 $parada = filter_input(INPUT_POST, 'parada', FILTER_SANITIZE_STRING);
+
 $numop = filter_input(INPUT_POST, 'numop', FILTER_SANITIZE_STRING);
 $qtd = filter_input(INPUT_POST, 'qtd', FILTER_SANITIZE_STRING);
 $uni = filter_input(INPUT_POST, 'uni', FILTER_SANITIZE_STRING);
@@ -62,7 +63,7 @@ if (!empty($maq) && !empty($data) && !empty($hrIn) && !empty($hrFim) && !empty($
         $hrFim = '06:00';
     }
     $codparada = explode('-', $parada);
-    if ($codparada[0] !== 0) {
+    if ($codparada[0] !== '0') {
         //limpar outros dados
         $numop = null;
         $qtd = null;
@@ -134,7 +135,7 @@ if (!empty($maq) && !empty($data) && !empty($hrIn) && !empty($hrFim) && !empty($
         $totalmin = $al['totmin'];
     }    
     //verificar se terminou o conjunto de dados do periodo/maquina 
-    if ($totalmin == 1440) {
+    if ($totalmin >= 1439) {
         //considerar encerrado, então limpar para novos dados
         $alert = 'Total de Completo !';
     }
@@ -178,6 +179,10 @@ $script = "<script type=\"text/javascript\">
         return true;
     }
     
+    function mudamaq() {
+        document.getElementById('hrIn').value = '06:00';
+    }
+    
     function isSunday() {
         var d = document.getElementById('data').value;
         var myarr = d.split('.');
@@ -216,13 +221,13 @@ $body = "
             <div class=\"col-md-3\">
                 <label for=\"data\">Data</label> 
                 <div class=\"input-group\">
-                    <input type=\"text\" pattern=\"\d{2}\.\d{2}\.\d{2}\" title=\"dd.mm.yy\" class=\"form-control\" id=\"data\" name=\"data\" value=\"$data\" onfocusout=\"isSunday(event);\" placeholder=\"Data ex.12.12.17\" required>
+                    <input type=\"text\" pattern=\"\d{2}\.\d{2}\.\d{2}\" title=\"dd.mm.yy\" class=\"form-control\" id=\"data\" name=\"data\" value=\"$data\" onfocusout=\"isSunday(event);\" autofocus placeholder=\"Data ex.12.12.17\" required>
                 </div>
             </div>            
             <div class=\"col-md-3\">
                 <label for=\"maq\">Máquina de Produção</label> 
                 <div class=\"input-group\">
-                    <input type=\"text\" list=\"mqnas\" maxlength=\"15\" class=\"form-control\" id=\"maq\" name=\"maq\" value=\"$maq\" placeholder=\"Entre com a maquina\" required>
+                    <input type=\"text\" list=\"mqnas\" maxlength=\"15\" class=\"form-control\" id=\"maq\" name=\"maq\" value=\"$maq\" onchange=\"mudamaq();\" placeholder=\"Entre com a maquina\" required>
                 </div>
             </div>
             <div class=\"col-md-3\"></div>

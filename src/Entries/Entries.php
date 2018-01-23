@@ -97,7 +97,9 @@ class Entries
                 . "'$std->refile',"
                 . "'$std->aparas'";
         }
-        $sqlComm .= ");";    
+        $sqlComm .= ");";  
+        echo $sqlComm;
+        die;
         if (!$this->dbase->execute($sqlComm)) {
             return "Não gravou DUPLICIDADE de dados.";
         }
