@@ -8,6 +8,7 @@ use Webetiq\DateTime\DateTime;
 
 $entries = new Entries();
 
+$modo = filter_input(INPUT_POST, 'modo', FILTER_SANITIZE_STRING);
 $maq = filter_input(INPUT_POST, 'maq', FILTER_SANITIZE_STRING);
 $data = filter_input(INPUT_POST, 'data', FILTER_SANITIZE_STRING);
 $hrIn = filter_input(INPUT_POST, 'hrIn', FILTER_SANITIZE_STRING);
@@ -53,15 +54,16 @@ $dlist = loadLists($data);
 
 if (!empty($maq) && !empty($data) && !empty($hrIn) && !empty($hrFim) && !empty($parada)) {
     $maquina = explode('-', $maq);
-    $d = explode('.', $data);
-    $dt = '20'. $d[2] . '-' . $d[1] . '-' . $d[0];
+    //$d = explode('.', $data);
+    //$dt = '20'. $d[2] . '-' . $d[1] . '-' . $d[0];
+    $dt = $data;
     if ($hrFim === '00:00') {
         $hrFim = '24:00';
     }
-    $af = explode(':', $hrFim);
-    if ($af[0] === '06') { 
-        $hrFim = '06:00';
-    }
+    //$af = explode(':', $hrFim);
+    //if ($af[0] === '06') { 
+    //    $hrFim = '06:00';
+    //}
     $codparada = explode('-', $parada);
     if ($codparada[0] !== '0') {
         //limpar outros dados
@@ -80,6 +82,7 @@ if (!empty($maq) && !empty($data) && !empty($hrIn) && !empty($hrFim) && !empty($
     }
     //gravar os dados na base
     $std = new \stdClass();
+    $std->modo = $modo;
     $std->maq = $maquina[0];
     $std->data = $dt;
     $std->shifttimeini = DateTime::convertDecToShiftMode(DateTime::convertTimeToDec($hrIn));
@@ -101,33 +104,46 @@ if (!empty($maq) && !empty($data) && !empty($hrIn) && !empty($hrFim) && !empty($
     $alert = $entries->save($std);
     //buscar os dados já gravados para data / maq
     $totalmin = 0;
+    $xOut = '';
     $al = $entries->getAll($maquina[0], $dt);
+    //echo "<pre>";
+    //print_r($al);
+    //echo "</pre>";
+    //die;
     if (!empty($al['lanc'])) {
-        $lista = "<br/><table class=\"table\"><thead><tr><th>#</th><th>Maq</th><th>Hin</th><th>Hfim</th><th>dif</th><th>Codigo</th><th>OP</th></tr></thead><tbody>";
+        $lista = "<br/><table class=\"table\" id=\"periods\" name=\"periods\"><thead><tr><th>#</th><th>Maq</th><th>Hin</th><th>Hfim</th><th>dif</th><th>Codigo</th><th>OP</th><th></th></tr></thead><tbody>";
         $oldFim = '06:00';
+        $b = 0;
         foreach ($al['lanc'] as $a) {
+            $b++;
+            $xIn = $a['hIn'];
+            $xOut= $a['hOut'];
             if ($a['hIn'] != $oldFim) {
                 $om = DateTime::convertTimeToDec($oldFim);
                 $fm = DateTime::convertTimeToDec($a['hIn']);
                 $dif = $fm-$om;
                 $lista .= "<tr>";
-                $lista .= "<td>"."Insert"."</td>";
+                $lista .= "<td><button onClick=\"insertPeriod('$oldFim','$xIn');\" type=\"button\" class=\"btn btn-warning\" id=\"btnI$b\" name=\"btnI$b\"><span class=\"glyphicon glyphicon-asterisk\"></span></button></td>";
                 $lista .= "<td>".$a['maq']."</td>";
                 $lista .= "<td>".$oldFim."</td>";
-                $lista .= "<td>".$a['hIn']."</td>";
+                $lista .= "<td>".$xIn."</td>";
                 $lista .= "<td>".$dif."</td>";
+                $lista .= "<td></td>";
                 $lista .= "<td></td>";
                 $lista .= "<td></td>";
                 $lista .= "</tr>";
             }
+            $id = $a['id'];
+            $m = $a['maq'];
             $lista .= "<tr>";
-            $lista .= "<td>"."Edit"."</td>";
+            $lista .= "<td><button onClick=\"editPeriod($id,'$m','$xIn','$xOut');\" type=\"button\" class=\"btn btn-primary\" id=\"btnE$b\" name=\"btnE$b\"><span class=\"glyphicon glyphicon-pencil\"></span></button></td>";
             $lista .= "<td>".$a['maq']."</td>";
             $lista .= "<td>".$a['hIn']."</td>";
             $lista .= "<td>".$a['hOut']."</td>";
             $lista .= "<td>".$a['dif']."</td>";
             $lista .= "<td>".$a['cod']."</td>";
             $lista .= "<td>".$a['op']."</td>";
+            $lista .= "<td><button onClick=\"deletePeriod($id,this);\" type=\"button\" class=\"btn btn-danger\" id=\"btnT$b\" name=\"btnT$b\"><span class=\"glyphicon glyphicon-trash\"></span></button></td>";
             $lista .= "</tr>";
             $oldFim = $a['hOut'];
         }
@@ -137,7 +153,7 @@ if (!empty($maq) && !empty($data) && !empty($hrIn) && !empty($hrFim) && !empty($
     //verificar se terminou o conjunto de dados do periodo/maquina 
     if ($totalmin >= 1439) {
         //considerar encerrado, então limpar para novos dados
-        $alert = 'Total de Completo !';
+        $alert = 'Total de Completo !  ';
     }
     //se não terminou manter maq e data e ajustar hrIn = hrFim
     if (!empty($hrFim)) {
@@ -166,7 +182,13 @@ if (!empty($maq) && !empty($data) && !empty($hrIn) && !empty($hrFim) && !empty($
         }
     }
     //prosseguir para o proximo bloco de dados
-    
+    if ($xOut != '') {
+        $mIn = DateTime::convertDecToShiftMode(DateTime::convertTimeToDec($hrIn));
+        $mOut = DateTime::convertDecToShiftMode(DateTime::convertTimeToDec($xOut));
+        if ($mIn < $mOut) {
+            //$hrIn = $xOut;
+        }    
+    }    
 }
 
 $script = "<script type=\"text/javascript\">     
@@ -185,13 +207,45 @@ $script = "<script type=\"text/javascript\">
     
     function isSunday() {
         var d = document.getElementById('data').value;
-        var myarr = d.split('.');
-        var myDate = new Date('20'+myarr[2], myarr[1]-1, myarr[0]);
-        if (myDate.getDay() == 0) { 
-            alert('Domingo');
+        var hoje = new Date();
+        var myDate = new Date(d);
+        if (myDate > hoje) {
+            alert('A data não pode ser maior que a de hoje');
+        }
+        //alert(myDate.getDay());
+        if (myDate.getDay() == 6) { 
+            //alert('Domingo');
             document.getElementById('hrFim').value = '06:00';
             document.getElementById('parada').value = '5-Domingo/Feriado';
         }
+        return true;
+    }
+    
+    var insertPeriod = function(x,y) {
+        document.getElementById('hrIn').value = x;
+        document.getElementById('hrFim').value = y;
+        document.getElementById('parada').focus();
+    }
+    
+    var deletePeriod = function(x,element) {
+        $.get('deleteaponta.php?id='+x, function(data, status){
+            if (status) {
+                var row = element.parentNode.parentNode.rowIndex;
+                document.getElementById('periods').deleteRow(row);
+            }
+        });
+    }
+    
+    var editPeriod = function(x,m,i,o) {
+        document.getElementById('modo').value = x;
+        document.getElementById('maq').value = m;
+        document.getElementById('hrIn').value = i;
+        document.getElementById('hrFim').value = o;
+        document.getElementById('parada').focus();
+    }
+    
+    var reloadPage = function() {
+        window.location.replace(location);
     }
 </script>";
 
@@ -205,6 +259,7 @@ $body = "
         </center>
     </div> 
     <form role=\"form\" method=\"POST\" action=\"aponta.php\" autocomplete=\"off\">
+    <input type=\"hidden\" id=\"modo\" name=\"modo\" value=\"i\">
     $dlist
     <datalist id=\"units\">
         <option value=\"KG\">
@@ -221,7 +276,7 @@ $body = "
             <div class=\"col-md-3\">
                 <label for=\"data\">Data</label> 
                 <div class=\"input-group\">
-                    <input type=\"text\" pattern=\"\d{2}\.\d{2}\.\d{2}\" title=\"dd.mm.yy\" class=\"form-control\" id=\"data\" name=\"data\" value=\"$data\" onfocusout=\"isSunday(event);\" autofocus placeholder=\"Data ex.12.12.17\" required>
+                    <input type=\"date\" class=\"form-control\" id=\"data\" name=\"data\" value=\"$data\" onfocusout=\"isSunday(event);\" autofocus required>
                 </div>
             </div>            
             <div class=\"col-md-3\">
@@ -230,7 +285,7 @@ $body = "
                     <input type=\"text\" list=\"mqnas\" maxlength=\"15\" class=\"form-control\" id=\"maq\" name=\"maq\" value=\"$maq\" onchange=\"mudamaq();\" placeholder=\"Entre com a maquina\" required>
                 </div>
             </div>
-            <div class=\"col-md-3\"></div>
+            <div class=\"col-md-3\"><button onClick=\"reloadPage();\" type=\"button\" class=\"btn btn btn-secondary\" id=\"btnR\" name=\"btnR\">Recarregar</button></div>
         </div>
         <br/>
         <div class=\"row\">
@@ -266,7 +321,7 @@ $body = "
             <div class=\"col-md-3\">
                 <label for=\"qtd\">Quantidade Produzida</label> 
                 <div class=\"input-group\">
-                    <input type=\"number\" min=1 step=0.01 class=\"form-control\" id=\"qtd\" name=\"qtd\" value=\"$qtd\" placeholder=\"Entre com quantidade\">
+                    <input type=\"number\" min=0.1 step=0.01 class=\"form-control\" id=\"qtd\" name=\"qtd\" value=\"$qtd\" placeholder=\"Entre com quantidade\">
                 </div>
             </div>
             <div class=\"col-md-3\">
@@ -283,7 +338,7 @@ $body = "
             <div class=\"col-md-3\">
                 <div class=\"input-group\">
                     <label for=\"fator\">Fator de Conversão (g/m, g/pç)</label> 
-                    <input type=\"number\" min=1 step=0.01 class=\"form-control\" id=\"fator\" name=\"fator\" value=\"$fator\" placeholder=\"Entre com o fator\">
+                    <input type=\"number\" min=0.01 step=0.01 class=\"form-control\" id=\"fator\" name=\"fator\" value=\"$fator\" placeholder=\"Entre com o fator\">
                 </div>
             </div>
             <div class=\"col-md-3\">
@@ -295,7 +350,7 @@ $body = "
             <div class=\"col-md-3\">
                 <label for=\"velocidade\">Velocidade (kg/h, m/min. bt/min)</label> 
                 <div class=\"input-group\">
-                    <input type=\"number\" min=1 step=0.01 class=\"form-control\" id=\"velocidade\" name=\"velocidade\" value=\"$velocidade\" placeholder=\"Entre a velocidade\">
+                    <input type=\"number\" min=0.01 step=0.01 class=\"form-control\" id=\"velocidade\" name=\"velocidade\" value=\"$velocidade\" placeholder=\"Entre a velocidade\">
                 </div>
             </div>                     
             <div class=\"col-md-3\"></div>
@@ -306,19 +361,19 @@ $body = "
             <div class=\"col-md-3\">
                 <label for=\"refile\">Refile</label> 
                 <div class=\"input-group\">
-                    <input type=\"number\" min=1 step=0.01 class=\"form-control\" id=\"refile\" name=\"refile\" value=\"$refile\" placeholder=\"Entre com qtdade\">
+                    <input type=\"number\" min=0 step=0.01 class=\"form-control\" id=\"refile\" name=\"refile\" value=\"$refile\" placeholder=\"Entre com qtdade\">
                 </div>
             </div>
             <div class=\"col-md-3\">
                 <label for=\"aparas\">Aparas</label> 
                 <div class=\"input-group\">
-                    <input type=\"number\" min=1 step=0.01 class=\"form-control\" id=\"aparas\" name=\"aparas\" value=\"$aparas\" placeholder=\"Entre com qtdade\">
+                    <input type=\"number\" min=0 step=0.01 class=\"form-control\" id=\"aparas\" name=\"aparas\" value=\"$aparas\" placeholder=\"Entre com qtdade\">
                 </div>
             </div>
             <div class=\"col-md-3\">
                 <label for=\"ops\">Operadores</label> 
                 <div class=\"input-group\">
-                    <input type=\"number\" min=1 step=0.01 class=\"form-control\" id=\"ops\" name=\"ops\" value=\"$ops\" placeholder=\"Entre com o numero\">
+                    <input type=\"number\" min=0.1 step=0.01 class=\"form-control\" id=\"ops\" name=\"ops\" value=\"$ops\" placeholder=\"Entre com o numero\">
                 </div>
             </div>
         </div>

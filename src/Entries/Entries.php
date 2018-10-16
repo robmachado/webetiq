@@ -20,8 +20,8 @@ class Entries
     {
         $filter = '';
         if (!empty($data)) {
-            $dt = DateTime::toDate($data);
-            $sqlComm = "SELECT DISTINCT maq FROM apontamentos WHERE data='$dt' ORDER BY maq;";
+            //$dt = DateTime::toDate($data);
+            $sqlComm = "SELECT DISTINCT maq FROM apontamentos WHERE data='$data' ORDER BY maq;";
             $rsp = $this->dbase->query($sqlComm);
             if (!empty($rsp)) {
                 foreach ($rsp as $r) {
@@ -43,7 +43,8 @@ class Entries
     
     public function getAll($maq, $dia)
     {
-        $sqlComm = "SELECT ap.*, pa.descricao FROM apontamentos ap INNER JOIN motivoparada pa ON ap.parada = pa.id "
+        $sqlComm = "SELECT ap.*, pa.descricao FROM apontamentos ap "
+            . "LEFT JOIN motivoparada pa ON ap.parada = pa.id "
             . "WHERE ap.maq='$maq' AND ap.data='$dia' ORDER BY ap.shifttimeini";
         $resp = $this->dbase->query($sqlComm);
         $r = [];
@@ -57,9 +58,13 @@ class Entries
             $tot += $dif;
             $hIn = DateTime::convertDecToTime($minI);
             $hOut = DateTime::convertDecToTime($minF);
-            $cod = $d['parada'].'-'.$d['descricao'];
+            $cod = $d['parada'].'-Em Operação';
+            if ($d['parada'] !== '0') {
+                $cod = $d['parada'].'-'.$d['descricao'];
+            } 
             $op = $d['numop'];
             $r[] = [
+                'id' => $d['id'],
                 'maq' => $d['maq'],
                 'hIn' => $hIn,
                 'hOut' => $hOut,
@@ -71,35 +76,66 @@ class Entries
         return ['totmin'=> $tot, 'lanc' => $r];
     }
     
+    public function delete($id)
+    {
+        $sqlComm = "DELETE FROM apontamentos WHERE id='$id';";
+        if (!$this->dbase->execute($sqlComm)) {
+            return false;
+        }
+        return true;
+    }
+    
     public function save(stdClass $std)
     {
-        //maq,data,shifttimeini,shifttimefim,turno,parada,numop,qtd,uni,fator,setup,ops,velocidade,refile,aparas
-        $sqlComm = "INSERT INTO apontamentos ("
-            . "maq,data,shifttimeini,shifttimefim,turno,parada";
-        if (!empty($std->numop)) {    
-            $sqlComm .= ",numop,qtd,uni,fator,setup,ops,velocidade,refile,aparas";
-        }
-        $sqlComm .= ") VALUES ("
-            . "'$std->maq',"
-            . "'$std->data',"
-            . "'$std->shifttimeini',"
-            . "'$std->shifttimefim',"
-            . "'$std->turno',"
-            . "'$std->parada'";
-        if (!empty($std->numop)) {    
-            $sqlComm .= ",'$std->numop',"
-                . "'$std->qtd',"
-                . "'$std->uni',"
-                . "'$std->fator',"
-                . "'$std->setup',"
-                . "'$std->ops',"
-                . "'$std->velocidade',"
-                . "'$std->refile',"
-                . "'$std->aparas'";
-        }
-        $sqlComm .= ");";  
-        echo $sqlComm;
-        die;
+        if ($std->modo !== 'i') {
+            $sqlComm = "UPDATE apontamentos SET "
+                . "maq='$std->maq',"
+                . "data='$std->data',"
+                . "shifttimeini='$std->shifttimeini',"
+                . "shifttimefim='$std->shifttimefim',"
+                . "turno='$std->turno',"
+                . "parada='$std->parada'";
+            if (!empty($std->numop)) {
+                 $sqlComm .= ",numop='$std->numop',"
+                    . "qtd='$std->qtd',"
+                    . "uni='$std->uni',"
+                    . "fator='$std->fator',"
+                    . "setup='$std->setup',"
+                    . "ops='$std->ops',"
+                    . "velocidade='$std->velocidade',"
+                    . "refile='$std->refile',"
+                    . "aparas='$std->aparas'";
+            }
+            $sqlComm .= "WHERE id='$std->modo';";
+        } else {
+            //maq,data,shifttimeini,shifttimefim,turno,parada,numop,qtd,uni,fator,setup,ops,velocidade,refile,aparas
+            $sqlComm = "INSERT INTO apontamentos ("
+                . "maq,data,shifttimeini,shifttimefim,turno,parada";
+            if (!empty($std->numop)) {    
+                $sqlComm .= ",numop,qtd,uni,fator,setup,ops,velocidade,refile,aparas";
+            }
+            $sqlComm .= ") VALUES ("
+                . "'$std->maq',"
+                . "'$std->data',"
+                . "'$std->shifttimeini',"
+                . "'$std->shifttimefim',"
+                . "'$std->turno',"
+                . "'$std->parada'";
+            if (!empty($std->numop)) {    
+                $sqlComm .= ",'$std->numop',"
+                    . "'$std->qtd',"
+                    . "'$std->uni',"
+                    . "'$std->fator',"
+                    . "'$std->setup',"
+                    . "'$std->ops',"
+                    . "'$std->velocidade',"
+                    . "'$std->refile',"
+                    . "'$std->aparas'";
+            }
+            $sqlComm .= ");";  
+            //echo $sqlComm;
+            //die;
+        }    
         if (!$this->dbase->execute($sqlComm)) {
             return "Não gravou DUPLICIDADE de dados.";
         }

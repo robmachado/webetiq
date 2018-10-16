@@ -100,6 +100,7 @@ class Takata extends LabelBase implements LabelsInterface
      * @var string
      */
     protected static $licplate = '';
+    protected static $licplatehuman = '';
     /**
      *
      * @var string
@@ -252,7 +253,7 @@ class Takata extends LabelBase implements LabelsInterface
             $template = str_replace('{data}', date('Y-m-d'), $template);
             $template = str_replace('{qtd}', number_format(self::$qtd, 3, '.', ''), $template);
             $template = str_replace('{lot}', self::formField('lot', self::$lot), $template);
-            $template = str_replace('{licplate}', self::$licplate, $template);
+            $template = str_replace('{licplate}', self::$licplatehuman, $template);
             $template = str_replace('{version}', self::$version, $template);
             $template = str_replace('{copias}', 1, $template);
             $response[] = $template;
@@ -270,7 +271,7 @@ class Takata extends LabelBase implements LabelsInterface
         $licplate = self::licPlate($seqnum, self::$lot);
         $bar2d  = '[)>' . self::RS . '06' . self::GS;
         $bar2d .= 'Z'  . self::$version . self::GS;
-        $bar2d .= '1J' . $licplate . self::GS;
+        $bar2d .= '' . $licplate . self::GS;
         $bar2d .= 'Q'  . self::formField('qtd', self::$qtd) . self::GS;
         $bar2d .= 'P'  . self::formField('part', self::$part) . self::GS;
         $bar2d .= 'V'  . self::formField('supplier', self::$supplier) . self::GS;
@@ -300,9 +301,15 @@ class Takata extends LabelBase implements LabelsInterface
     protected static function licPlate($seqnum, $lot)
     {
         $seqnumform = str_pad($seqnum, 3, "0", STR_PAD_LEFT);
-        $licplate = $lot . date('ymd', self::$datats) . $seqnumform;
-        $licplate = self::formField('licplate', $licplate);
-        self::$licplate = $licplate;
+        //                  7digitos                                                        0/1+5/6+3 = 9digitos LOTE com até 6 digitos
+        self::$licplate = '1J' . str_pad(self::$supplier, 7, '0', STR_PAD_LEFT) . substr(str_pad($lot.$seqnumform, 9, '0', STR_PAD_LEFT), -9);
+        self::$licplatehuman = str_pad(self::$supplier, 7, '0', STR_PAD_LEFT) . ' ' . substr(str_pad($lot.$seqnumform, 9, '0', STR_PAD_LEFT), -9);
+        
+        //$seqnumform = str_pad($seqnum, 3, "0", STR_PAD_LEFT);
+        //$licplate = $lot . date('ymd', self::$datats) . $seqnumform;
+        //$licplate = self::formField('licplate', $licplate);
+        //self::$licplate = $licplate;
+        //self::$licplatehuman = $licplate;
         return $licplate;
     }
     

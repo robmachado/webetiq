@@ -174,6 +174,8 @@ class DBase
                 $this->rollbackTrans();
             }
             throw new RuntimeException("Falha em execute: " . $e->getMessage());
+        } catch (\Exception $e) {
+            throw new RuntimeException("Falha em execute: " . $e->getMessage());
         }
         return $flag;
     }
