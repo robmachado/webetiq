@@ -37,6 +37,9 @@ class Render
             case 'TAKATA':
                 $layout = 'takata';
                 break;
+            case 'JOYSONcd src':
+                $layout = 'takata';
+                break;
             case 'SOMAPL':
                 $layout = 'somaplast';
                 break;
