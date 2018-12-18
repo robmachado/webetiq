@@ -83,6 +83,7 @@ if (!isset($numop) && !isset($customer)) {
     $html = str_replace("{{extras}}", '', $html);
     $html = str_replace("{{title}}", 'Romaneios', $html);
     $html = str_replace("{{content}}", $body, $html);
+    $html = str_replace("{{script}}", '', $html);
     echo $html;
 } elseif (isset($numop) && !isset($customer)) {
     $sqlComm = "SELECT * FROM orders WHERE id = $numop;";
@@ -113,19 +114,31 @@ if (!isset($numop) && !isset($customer)) {
         $pbruto = $r['pbruto'];
         $data = $r['data'];
         $block .= "$id|$seq|$pliq|$pbruto|$data|;";
-        $table .= "<tr><td><input type=\"checkbox\" class=\"form-check-input\" id=\"pc[$id]\" name=\"pc[$id]\" ></td><td>$seq</td><td>$pliq</td><td>$pbruto</td><td>$data</td></tr>";
+        $table .= "<tr><td><input type=\"checkbox\" class=\"form-check-input\" id=\"pc[$id]\" name=\"pc[$id]\" value=\"$pliq\" ></td><td>$seq</td><td>$pliq</td><td>$pbruto</td><td>$data</td></tr>";
     }
     $table .= "</tbody></table>";
-    
+    $script = '<script>
+        $(":checkbox").change((event) => {
+            let total = 0;
+            $(":checkbox").each(function() {
+                if (this.checked) {
+                    total += Number(this.value);
+                }
+            });
+            total = Math.round(total * 100) / 100
+            $("#total").val(total);
+            //console.log(total);
+        });</script>';
     $body = "
         <div class=\"container-fluid\" align=\"center\">
             <div class=\"row\">
-                <div class=\"col-md-3\"> </div>
+                <div class=\"col-md-3\"></div>
                 <div class=\"col-md-4\">
                     <center>
                     <h2>Romaneio OP $numop</h2>
                     </center>
                 </div>
+                <div class=\"col-md-3\">Peso Liq: <input type=\"text\" style=\"text-align:right;\" name=\"total\" value=\"\" size=\"30\" id=\"total\" readonly></div>
             </div>
             <div class=\"row\">
                 <div class=\"col-md-3\">$customer</div>
@@ -156,12 +169,13 @@ if (!isset($numop) && !isset($customer)) {
                 </div>
             </div>
             </form>
-        </div>    
+        </div>
     ";
     $html = file_get_contents('assets/main.html');
     $html = str_replace("{{extras}}", '', $html);
     $html = str_replace("{{title}}", 'Romaneios', $html);
     $html = str_replace("{{content}}", $body, $html);
+    $html = str_replace("{{script}}", $script, $html);
     echo $html;
 }
 
