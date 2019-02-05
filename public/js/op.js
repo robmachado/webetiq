@@ -1,3 +1,4 @@
+
 //aciona o processo de migração das ultimas OPs para o MySQL
 var waitingDialog = waitingDialog || (function ($) {
     'use strict';
@@ -56,6 +57,7 @@ var waitingDialog = waitingDialog || (function ($) {
 	}
     };
 })(jQuery);
+
 
 $('#btn1').on('click', function(event) {
     event.preventDefault();

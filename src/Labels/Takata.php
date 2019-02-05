@@ -288,8 +288,8 @@ class Takata extends LabelBase implements LabelsInterface
         $bar2d .= 'V'  . self::formField('supplier', self::$supplier) . self::GS;
         $bar2d .= '1T' . self::formField('lot', self::$lot) . self::GS;
         $bar2d .= 'K'  . self::formField('ped', self::$ped);
-        //$bar2d .=  . self::GS . '21L'  . self::formField('dock', self::$dock);
-        //$bar2d .=  . self::GS . 'N'  . self::formField('asn', self::$asn);
+        //$bar2d .= self::GS . '21L'  . self::formField('dock', self::$dock);
+        //$bar2d .= self::GS . 'N'  . self::formField('asn', self::$asn);
         $bar2d .= self::RS . self::EOT;
         self::$bar2d = $bar2d;
         self::make1D($licplate);
