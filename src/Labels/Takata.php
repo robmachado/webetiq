@@ -348,7 +348,7 @@ class Takata extends LabelBase implements LabelsInterface
             $value = number_format($value, 3, '.', '');
         }
         if ($aFrom[$key][2] == "") {
-            return $resp;
+            return $value;
         }
         $resp = str_pad($value, $aFrom[$key][1], $aFrom[$key][2], $aFrom[$key][3]);
         return $resp;
