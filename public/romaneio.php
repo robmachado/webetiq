@@ -98,7 +98,7 @@ if (!isset($numop) && !isset($customer)) {
     $table = "<table class=\"table\">
         <thead>
             <tr>
-                <th scope=\"col\">#</th>
+                <th scope=\"col\"><input type=\"checkbox\" class=\"form-check-input\" onchange=\"checkAll(this)\" name=\"chk[]\" value=\"0\"/></th>
                 <th scope=\"col\">Seq</th>
                 <th scope=\"col\">Peso Liq</th>
                 <th scope=\"col\">Peso Bruto</th>
@@ -128,7 +128,25 @@ if (!isset($numop) && !isset($customer)) {
             total = Math.round(total * 100) / 100
             $("#total").val(total);
             //console.log(total);
-        });</script>';
+        });
+        function checkAll(ele) {
+            var checkboxes = document.getElementsByTagName("input");
+            if (ele.checked) {
+                for (var i = 0; i < checkboxes.length; i++) {
+                    if (checkboxes[i].type == "checkbox") {
+                        checkboxes[i].checked = true;
+                    }
+                }
+            } else {
+                for (var i = 0; i < checkboxes.length; i++) {
+                    console.log(i)
+                    if (checkboxes[i].type == "checkbox") {
+                        checkboxes[i].checked = false;
+                    }
+                }
+            }
+        }
+        </script>';
     $body = "
         <div class=\"container-fluid\" align=\"center\">
             <div class=\"row\">
