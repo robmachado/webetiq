@@ -26,7 +26,7 @@ class Render
         }
         
         //localizar o template
-        $costumer = strtoupper(substr($lbl->cliente, 0, 6));
+        $costumer = trim(strtoupper(substr($lbl->cliente, 0, 6)));
         switch($costumer) {
             case 'NEFAB':
                 $layout = 'nefab';
@@ -34,10 +34,15 @@ class Render
             case 'VISTEO':
                 $layout = 'visteon';
                 break;
+	    case 'SMRC':
+	    case 'SMRCG':
+            case 'SMRCS':
+                $layout = 'visteon';
+                break;
             case 'TAKATA':
                 $layout = 'takata';
                 break;
-            case 'JOYSONcd src':
+            case 'JOYSON':
                 $layout = 'takata';
                 break;
             case 'SOMAPL':

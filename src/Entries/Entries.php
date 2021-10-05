@@ -9,13 +9,13 @@ use Webetiq\DateTime\DateTime;
 class Entries
 {
     private $dbase;
-    
+
     public function __construct()
     {
         $config = json_encode(['host' => 'localhost','user'=>'root', 'pass'=>'monitor5', 'db'=>'legacy']);
         $this->dbase = new DBase($config);
     }
-    
+
     public function getMaquinas($data)
     {
         $filter = '';
@@ -33,14 +33,14 @@ class Entries
         $sqlComm = "SELECT * FROM maquinas $filter ORDER BY maq;";
         return $this->dbase->query($sqlComm);
     }
-    
-    
+
+
     public function getCodParadas()
     {
         $sqlComm = "SELECT * FROM motivoparada ORDER BY id;";
         return $this->dbase->query($sqlComm);
     }
-    
+
     public function getAll($maq, $dia)
     {
         $sqlComm = "SELECT ap.*, pa.descricao FROM apontamentos ap "
@@ -54,14 +54,14 @@ class Entries
             $minI = DateTime::convertShiftModeToDec($d['shifttimeini']);
             //$dif = $minF-$minI;
             $dif = ($d['shifttimefim']-$d['shifttimeini']) * 60;
-            
+
             $tot += $dif;
             $hIn = DateTime::convertDecToTime($minI);
             $hOut = DateTime::convertDecToTime($minF);
             $cod = $d['parada'].'-Em Operação';
             if ($d['parada'] !== '0') {
                 $cod = $d['parada'].'-'.$d['descricao'];
-            } 
+            }
             $op = $d['numop'];
             $r[] = [
                 'id' => $d['id'],
@@ -75,7 +75,7 @@ class Entries
         }
         return ['totmin'=> $tot, 'lanc' => $r];
     }
-    
+
     public function delete($id)
     {
         $sqlComm = "DELETE FROM apontamentos WHERE id='$id';";
@@ -84,9 +84,15 @@ class Entries
         }
         return true;
     }
-    
+
     public function save(stdClass $std)
     {
+	$m = substr($std->maq,0,1);
+        $uni = 'KG';
+        if ($m == 'C') {
+	    $uni = 'PC';
+        }
+
         if ($std->modo !== 'i') {
             $sqlComm = "UPDATE apontamentos SET "
                 . "maq='$std->maq',"
@@ -98,7 +104,7 @@ class Entries
             if (!empty($std->numop)) {
                  $sqlComm .= ",numop='$std->numop',"
                     . "qtd='$std->qtd',"
-                    . "uni='$std->uni',"
+                    . "uni='$uni',"
                     . "fator='$std->fator',"
                     . "setup='$std->setup',"
                     . "ops='$std->ops',"
@@ -111,7 +117,7 @@ class Entries
             //maq,data,shifttimeini,shifttimefim,turno,parada,numop,qtd,uni,fator,setup,ops,velocidade,refile,aparas
             $sqlComm = "INSERT INTO apontamentos ("
                 . "maq,data,shifttimeini,shifttimefim,turno,parada";
-            if (!empty($std->numop)) {    
+            if (!empty($std->numop)) {
                 $sqlComm .= ",numop,qtd,uni,fator,setup,ops,velocidade,refile,aparas";
             }
             $sqlComm .= ") VALUES ("
@@ -121,10 +127,10 @@ class Entries
                 . "'$std->shifttimefim',"
                 . "'$std->turno',"
                 . "'$std->parada'";
-            if (!empty($std->numop)) {    
+            if (!empty($std->numop)) {
                 $sqlComm .= ",'$std->numop',"
                     . "'$std->qtd',"
-                    . "'$std->uni',"
+                    . "'$uni',"
                     . "'$std->fator',"
                     . "'$std->setup',"
                     . "'$std->ops',"
@@ -132,10 +138,10 @@ class Entries
                     . "'$std->refile',"
                     . "'$std->aparas'";
             }
-            $sqlComm .= ");";  
+            $sqlComm .= ");";
             //echo $sqlComm;
             //die;
-        }    
+        }
         if (!$this->dbase->execute($sqlComm)) {
             return "Não gravou DUPLICIDADE de dados.";
         }

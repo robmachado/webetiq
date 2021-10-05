@@ -7,9 +7,8 @@ require_once '../bootstrap.php';
 //o numero da bobina é sequencial e não leva em consideração o numero da maquina
 //por principio uma OP é produzida por uma unica extrusora
 
-$script = '';
 
-$script22 = "<script type=\"text/javascript\" language=\"javascript\">"
+$script = "<script type=\"text/javascript\" language=\"javascript\">"
     . "
         qz.security.setCertificatePromise(function(resolve, reject) {
             $.ajax(\"assets/signing/plastfoam-certificate.txt\").then(resolve, reject);
@@ -117,9 +116,8 @@ $script22 = "<script type=\"text/javascript\" language=\"javascript\">"
     
     "
     . "</script>";
-
-$extras = '';
-$extras222 = "<script type=\"text/javascript\" language=\"javascript\">
+        
+$extras = "<script type=\"text/javascript\" language=\"javascript\">
             $(document).ready(function() {
                 $('#numop').focus();
                 $('#numop').on('keydown', function(event) {
@@ -186,9 +184,9 @@ $extras222 = "<script type=\"text/javascript\" language=\"javascript\">
                     //console.log('Aqui '+nop);
                     $.getJSON('retopdata.php?op='+nop, function (data) {
                         //console.log(data);
-                        $('#cod').attr('value', data.code);
-                        $('#seq').attr('value', data.lastbob+1);
-                        $('#desc').attr('value', data.description);
+                        $('#cod').attr('value', data.cod);
+                        $('#seq').attr('value', data.seq);
+                        $('#desc').attr('value', data.desc);
                         $('#ext').focus();
                     });
                 }    

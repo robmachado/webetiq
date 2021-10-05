@@ -2,8 +2,9 @@
 
 namespace Webetiq;
 
-use Webetiq\DBase\DBase;
-use Webetiq\Ops;
+use Webetiq\DBase;
+use Webetiq\Op;
+use Webetiq\Products;
 
 class Extruder {
     
@@ -15,12 +16,13 @@ class Extruder {
     public $ext;
     public $data;
     public $operador;
-        
+    
     private $dbase;
     
-    public function __construct(DBase $dbase)
+    public function __construct()
     {
-        $this->dbase = $dbase;
+        $this->dbase = new DBase();
+        $this->dbase->setDBname('production');
         $this->dbase->connect();
     }
     
@@ -43,28 +45,27 @@ class Extruder {
     
     public function get($opnum)
     {
-        $sqlComm = "SELECT "
-            . "ord.id,"
-            . "ord.customer,"
-            . "ord.code,"
-            . "ord.description,"
-            . "max(ext.seq) as lastbob "
-            . "FROM orders ord "
-            . "LEFT JOIN extruders ext ON ext.lote = ord.id "
-            . "WHERE ord.id = '$opnum'";
+        //get OP
+        $op = new Op();
+        $op->get($opnum);
+        $desc = $op->produto;
+        $op = null;
         
-        $rows = $this->dbase->query($sqlComm);
+        //get Produto
+        $prod = new Products();
+        $resp = $prod->get($desc);
+        $cod = $prod->codigo;
+        $prod = null;
+        
+        $sqlComm = "SELECT max(seq) FROM extruders WHERE lote='$opnum'";
+        $rows = $this->dbase->querySql($sqlComm);
         if (! empty($rows)) {
-            foreach ($rows[0] as $key=> $value) {
-                if (!is_numeric($key)) {
-                    $op[$key] = $value;
-                }    
+            foreach ($rows as $row) {
+                $seq = $row[0];
             }
         }
-        if (empty($op['lastbob'])) {
-            $op['lastbob'] = 0;
-        }
-        return $op;
+        $seq += 1;
+        return ['op' => $opnum, 'seq' => $seq, 'cod' => $cod, 'desc' => $desc];
     }
     
     public function save()

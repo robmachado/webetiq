@@ -207,18 +207,13 @@ $script = "<script type=\"text/javascript\">
     
     function isSunday() {
         var d = document.getElementById('data').value;
-        var hoje = new Date();
         var myDate = new Date(d);
-        if (myDate > hoje) {
-            alert('A data não pode ser maior que a de hoje');
-        }
         //alert(myDate.getDay());
         if (myDate.getDay() == 6) { 
             //alert('Domingo');
             document.getElementById('hrFim').value = '06:00';
             document.getElementById('parada').value = '5-Domingo/Feriado';
         }
-        return true;
     }
     
     var insertPeriod = function(x,y) {

@@ -251,7 +251,7 @@ if (!empty($pc)) {
     $table .= "</tbody></table>";
     $cabec .= "<h4>Total Liquido: " . number_format($totPLiq, 2, ',', '.') ." kg</h4>" ;
     $cabec .= "<h4>Total Bruto: " . number_format($totPBruto, 2, ',', '.') ." kg</h4><br><br>" ;
-    $sql = "UPDATE extruders SET romaneado=1 WHERE id IN ($list)";
+    
     
     $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
     $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
@@ -278,9 +278,14 @@ EOD;
         . "'" . date('Y-m-d H:i:s') . "', "
         . "'" . $numop . "', "
         . "'" . $pdfstring . "');";
-    
-    $resp = $db->execute($sql);
     $resp = $db->execute($sqlComm);
+
+    $sqlComm = "SELECT MAX(id) FROM romaneios;";
+    $resp = $db->query($sqlComm);
+    $rom = $resp[0][0];
+    $sql = "UPDATE extruders SET romaneado=$rom WHERE id IN ($list);";
+    $resp = $db->execute($sql);
+
     header('Content-Type: application/pdf');
     echo gzdecode(base64_decode($pdfstring));
 }

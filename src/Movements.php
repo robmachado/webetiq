@@ -34,7 +34,7 @@ class Movements
     {
         $flag = true;
         $this->dbase->beginTrans();
-        $pb = ! empty($lbl->pesoBruto) ? $lbl->pesoBruto : 0;
+	$pb = ! empty($lbl->pesoBruto) ? $lbl->pesoBruto : 0;
         $pl = ! empty($lbl->pesoLiq) ? $lbl->pesoLiq : 0;
         if (count($blbl) == 1) {
             //insere uma vez ajustando o numero do volume = ant + copias

@@ -5,7 +5,6 @@ require_once '../bootstrap.php';
 
 use Webetiq\Entries\Entries;
 
-$id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_STRING);
 $numop = filter_input(INPUT_POST, 'numop', FILTER_SANITIZE_STRING);
 $fase = filter_input(INPUT_POST, 'fase', FILTER_SANITIZE_STRING);
 $maq = filter_input(INPUT_POST, 'maq', FILTER_SANITIZE_STRING);

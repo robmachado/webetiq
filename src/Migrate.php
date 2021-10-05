@@ -101,7 +101,7 @@ class Migrate
         }
         $registro = explode('|', $reg);
         $num = count($registro);
-        if ($num != 90) {
+        if ($num != 91) {
             throw new \RuntimeException("Dados errados na linha. ");
         }
         $desc = $registro[0];

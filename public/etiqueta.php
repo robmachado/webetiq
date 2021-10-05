@@ -9,9 +9,6 @@ require_once '../bootstrap.php';
  * Mostra essas informações na tela e pede outras informações
  * depois de completar os dados requeridos passa os dados para
  * impressão
- * 
- * Mostra o total já registrado
- * SELECT SUM(amount*labels) AS qtd, SUM(netweight*labels) AS peso FROM  `movements` WHERE  `op_id`='67450'
  */
 use Webetiq\DBase\DBase;
 use Webetiq\Ops;
@@ -22,6 +19,8 @@ use Webetiq\Units;
 
 $config = json_encode(['host' => 'localhost','user'=>'root', 'pass'=>'monitor5', 'db'=>'blabel']);
 $dbase = new DBase($config);
+$flag = '';
+$mensagem = '';
 
 $oPrinters = new Printers($dbase);
 $oOPs = new Ops($dbase);
@@ -65,7 +64,66 @@ $lbl->pedido = $op->salesorder;
 $lbl->numop = $op->id;
 $lbl->qtdade = $op->packagedamount;
 $lbl->unidade = $op->salesunit;
-    
+
+if ($op->customer == 'TAKATA' || $op->customer == 'JOYSON') {
+    $valids = [
+        '405000000043' => 'PEBD-S4530',
+        '409900000009' => 'PEBD-S3367',
+        '409900000010' => 'PEBD-S3368',
+        '350-0001' => 'PEAD-S0001',
+        '350-0002' => 'PEAD-S0002',
+        '350-0006' => 'PEAD-S0006',
+        '350-0013' => 'PEAD-S0013',
+        '350-0019' => 'PEBD-S0019',
+        '350-0020' => 'PEAD-S0020',
+        '350-0025' => 'PEAD-S0025',
+        '350-0033' => 'PEAD-S0033',
+        '350-0047' => 'PEAD-S0047',
+        '350-0048' => 'PEAD-S0048',
+        '350-0060' => 'PEAD-S0060',
+        '350-0066' => 'PEAD-S0066',
+        '350-0068' => 'PEBD-S0068',
+        '350-0093' => 'PEAD-L0001',
+        '350-0096' => 'BOLH-S1203',
+        '350-0101' => 'BOLH-S1207',
+        '350-0103' => 'BOLH-S1265',
+        '350-0105' => 'BOLH-S1284',
+        '350-0111' => 'PEAD-S3242',
+        '350-0112' => 'PEBD-S2240',
+        '350-0114' => 'PEBD-S2239',
+        '350-0116' => 'PEBD-S2238',
+        '350-0120' => 'PEBD-S2237',
+        '350-0124' => 'BOLH-S1339',
+        '350-0127' => 'PEBD-S3472',
+        '355-0011' => 'MANT-L0001',
+        '355-0024' => 'MANT-S0001',
+        '355-0025' => 'MANT-L0002',
+        '355-0033' => 'MANT-L0003',
+        '650-0019' => 'PEAD-S0095',
+        '355-0136' => 'PEAD-S2040',
+        '350-0136' => 'PEAD-S2040',
+    ];
+    $flip = array_flip($valids);
+    $lbl->codcli = str_replace('.', '-', trim($lbl->codcli));
+    if (!array_key_exists($lbl->codcli, $valids)) {
+        //procura o codigo do cliente pelo codigo interno
+        if (array_key_exists($lbl->cod, $flip)) {
+            $lbl->codcli = $flip[$lbl->cod];
+            $mensagem = "<h3>O código do cliente esta errado, avise o PCP.</h3>";
+        } else {
+            $flag = 'disabled';
+            $mensagem = "<h3>O código do cliente esta errado, avise o PCP. Essa etiqueta não será impressa!</h3>";
+        }
+    } elseif ($lbl->cod !== $valids[$lbl->codcli]) {
+        if (array_key_exists($lbl->cod, $flip)) {
+            $lbl->codcli = $flip[$lbl->cod];
+            $mensagem = "<h3>O código do cliente esta errado [$op->customercode] o correto é [$lbl->codcli], avise o PCP.</h3>";
+        } else {
+            $flag = 'disabled';
+            $mensagem = "<h3>O código do cliente esta errado, avise o PCP. Essa etiqueta não será impressa!</h3>";
+        }
+    }
+}
 
 if ($lbl->numdias == 0) {
     $lbl->numdias == 365;
@@ -93,6 +151,7 @@ $title = "Dados da OP";
 $body = "
 <center>
 <h2>Gerador de Etiquetas</h2>
+$mensagem
 </center>
 <div class=\"container\">
     <form role=\"form\" name=\"form\" id=\"form\" method=\"POST\" action=\"process.php\">
@@ -133,7 +192,7 @@ $body = "
                     <input type=\"number\" min=\"0\" class=\"form-control\" id=\"copias\" name=\"copias\" value=\"$lbl->copias\" placeholder=\"Entre com o numero de etiquetas\" required>
                 </div>
                 $selPrintGroup
-                <button type=\"submit\" class=\"btn btn-info\"><span class=\"glyphicon glyphicon-print\"></span> Imprimir & Salvar </button>
+                <button type=\"submit\" class=\"btn btn-info\" $flag><span class=\"glyphicon glyphicon-print\"></span> Imprimir & Salvar </button>
             </div>
             <div class=\"col-md-2\"></div>
             <div class=\"col-md-5\">

@@ -1,3 +1,4 @@
+
 <?php
 ini_set("display_errors", 1);
 error_reporting(E_ALL);
@@ -10,54 +11,72 @@ $data= filter_input(INPUT_POST, 'data', FILTER_SANITIZE_STRING);
 
 $cont = "";
 if (!empty($maq) && !empty($data)) {
+    $maq = strtoupper($maq);
+    $d = explode('.', $data);
+    $dia = "20{$d[2]}-{$d[1]}-{$d[0]}";
     //buscar os dados lançados e colocar em uma tabela
-    $sqlComm = "SELECT ap.*, pa.descricao FROM apontamentos ap INNER JOIN motivoparada pa ON ap.parada = pa.id "
+    $sqlComm = "SELECT ap.*, pa.descricao FROM apontamentos ap LEFT JOIN motivoparada pa ON ap.parada = pa.id "
         . "WHERE ap.maq='$maq' AND ap.data='$dia' ORDER BY ap.shifttimeini";
     $resp = Request::get($sqlComm);
-    echo "<pre>";
-    print_r($reps);
-    echo "</pre>";
-    die;
     if (!empty($resp)) {
         $cont = "<div class=\"row\">"
             . "<table class=\"table table-hover\" id=\"some-table\" data-provide=\"datagrid\">"
             . "<thead>"
             . "<tr>"
             . "<th>#</th>"
-            . "<th>OP</th>"
-            . "<th>Fase</th>"
+            . "<th>Maq</th>"
+            . "<th>Data</th>"
             . "<th>Inicio</th>"
             . "<th>Fim</th>"
-            . "<th>Maquina</th>"
-            . "<th>Operador</th>"
+            . "<th>Turno</th>"
+            . "<th>Parada</th>"
+            . "<th>OP</th>"
             . "<th>Qtd</th>"
             . "<th>Uni</th>"
-            . "<th>Sucata</th>"                
+            . "<th>Fator</th>"
+            . "<th>SetUP</th>"
+            . "<th>Ops</th>"
+            . "<th>Vel.</th>"
+            . "<th>Refile</th>"
+            . "<th>Aparas</th>"
             . "</tr>"
             . "</thead>"
             . "<tbody>";
         foreach ($resp as $r) {
             $id = $r['id'];
-            $numop = $r['numop'];
-            $fase = $r['fase'];
-            $datain = $r['datain'];
-            $datafim = $r['datafim'];
             $maq = $r['maq'];
-            $operador = $r['operador'];
+            $data = $r['data'];
+            $inicio = $r['shifttimeini'];
+            $fim = $r['shifttimefim'];
+            $turno = $r['turno'];
+            $parada = $r['parada'];
+            $numop = $r['numop'];
             $qtd = $r['qtd'];
             $uni = $r['uni'];
-            $sucata = $r['sucata'];
+            $fator = $r['fator'];
+            $setup = $r['setup'];
+            $ops = $r['ops'];
+            $vel = $r['velocidade'];
+            $refile = $r['refile'];
+            $aparas = $r['aparas'];
+
             $cont .= "<tr class=\"active\">"
-                    . "<td>$id</td>"                    
-                    . "<td>$numop</td>"
-                    . "<td data-type=\"selectFase\" data-value=\"$fase\">$fase</td>"
-                    . "<td data-type=\"datetime\" data-value=\"$datain\">$datain</td>"
-                    . "<td>$datafim</td>"
+                    . "<td>$id</td>"
                     . "<td>$maq</td>"
-                    . "<td>$operador</td>"
+                    . "<td data-type=\"datetime\" data-value=\"$data\">$data</td>"
+		    . "<td>$inicio</td>"
+		    . "<td>$fim</td>"
+                    . "<td>$turno</td>"
+                    . "<td>$parada</td>"
+                    . "<td>$numop</td>"
                     . "<td>$qtd</td>"
                     . "<td>$uni</td>"
-                    . "<td>$sucata</td>"
+                    . "<td>$fator</td>"
+                    . "<td>$setup</td>"
+                    . "<td>$ops</td>"
+                    . "<td>$vel</td>"
+                    . "<td>$refile</td>"
+                    . "<td>$aparas</td>"
                     . "</tr>";
         }
         $cont .= "</tbody></table></div>";
@@ -179,19 +198,19 @@ $body = "
         <center>
         <h2>Pesquisa/Manutenção dos Lançamentos de Produção</h2>
         </center>
-    </div> 
+    </div>
     <form role=\"form\" method=\"POST\" action=\"manu.php\" autocomplete=\"off\">
         <div class=\"row\">
             <div class=\"col-md-3\"></div>
             <div class=\"col-md-3\">
-                <label for=\"maq\">Maquina</label> 
+                <label for=\"maq\">Maquina</label>
                 <div class=\"input-group\">
                     <input type=\"text\" class=\"form-control\" id=\"maq\" name=\"maq\" value=\"$maq\" autofocus placeholder=\"Entre com a maquina\" required>
                 </div>
             </div>
             <div class=\"col-md-3\">
                 <div class=\"input-group\">
-                    <label for=\"data\">Data</label> 
+                    <label for=\"data\">Data</label>
                     <div class=\"input-group\">
                         <input type=\"text\" pattern=\"\d{2}\.\d{2}\.\d{2}\" title=\"dd.mm.yy\" class=\"form-control\" id=\"data\" name=\"data\" value=\"$data\" onfocusout=\"isSunday(event);\" placeholder=\"Data ex.12.12.17\" required>
                         <span class=\"input-group-btn\">
@@ -199,13 +218,13 @@ $body = "
                         </span>
                     </div>
                 </div>
-            </div>            
+            </div>
             <div class=\"col-md-3\"></div>
-        </div>    
+        </div>
         <br/>
-        <div class=\"row\">    
+        <div class=\"row\">
             <div class=\"col-md-12\">$alert</div>
-        </div>    
+        </div>
     </form>
 </div><br/>$cont<br/>
 ";

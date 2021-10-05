@@ -1,5 +1,5 @@
 # Criação de Certificados (Auto Assinados)
-Extraido do [original](https://jamielinux.com/docs/openssl-certificate-authority/create-the-root-pair.html) 
+Extraido do [original](https://jamielinux.com/docs/openssl-certificate-authority/create-the-root-pair.html)
 # Certificado raiz (CA root)
 
 ## Prepare o diretorio

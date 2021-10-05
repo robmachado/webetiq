@@ -11,10 +11,10 @@ class Request
         if (empty($sqlComm)) {
             return [];
         }
-        
         $config = json_encode(['host' => 'localhost','user'=>'root', 'pass'=>'monitor5', 'db'=>'legacy']);
         $dbase = new DBase($config);
         $dbase->connect();
         return $dbase->query($sqlComm);
     }
 }
+
